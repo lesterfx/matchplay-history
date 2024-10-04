@@ -35,16 +35,29 @@
 			}
 			$('#log').append($('<pre>').text(message))
 		}
-		function load(src) {
+		async function load(src) {
 			try {
 				let time = Date.now()
-				var script = document.createElement(script)
-				script.src = `${src}?t=${time}`
-				document.head.appendChild(script)
+				let src = `${src}?t=${time}`
+				await loader(src)
+				log("script successfully loaded"); 
 			} catch (err) {
-				log('load error f')
+				log("error loading");
 				log(err)
 			}
+		}
+		function loader(scriptUrl){
+			return new Promise(function (res, rej) {
+				let script = document.createElement('script');
+				script.src = scriptUrl;
+				script.type = 'text/javascript';
+				script.onerror = rej;
+				script.async = true;
+				script.onload = res;
+				script.addEventListener('error',rej);
+				script.addEventListener('load',res);
+				document.head.appendChild(script);
+			})
 		}
 		log('begin')
 		try {
@@ -52,7 +65,7 @@
 		} catch (err) {
 			alert(err)
 		}
-		log('loaded')
+		log('load call finished')
 		</script>
 	</body>
 </html>
