@@ -26,7 +26,7 @@
 			let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
 			alert('error done')
 		}
-		let log = function (message) {
+		let log = function (obj) {
 			$('#log').append($('<li>').append($('<pre>').text(JSON.stringify(obj, null, 2))))
 		}
 		function load(src) {
