@@ -103,7 +103,7 @@ async function get_other() {
 	let tournament = my_tournaments[0]
 	let active_games = await get_games_from_tournament(tournament)
 }
-function main() {
+function premain() {
     alert('c')
     let token = localStorage.getItem('token')
 	if (!token) {
@@ -112,13 +112,14 @@ function main() {
 		$('#token-form').on('submit', function (event) {
 			event.preventDefault()
 			localStorage.setItem('token', $('#token').val())
+			main()
 		})
 	} else {
 		$('#token-entry').hide()
+		main()
 	}
-    alert(token)
 }
-async function get() {
+async function main() {
 	await get_me()
 	my_tournaments = await get_my_tournaments()
 	await get_other()
@@ -139,7 +140,7 @@ log('hello world')
 ////////////////////////////////////////////////////////////////
 
 $(function() {
-	main()
+	premain()
 });
 
 function add_player_button(uid) {
