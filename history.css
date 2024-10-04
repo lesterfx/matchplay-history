@@ -18,6 +18,9 @@ div.box.button {
 div.box.button:active {
     background: #ccc;
 }
+div.box.game.active {
+    background: #aaa;
+}
 #token-entry {
     display: none;
 }
@@ -33,4 +36,7 @@ div.box.button:active {
 }
 .windowerror {
     background: rgb(255, 119, 119);
+}
+.spacer {
+    flex-grow: 1;
 }

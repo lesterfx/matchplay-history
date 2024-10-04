@@ -188,14 +188,22 @@ async function get_tournament_details(tournament) {
 }
 async function get_other() {
 	let tournament = my_tournaments[0]
-	let active_games = await get_games_from_tournament(tournament)
+	let active_games = await get_games_from_tournament(tournament).reverse()
+	$('#active-tournament-title').append(title('tournament', tournament))
+	let got_one = false
 	active_games.forEach(function (game) {
-		game.userIds.forEach((uid) => {
-			if (uid == myUserId) return
-			active_players[uid] = true
-		})
-		add_active_game(game)
+		if (!got_one) {
+			game.userIds.forEach((uid) => {
+				if (uid == myUserId) return
+				active_players[uid] = true
+			})
+		}
+		add_active_game(game, got_one)
+		got_one = true
 	})
+}
+async function merge_tournaments() {
+
 }
 function premain() {
     token = localStorage.getItem('token')
@@ -216,7 +224,7 @@ async function main() {
 	await get_me()
 	my_tournaments = await get_my_tournaments()
 	await get_other()
-
+	await merge_tournaments()
 	//todo.push(merge_tournaments)
 	//todo.push(get_games_from_tournaments)
 	//todo.push(get_missing_tournament_details)
@@ -240,7 +248,7 @@ function insertSorted(element, parent) {
 	let added = false
 	let etext = $(element).text()
 	parent.children().each(function(){
-		if ($(this).text().localeCompare(etext, 'en', {'sensitivity': 'base'})) {
+		if (($(this).text()) < etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
 			$(element).insertBefore($(this))
 			added = true;
 			return false;
@@ -255,7 +263,7 @@ function add_player_button(uid) {
 }
 
 function title(kind, id) {
-	let element = $('<div>')
+	let element = $('<span>')
 	element.addClass(kind+'-name').data('id', id)
 	let name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id)
 	element.text(name)
@@ -266,14 +274,22 @@ function save_data(kind, obj) {
 	all_data[kind][id] = obj
 	$(`.${kind}-title[data-id="${id}"`).text(obj.name)
 }
-function add_active_game(game) {
+function spacer() {
+	return $('<div>').addClass('spacer')
+}
+function add_active_game(game, active) {
 	log(game)
 	let box = $('<div>').addClass('game box')
+	if (active) {
+		box.addClass('active')
+	}
 	title('arena', game.arenaId).appendTo(box)
+	spacer().appendTo(box)
 	title('tournament', game.tournamentId).appendTo(box)
+	spacer().appendTo(box)
 	let plist = $('<ol>').addClass('players').appendTo(box)
 	game.userIds.forEach(function (uid) {
-		title('player', uid).appendTo(plist)
+		$('<li>').append(title('player', uid)).appendTo(plist)
 	})
 	$('#active-games').append(box)
 }
