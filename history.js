@@ -33,8 +33,9 @@ async function get(options) {
 	}).always(function (response) {
 		logobj(response)
 	})
+	log('waiting...')
 	response = await requested
-	
+	log('got response')
 	return response.data
 };
 
