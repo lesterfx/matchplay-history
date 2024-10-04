@@ -127,6 +127,7 @@ async function get_tournaments(uid) {
 	})
 	data.forEach(function (tournament) {
 		tournament_by_id[tournament.tournamentId] = tournament
+		$(`.tournament-title[data-tournamentId="${tournament.tournamentId}"`).text(tournament.name)
 	})
 	return data
 }
@@ -239,8 +240,9 @@ $(function() {
 
 function insertSorted(element, parent) {
 	let added = false
+	let etext = $(element).text()
 	parent.children().each(function(){
-		if ($(this).text() > $(element).text()) {
+		if ($(this).text().localeCompare(etext, 'en', {'sensitivity': 'base'})) {
 			$(element).insertBefore($(this))
 			added = true;
 			return false;
@@ -259,8 +261,10 @@ function add_active_game(game) {
 	log(game)
 	let arenaId = game.arenaId
 	let name = arena_by_id[arenaId] || arenaId
+	let tournament = (tournament_by_id[game.tournamentId] && tournament_by_id[game.tournamentId].name) || game.tournamentId
 	let button = $('<div>').addClass('game box').data('gameId', game.gameId).data('arenaId', arenaId)
 	$('<div>').data('arenaId', arenaId).addClass('arena-title').text(name).appendTo(button)
+	$('<div>').data('tournamentId', game.tournamentId).addClass('tournament-title').text(tournament).appendTo(button)
 	$('<ol>').addClass('players').appendTo(button)
 	$('#active-games').append(button)
 }
