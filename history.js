@@ -126,11 +126,11 @@ function premain() {
 		$('#token-form').on('submit', function (event) {
 			event.preventDefault()
 			localStorage.setItem('token', $('#token').val())
-			main()
+			main().catch(alert)
 		})
 	} else {
 		$('#token-entry').hide()
-		main()
+		main().catch(alert)
 	}
 }
 async function main() {
@@ -156,7 +156,11 @@ log('hello world')
 ////////////////////////////////////////////////////////////////
 
 $(function() {
-	premain()
+	try {
+		premain()
+	} catch (err) {
+		alert(err)
+	}
 });
 
 function add_player_button(uid) {
