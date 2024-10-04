@@ -33,13 +33,18 @@
 			log(JSON.stringify(obj, null, 2))
 		}
 		function load(src) {
+			try {
 			let time = Date.now()
 			var script = document.createElement(script)
 			script.src = `${src}?t=${time}`
 			document.head.appendChild(script)
+			} catch (err) {
+				logobj(err)
+			}
 		}
 		log('begin')
 		load('history.js', 'script')
+		log('loaded')
 		</script>
 	</body>
 </html>
