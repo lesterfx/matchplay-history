@@ -73,14 +73,15 @@
 
 
 myUserId = 0
-tournament_by_id = {}
 my_tournaments = []
-player_names = {}
-all_players = {}
 active_players = {}
 my_pid_by_organizer = {}
-all_games = {}
-arena_by_id = {}
+all_data = {
+	player: {},
+	arena: {},
+	tournament: {},
+	game: {}
+}
 
 log('history begin')
 
@@ -123,11 +124,10 @@ async function get_my_tournaments() {
 async function get_tournaments(uid) {
 	let data = await get({
 		endpoint: 'tournaments',
-		query: {played: myUserId}
+		query: {played: uid}
 	})
 	data.forEach(function (tournament) {
-		tournament_by_id[tournament.tournamentId] = tournament
-		$(`.tournament-title[data-tournamentId="${tournament.tournamentId}"`).text(tournament.name)
+		save_data('tournament', tournament)
 	})
 	return data
 }
@@ -151,7 +151,7 @@ async function get_games_from_tournament(tournament) {
 		game.userIds.forEach(function (uid) {
 			if (uid == myUserId) return
 			if (active_players[uid]) {
-				all_games[game.gameId] = game
+				save_data('game', game)
 			}
 		})
 	})
@@ -175,16 +175,14 @@ async function get_tournament_details(tournament) {
 		if (uid == myUserId) {
 			pid = player.playerId
 		}
-		if (!all_players[uid]) {
-			all_players[uid] = player
+		if (!all_data.player[uid]) {
+			all_data.player[uid] = player
 			add_player_button(uid)
 		}
 	})
 	log('adding arenas')
 	tournament_details.arenas.forEach(function (arena) {
-		arena_by_id[arena.arenaId] = arena.name
-		$(`.arena-title[data-arenaId="${arena.arenaId}"`).text(arena.name)
-		log(arena.name)
+		save_data('arena', arena)
 	})
 	return pid
 }
@@ -252,21 +250,32 @@ function insertSorted(element, parent) {
 }
 
 function add_player_button(uid) {
-	let player = all_players[uid]
-	let button = $('<div>').addClass('player box button').text(player.name).data('userId', uid)
+	let button = title('player', uid).addClass('box button')
 	insertSorted(button, $('#players'))
 }
 
+function title(kind, id) {
+	let element = $('<div>')
+	element.addClass(kind+'-name').data('id', id)
+	let name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id)
+	element.text(name)
+	return element
+}
+function save_data(kind, obj) {
+	let id = obj[kind+'Id']
+	all_data[kind][id] = obj
+	$(`.${kind}-title[data-id="${id}"`).text(obj.name)
+}
 function add_active_game(game) {
 	log(game)
-	let arenaId = game.arenaId
-	let name = arena_by_id[arenaId] || arenaId
-	let tournament = (tournament_by_id[game.tournamentId] && tournament_by_id[game.tournamentId].name) || game.tournamentId
-	let button = $('<div>').addClass('game box').data('gameId', game.gameId).data('arenaId', arenaId)
-	$('<div>').data('arenaId', arenaId).addClass('arena-title').text(name).appendTo(button)
-	$('<div>').data('tournamentId', game.tournamentId).addClass('tournament-title').text(tournament).appendTo(button)
-	$('<ol>').addClass('players').appendTo(button)
-	$('#active-games').append(button)
+	let box = $('<div>').addClass('game box')
+	title('arena', game.arenaId).appendTo(box)
+	title('tournament', game.tournamentId).appendTo(box)
+	let plist = $('<ol>').addClass('players').appendTo(box)
+	game.userIds.forEach(function (uid) {
+		title('player', uid).appendTo(plist)
+	})
+	$('#active-games').append(box)
 }
 
 log('history end')
