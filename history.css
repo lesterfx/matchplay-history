@@ -1,19 +1,21 @@
-#players {
+.boxgroup {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 100%;
 }
-div.player.button {
+div.box {
     border: 1px solid #aaa;
     background: #ddd;
     border-radius: 10px;
     padding: 10px;
     margin: 5px;
     min-width: 10em;
+}
+div.box.button {
     cursor: pointer;
 }
-div.player.button:active {
+div.box.button:active {
     background: #ccc;
 }
 #token-entry {
@@ -23,4 +25,7 @@ div.player.button:active {
     background: #eee;
     padding: 2px;
     margin: 2px;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+    overflow-x: scroll;
 }

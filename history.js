@@ -1,4 +1,18 @@
-// 70 lines to not overlap the html file
+// 75 lines to not overlap the html file
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 60 lines to not overlap the html file
 
 
 
@@ -13,6 +27,7 @@
 
 
 
+// 45 lines to not overlap the html file
 
 
 
@@ -27,6 +42,7 @@
 
 
 
+// 30 lines to not overlap the html file
 
 
 
@@ -41,19 +57,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+// 15 lines to not overlap the html file
 
 
 
@@ -73,6 +77,7 @@ tournament_by_id = {}
 my_tournaments = []
 player_names = {}
 players = {}
+active_players = {}
 my_pid_by_organizer = {}
 all_games = {}
 arena_by_id = {}
@@ -95,18 +100,14 @@ async function get(options) {
 	request.dataType = 'json'
 	log(request.url)
 	let requested = $.get(request)
-	requested.done(function (e) {
-		log('done')
-	}).fail(function (e) {
+	requested.fail(function (e) {
 		log('error:')
 		log(e.toString())
 		throw e
 	}).always(function (response) {
 		log(response)
 	})
-	log('waiting...')
 	response = await requested
-	log('got response')
 	return response.data
 };
 
@@ -120,6 +121,7 @@ async function get_me() {
 async function get_my_tournaments() {
 	return await get_tournaments(myUserId)
 }
+
 async function get_tournaments(uid) {
 	let data = await get({
 		endpoint: 'tournaments',
@@ -154,7 +156,7 @@ async function get_games_from_tournament(tournament) {
 			}
 		})
 	})
-	log(all_games)
+	return all_games
 }
 async function get_tournament_details(tournament) {
 	let tid = tournament.tournamentId
@@ -173,11 +175,14 @@ async function get_tournament_details(tournament) {
 		if (uid == myUserId) {
 			pid = player.playerId
 		}
-		players[uid] = player
-		add_player_button(uid)
+		if (!players[uid]) {
+			all_players[uid] = player
+			add_player_button(uid)
+		}
 	})
 	tournament_details.arenas.forEach(function (arena) {
 		arena_by_id[arena.arenaId] = arena.name
+		$(`.arena-title[data-arenaId="${arena.arenaId}"`).text(arena.name)
 		log(arena.name)
 	})
 	return pid
@@ -185,14 +190,18 @@ async function get_tournament_details(tournament) {
 async function get_other() {
 	let tournament = my_tournaments[0]
 	let active_games = await get_games_from_tournament(tournament)
+	active_games.forEach(function (game) {
+		game.userIds.forEach((uid) => {
+			if (uid == myUserId) return
+			active_players[uid] = true
+		})
+		add_active_game(game)
+	})
 }
 function premain() {
-	log('b')
     token = localStorage.getItem('token')
 	if (!token) {
-		log('c')
-		$('#token-entry').show()
-		alert('token needed')
+	$('#token-entry').show()
 		$('#token-form').on('submit', async function (event) {
 			event.preventDefault()
 			token = $('#token').val()
@@ -200,14 +209,11 @@ function premain() {
 			main().catch(log)
 		})
 	} else {
-		log('d')
 		$('#token-entry').hide()
 		main().catch(log)
-		log('e')
 	}
 }
 async function main() {
-	log('f')
 	await get_me()
 	my_tournaments = await get_my_tournaments()
 	await get_other()
@@ -220,20 +226,15 @@ async function main() {
 ////////////////////////////////////////////////////////////////
 
 $(function() {
-	log('z')
 	try {
-		log('y')
 		premain()
-		log('x')
 	} catch (err) {
-		log('w')
 		log(err)
 	}
 	$('#players').on('click', '.player.button', function () {
-		let uid = $(this).data('uid')
+		let uid = $(this).data('userId')
 		alert(`player ${uid} clicked`)
 	})
-	log('v')
 });
 
 function insertSorted(element, parent) {
@@ -249,11 +250,16 @@ function insertSorted(element, parent) {
 }
 
 function add_player_button(uid) {
-	log('add_player_button')
-	let player = players[uid]
-	log(player)
-	let button = $('<div>').addClass('player button').text(player.name).data('uid', uid)
+	let player = all_players[uid]
+	let button = $('<div>').addClass('player box button').text(player.name).data('userId', uid)
 	insertSorted(button, $('#players'))
+}
+
+function add_active_game(game) {
+	let button = $('<div>').addClass('game box').data('gameId', game.gameId).data('arenaId'. game.arenaId)
+	$('<div>').data('arenaId'. game.arenaId).addClass('arena-title').text(arena_by_id[game.arenaId] || game.arenaId).appendTo(button)
+	$('<ol>').addClass('players').appendTo(button)
+	$('#active-games').append(button)
 }
 
 log('history end')

@@ -10,15 +10,23 @@
 <body>
 	<h1>history</h1>
 	<div id="token-entry">
+		<h2>API Token Required</h2>
 		<form id="token-form">
 			<input type="password" placeholder="api token" name="token" id="token">
 			<input type="submit">
 		</form>
 	</div>
 	<div id="main">
-		<div id="players"></div>
+		<div id="active-games" class="boxgroup">
+			<h2>Active Games</h2>
+		</div>
+		<div id="players" class="boxgroup">
+			<h2>All Players</h2>
+		</div>
 	</div>
-	<div id="log"></div>
+	<div id="log">
+		<h2>Log</h2>
+	</div>
 	<script>
 		window.onerror = function(error, url, line) {
 			let e = `${url}\nline ${line}\n\n${error}`
@@ -33,7 +41,6 @@
 				alert(obj)
 				message = obj.toString() + '\nLine:' + obj.line
 			} else {
-				alert(obj)
 				message = JSON.stringify(obj, null, 2)
 			}
 			$('#log').append($('<pre>').text(message))
