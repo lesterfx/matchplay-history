@@ -188,7 +188,8 @@ async function get_tournament_details(tournament) {
 }
 async function get_other() {
 	let tournament = my_tournaments[0]
-	let active_games = await get_games_from_tournament(tournament).reverse()
+	let active_games = await get_games_from_tournament(tournament)
+	active_games.reverse()
 	$('#active-tournament-title').append(title('tournament', tournament))
 	let got_one = false
 	active_games.forEach(function (game) {
