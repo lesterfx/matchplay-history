@@ -14,6 +14,8 @@ all_games = {}
 arena_by_id = {}
 
 async function get(options) {
+	log('hello?')
+	alert('hello?')
 	let request = {}
 	request.headers = headers
 	let base_url = 'https://app.matchplay.events/api/'
