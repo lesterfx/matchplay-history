@@ -33,24 +33,14 @@
 			alert(e)
 			let li = $('<pre>').addClass('windowerror').text(e).prependTo($('#log'))
 		}
+		function stringify(value) {
+			switch (typeof value) {
+				case 'string': case 'object': return JSON.stringify(value);
+				default: return String(value);
+			}
+		};
 		function log (obj) {
-			let message = String(obj)
-			if (typeof obj === "string") {
-				message = obj
-			} else if (typeof obj === "error") {
-				alert(obj)
-				message = obj.toString() + '\nLine:' + obj.line
-			} else {
-				message = String(obj)
-			}
-			if (message == '{}') {
-				alert(typeof obj)
-				alert(obj)
-				message = String(obj)
-			}
-			if (message == '[object Object]') {
-				alert('now what?? [object Object]???')
-			}
+			let message = stringify(obj)
 			$('#log').prepend($('<pre>').text(message))
 		}
 		async function load(src) {
