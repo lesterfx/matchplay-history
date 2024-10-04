@@ -1,27 +1,24 @@
-body {
-    background: #fafafa;
-  }
-  #players {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      max-width: 100%;
-  }
-  div.player.button {
-      border: 1px solid #aaa;
-      background: #ddd;
-      border-radius: 10px;
-      padding: 10px;
-      margin: 5px;
-      min-width: 10em;
-      cursor: pointer;
-  }
-  div.player.button:active {
+#players {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+div.player.button {
+    border: 1px solid #aaa;
+    background: #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 5px;
+    min-width: 10em;
+    cursor: pointer;
+}
+div.player.button:active {
     background: #ccc;
-  }
-  #token-entry {
+}
+#token-entry {
     display: none;
-  }
-  #log pre {
+}
+#log pre {
     background: #eee;
-  }
+}

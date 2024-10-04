@@ -27,10 +27,10 @@ async function get(options) {
 		log('done')
 	}).fail(function (e) {
 		log('error:')
-		logobj(e)
+		log(e)
 		throw e
 	}).always(function (response) {
-		logobj(response)
+		log(response)
 	})
 	log('waiting...')
 	response = await requested
@@ -82,7 +82,7 @@ async function get_games_from_tournament(tournament) {
 			}
 		})
 	})
-	logobj(all_games)
+	log(all_games)
 }
 async function get_tournament_details(tournament) {
 	let tid = tournament.tournamentId
@@ -95,7 +95,7 @@ async function get_tournament_details(tournament) {
 		}
 	})
 	let pid
-	// logobj(tournament_details)
+	// log(tournament_details)
 	tournament_details.players.forEach(function (player) {
 		let uid = player.claimedBy
 		if (uid == myUserId) {
@@ -123,11 +123,11 @@ function premain() {
 			event.preventDefault()
 			token = $('#token').val()
 			localStorage.setItem('token', token)
-			main().catch(logobj)
+			main().catch(log)
 		})
 	} else {
 		$('#token-entry').hide()
-		main().catch(logobj)
+		main().catch(log)
 	}
 }
 async function main() {
@@ -149,7 +149,8 @@ $(function() {
 		alert(err)
 	}
 	$('#players').on('click', '.player.button', function () {
-
+		let uid = $(this).data('uid')
+		alert(`player {uid} clicked`)
 	})
 });
 
@@ -167,7 +168,7 @@ function insertSorted(element, parent) {
 function add_player_button(uid) {
 	log('add_player_button')
 	let player = players[uid]
-	logobj(player)
+	log(player)
 	let button = $('<div>').addClass('player button').text(player.name).data('uid', uid)
 	insertSorted(button, $('#players'))
 }
