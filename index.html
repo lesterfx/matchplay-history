@@ -39,7 +39,11 @@
 			}
 		}
 		log('begin')
-		load('history.js', 'script')
+		try {
+			load('history.js', 'script')
+		} catch (err) {
+			log(err)
+		}
 		log('loaded')
 		</script>
 	</body>
