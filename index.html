@@ -9,7 +9,7 @@
   <script>
 	alert('H')
 	window.onerror = function(error, url, line) {
-		alert(`error ${error}\n${url}\nline ${line}`)
+		alert(`${url}\nline ${line}\n\n${error}`)
 		let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
 		alert('error done')
 	}
@@ -19,7 +19,7 @@
 	alert('j')
 	let s = document.createElement('script')
 	alert('k')
-	let t = (new Date()).now()
+	let t = Date.now()
 	alert('L')
 	s.src = `history.js?t=${t}`
 	alert('m')
