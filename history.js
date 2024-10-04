@@ -139,12 +139,6 @@ async function main() {
 	//todo.push(get_games_from_tournaments)
 	//todo.push(get_missing_tournament_details)
 }
-let log = function (message) {
-	$('#log').append($('<li>').append($('<pre>').text(message)))
-}
-let logobj = function (obj) {
-	log(JSON.stringify(obj, null, 2))
-}
 
 ////////////////////////////////////////////////////////////////
 
@@ -162,12 +156,12 @@ $(function() {
 function insertSorted(element, parent) {
 	parent.children().each(function(){
 		if ($(this).text() > $(element).text()) {
-			$(element).insertBefore($(this)).fadeIn("fast");
+			$(element).insertBefore($(this))
 			added = true;
 			return false;
 		}
 	});
-	if(!added) $(element).appendTo($(targetList)).fadeIn("fast");
+	if(!added) $(element).appendTo(parent)
 }
 
 function add_player_button(uid) {

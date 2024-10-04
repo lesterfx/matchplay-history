@@ -6,23 +6,6 @@
   <title>history</title>
   <link rel="stylesheet" href="history.css" />
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-  <script>
-	window.onerror = function(error, url, line) {
-		let e = `${url}\nline ${line}\n\n${error}`
-		alert(e)
-		let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
-		alert('error done')
-	}
-  </script>
-  <script>
-	function load(src) {
-		let time = Date.now()
-		var script = document.createElement(script)
-		script.src = `${src}?t=${time}`
-		document.head.appendChild(script)
-	}
-	load('history.js', 'script')
-	</script>
 </head>
 <body>
 	<h1>history</h1>
@@ -36,5 +19,27 @@
 		<div id="players"></div>
 	</div>
 	<ul id="log"></ul>
-</body>
+	<script>
+		window.onerror = function(error, url, line) {
+			let e = `${url}\nline ${line}\n\n${error}`
+			alert(e)
+			let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
+			alert('error done')
+		}
+		let log = function (message) {
+		$('#log').append($('<li>').append($('<pre>').text(message)))
+		}
+		let logobj = function (obj) {
+			log(JSON.stringify(obj, null, 2))
+		}
+		function load(src) {
+			let time = Date.now()
+			var script = document.createElement(script)
+			script.src = `${src}?t=${time}`
+			document.head.appendChild(script)
+		}
+		log('begin')
+		load('history.js', 'script')
+		</script>
+	</body>
 </html>
