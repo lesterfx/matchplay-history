@@ -31,7 +31,7 @@
 		window.onerror = function(error, url, line) {
 			let e = `${url}\nline ${line}\n\n${error}`
 			alert(e)
-			let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
+			let li = $('<pre>').addClass('windowerror').text(e).appendTo($('#log'))
 		}
 		function log (obj) {
 			let message
@@ -43,7 +43,7 @@
 			} else {
 				message = JSON.stringify(obj, null, 2)
 			}
-			$('#log').append($('<pre>').text(message).title(String(new Error().stack)))
+			$('#log').append($('<pre>').text(message).attr('title', String(new Error().stack)))
 		}
 		async function load(src) {
 			try {

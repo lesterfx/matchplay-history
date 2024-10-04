@@ -28,4 +28,9 @@ div.box.button:active {
     border-radius: 4px;
     border: 1px solid #aaa;
     overflow-x: scroll;
+    overflow-y: scroll;
+    max-height: 100em;
+}
+.windowerror {
+    background: rgb(255, 119, 119);
 }
