@@ -7,7 +7,10 @@
   <link rel="stylesheet" href="history.css" />
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <script>
-	$('head').append(`<script src="history.js?t=${(new Date()).now()}"</script>`)
+	let s = new Element('script')
+	let t = (new Date()).now()
+	s.src = `history.js?t=${t}`
+	document.appendChild(s)
 	</script>
 </head>
 <body>
