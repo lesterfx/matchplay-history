@@ -29,7 +29,7 @@ async function get(options) {
 	}).error(function (e) {
 		log('error:')
 		logobj(e)
-		throw
+		throw e
 	}).always(function (response) {
 		logobj(response)
 	})
