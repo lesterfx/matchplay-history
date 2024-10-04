@@ -16,15 +16,10 @@
 	alert('I')
   </script>
   <script>
-	alert('j')
-	let s = document.createElement('script')
-	alert('k')
-	let t = Date.now()
-	alert('L')
-	s.src = `history.js?t=${t}`
-	alert('m')
-	document.appendChild(s)
-	alert('n')
+	let script = document.createElement('script')
+	let time = Date.now()
+	script.src = `history.js?t=${time}`
+	document.body.appendChild(script)
 	</script>
 </head>
 <body>
