@@ -8,7 +8,8 @@
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <script>
 	window.onerror = function(error, url, line) {
-		alert(`${url}\nline ${line}\n\n${error}`)
+		let e = `${url}\nline ${line}\n\n${error}`
+		alert(e)
 		let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
 		alert('error done')
 	}

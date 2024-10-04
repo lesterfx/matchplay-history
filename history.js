@@ -116,13 +116,14 @@ async function get_other() {
 	let active_games = await get_games_from_tournament(tournament)
 }
 function premain() {
-    let token = localStorage.getItem('token')
+    token = localStorage.getItem('token')
 	if (!token) {
 		$('#token-entry').show()
 		alert('token needed')
 		$('#token-form').on('submit', function (event) {
 			event.preventDefault()
-			localStorage.setItem('token', $('#token').val())
+			token = $('#token').val()
+			localStorage.setItem('token', token)
 			main().catch(logobj)
 		})
 	} else {
