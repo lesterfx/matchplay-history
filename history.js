@@ -1,9 +1,3 @@
-let headers = {}
-let token = ''
-headers['Authorization'] = `Bearer ${token}`
-headers['Content-Type'] = 'application/json'
-headers['Accept'] = 'application/json'
-
 myUserId = 0
 tournament_by_id = {}
 my_tournaments = []
@@ -14,8 +8,11 @@ all_games = {}
 arena_by_id = {}
 
 async function get(options) {
-	log('hello?')
-	alert('hello?')
+	let headers = {}
+	headers['Authorization'] = `Bearer ${token}`
+	headers['Content-Type'] = 'application/json'
+	headers['Accept'] = 'application/json'
+
 	let request = {}
 	request.headers = headers
 	let base_url = 'https://app.matchplay.events/api/'
@@ -126,11 +123,11 @@ function premain() {
 		$('#token-form').on('submit', function (event) {
 			event.preventDefault()
 			localStorage.setItem('token', $('#token').val())
-			main().catch(alert)
+			main().catch(logobj)
 		})
 	} else {
 		$('#token-entry').hide()
-		main().catch(alert)
+		main().catch(logobj)
 	}
 }
 async function main() {
