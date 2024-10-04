@@ -104,6 +104,8 @@ async function get_other() {
 	let active_games = await get_games_from_tournament(tournament)
 }
 async function main() {
+    let token = getCoookie('token')
+    alert(token)
 	await get_me()
 	my_tournaments = await get_my_tournaments()
 	await get_other()
