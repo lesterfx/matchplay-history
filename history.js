@@ -154,7 +154,7 @@ async function get_games_from_tournament(tournament) {
 			}
 		})
 	})
-	return all_games
+	return games
 }
 async function get_tournament_details(tournament) {
 	let tid = tournament.tournamentId
