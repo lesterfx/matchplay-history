@@ -24,7 +24,6 @@
 			let e = `${url}\nline ${line}\n\n${error}`
 			alert(e)
 			let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
-			alert('error done')
 		}
 		let log = function (obj) {
 			$('#log').append($('<li>').append($('<pre>').text(JSON.stringify(obj, null, 2))))

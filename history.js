@@ -115,22 +115,27 @@ async function get_other() {
 	let active_games = await get_games_from_tournament(tournament)
 }
 function premain() {
+	log('b')
     token = localStorage.getItem('token')
 	if (!token) {
+		log('c')
 		$('#token-entry').show()
 		alert('token needed')
-		$('#token-form').on('submit', function (event) {
+		$('#token-form').on('submit', async function (event) {
 			event.preventDefault()
 			token = $('#token').val()
 			localStorage.setItem('token', token)
 			main().catch(log)
 		})
 	} else {
+		log('d')
 		$('#token-entry').hide()
 		main().catch(log)
+		log('e')
 	}
 }
 async function main() {
+	log('f')
 	await get_me()
 	my_tournaments = await get_my_tournaments()
 	await get_other()
@@ -143,15 +148,20 @@ async function main() {
 ////////////////////////////////////////////////////////////////
 
 $(function() {
+	log('z')
 	try {
+		log('y')
 		premain()
+		log('x')
 	} catch (err) {
-		alert(err)
+		log('w')
+		log(err)
 	}
 	$('#players').on('click', '.player.button', function () {
 		let uid = $(this).data('uid')
-		alert(`player {uid} clicked`)
+		alert(`player ${uid} clicked`)
 	})
+	log('v')
 });
 
 function insertSorted(element, parent) {
