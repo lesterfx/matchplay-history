@@ -24,8 +24,10 @@
 			<h2>All Players</h2>
 		</div>
 	</div>
-	<div id="log">
+	<div>
 		<h2>Log</h2>
+	</div>
+	<div id="log">
 	</div>
 	<script>
 		window.onerror = function(error, url, line) {
@@ -43,7 +45,12 @@
 			} else {
 				message = JSON.stringify(obj, null, 2)
 			}
-			$('#log').prepend($('<pre>').text(message + '\n\n' + String(new Error().stack)))
+			if (message == '{}') {
+				alert('empty message')
+				alert(obj)
+				alert(String(new Error().stack))
+			}
+			$('#log').prepend($('<pre>').text(message))
 		}
 		async function load(src) {
 			try {

@@ -104,8 +104,6 @@ async function get(options) {
 		log('error:')
 		log(e.toString())
 		throw e
-	}).always(function (response) {
-		log(response)
 	})
 	response = await requested
 	return response.data
@@ -170,16 +168,18 @@ async function get_tournament_details(tournament) {
 	})
 	let pid
 	// log(tournament_details)
+	log('adding players')
 	tournament_details.players.forEach(function (player) {
 		let uid = player.claimedBy
 		if (uid == myUserId) {
 			pid = player.playerId
 		}
-		if (!players[uid]) {
+		if (!all_players[uid]) {
 			all_players[uid] = player
 			add_player_button(uid)
 		}
 	})
+	log('adding arenas')
 	tournament_details.arenas.forEach(function (arena) {
 		arena_by_id[arena.arenaId] = arena.name
 		$(`.arena-title[data-arenaId="${arena.arenaId}"`).text(arena.name)
