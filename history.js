@@ -29,7 +29,7 @@ async function get(options) {
 		log('done')
 	}).fail(function (e) {
 		log('error:')
-		log(e)
+		log(e.toString())
 		throw e
 	}).always(function (response) {
 		log(response)

@@ -42,7 +42,7 @@
 				await loader(src)
 				log("script successfully loaded"); 
 			} catch (err) {
-				log(err)
+				log(err.toString())
 				log(err.line)
 			}
 		}
@@ -59,13 +59,11 @@
 				document.head.appendChild(script);
 			})
 		}
-		log('begin')
 		try {
 			load('history.js')
 		} catch (err) {
 			alert(err)
 		}
-		log('load call finished')
 		</script>
 	</body>
 </html>
