@@ -47,8 +47,8 @@
 			}
 			if (message == '{}') {
 				alert('empty message')
-				alert(obj)
-				alert(String(new Error().stack))
+				alert(typeof obj)
+				message = String(obj)
 			}
 			$('#log').prepend($('<pre>').text(message))
 		}

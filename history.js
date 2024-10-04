@@ -76,7 +76,7 @@ myUserId = 0
 tournament_by_id = {}
 my_tournaments = []
 player_names = {}
-players = {}
+all_players = {}
 active_players = {}
 my_pid_by_organizer = {}
 all_games = {}
@@ -149,7 +149,7 @@ async function get_games_from_tournament(tournament) {
 	games.forEach(function (game) {
 		game.userIds.forEach(function (uid) {
 			if (uid == myUserId) return
-			if (players[uid]) {
+			if (active_players[uid]) {
 				all_games[game.gameId] = game
 			}
 		})
