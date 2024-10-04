@@ -21,4 +21,6 @@ div.player.button:active {
 }
 #log pre {
     background: #eee;
+    padding: 2px;
+    margin: 2px;
 }
