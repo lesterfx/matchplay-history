@@ -256,8 +256,11 @@ function add_player_button(uid) {
 }
 
 function add_active_game(game) {
-	let button = $('<div>').addClass('game box').data('gameId', game.gameId).data('arenaId'. game.arenaId)
-	$('<div>').data('arenaId'. game.arenaId).addClass('arena-title').text(arena_by_id[game.arenaId] || game.arenaId).appendTo(button)
+	log(game)
+	let arenaId = game.arenaId
+	let name = arena_by_id[arenaId] || arenaId
+	let button = $('<div>').addClass('game box').data('gameId', game.gameId).data('arenaId'. arenaId)
+	$('<div>').data('arenaId'. game.arenaId).addClass('arena-title').text(name).appendTo(button)
 	$('<ol>').addClass('players').appendTo(button)
 	$('#active-games').append(button)
 }
