@@ -23,7 +23,12 @@ async function get(options) {
 	}
 	request.dataType = 'json'
 	log(request.url)
-	response = await $.get(request)
+	let requested = $.get(request)
+	requested.error(function (e) {
+		throw e
+	})
+	response = await requested
+	
 	return response.data
 };
 
