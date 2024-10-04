@@ -24,8 +24,14 @@ async function get(options) {
 	request.dataType = 'json'
 	log(request.url)
 	let requested = $.get(request)
-	requested.error(function (e) {
-		throw e
+	requested.done(function (e) {
+		log('done')
+	}).error(function (e) {
+		log('error:')
+		logobj(e)
+		throw
+	}).always(function (response) {
+		logobj(response)
 	})
 	response = await requested
 	
