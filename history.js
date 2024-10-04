@@ -31,6 +31,7 @@ async function get_me() {
 	let data = await get({
 		endpoint: 'users/profile'
 	})
+	log('got result in get_me')
 	myUserId = data.userId
 }
 
@@ -104,7 +105,6 @@ async function get_other() {
 	let active_games = await get_games_from_tournament(tournament)
 }
 function premain() {
-    alert('c')
     let token = localStorage.getItem('token')
 	if (!token) {
 		$('#token-entry').show()
@@ -120,7 +120,9 @@ function premain() {
 	}
 }
 async function main() {
+	log('get me')
 	await get_me()
+	log('got me')
 	my_tournaments = await get_my_tournaments()
 	await get_other()
 

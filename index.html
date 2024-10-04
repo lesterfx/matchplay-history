@@ -7,13 +7,11 @@
   <link rel="stylesheet" href="history.css" />
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <script>
-	alert('H')
 	window.onerror = function(error, url, line) {
 		alert(`${url}\nline ${line}\n\n${error}`)
 		let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
 		alert('error done')
 	}
-	alert('I')
   </script>
   <script>
 	var script = document.createElement('script')
@@ -27,6 +25,7 @@
 	<div id="token-entry">
 		<form id="token-form">
 			<input type="password" placeholder="api token" name="token" id="token">
+			<input type="submit">
 		</form>
 	</div>
 	<div id="main">
