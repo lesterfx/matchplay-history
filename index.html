@@ -7,19 +7,17 @@
   <link rel="stylesheet" href="history.css" />
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
   <script>
-	alert('x')
+	alert('H')
 	window.onerror = function(error, url, line) {
-		alert('z')
-		let li = $('<li>')
-		li.text(`error ${error} in ${url} on line ${line}`)
-    	$('#log').append(li)
-		alert('w')
+		alert(`error ${error}\n${url}\nline ${line}`)
+		let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
+		alert('error done')
 	}
-	alert('y')
+	alert('I')
   </script>
   <script>
 	alert('j')
-	let s = document.createELement('script')
+	let s = document.createElement('script')
 	alert('k')
 	let t = (new Date()).now()
 	alert('L')
