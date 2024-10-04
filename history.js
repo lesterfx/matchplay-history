@@ -104,7 +104,7 @@ async function get_other() {
 	let active_games = await get_games_from_tournament(tournament)
 }
 function main() {
-    alert('b')
+    alert('c')
     let token = localStorage.getItem('token')
 	if (!token) {
 		$('#token-entry').show()
