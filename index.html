@@ -18,7 +18,7 @@
 	<div id="main">
 		<div id="players"></div>
 	</div>
-	<ul id="log"></ul>
+	<div id="log"></div>
 	<script>
 		window.onerror = function(error, url, line) {
 			let e = `${url}\nline ${line}\n\n${error}`
@@ -26,23 +26,29 @@
 			let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
 		}
 		let log = function (obj) {
-			$('#log').append($('<li>').append($('<pre>').text(JSON.stringify(obj, null, 2))))
+			let message
+			if (typeof obj === "string") {
+				message = obj
+			} else {
+				message = JSON.stringify(obj, null, 2)
+			}
+			$('#log').append($('<pre>').text(message))
 		}
 		function load(src) {
 			try {
-			let time = Date.now()
-			var script = document.createElement(script)
-			script.src = `${src}?t=${time}`
-			document.head.appendChild(script)
+				let time = Date.now()
+				var script = document.createElement(script)
+				script.src = `${src}?t=${time}`
+				document.head.appendChild(script)
 			} catch (err) {
-				logobj(err)
+				log(err)
 			}
 		}
 		log('begin')
 		try {
 			load('history.js', 'script')
 		} catch (err) {
-			log(err)
+			alert(err)
 		}
 		log('loaded')
 		</script>
