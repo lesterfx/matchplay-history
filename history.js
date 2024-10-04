@@ -1,5 +1,5 @@
 let headers = {}
-let token = '327|nDimOMwPf0q8noyupdi3SIjnpgb3xTffK8ngdaqLbb617e07'
+let token = ''
 headers['Authorization'] = `Bearer ${token}`
 headers['Content-Type'] = 'application/json'
 headers['Accept'] = 'application/json'
@@ -105,7 +105,13 @@ async function get_other() {
 }
 function main() {
     alert('hello world')
-    let token = getCoookie('token')
+    let token = window.getCoookie('token')
+	if (!token) {
+		$('#token').show()
+		alert('token needed')
+	} else {
+		$('#token').hide()
+	}
     alert(token)
 }
 async function get() {

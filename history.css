@@ -14,3 +14,6 @@ body {
       margin: 5px;
       min-width: 12em;
   }
+  div.token {
+    display: none;
+  }
