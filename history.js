@@ -260,7 +260,7 @@ function add_active_game(game) {
 	let arenaId = game.arenaId
 	let name = arena_by_id[arenaId] || arenaId
 	let button = $('<div>').addClass('game box').data('gameId', game.gameId).data('arenaId', arenaId)
-	$('<div>').data('arenaId'. game.arenaId).addClass('arena-title').text(name).appendTo(button)
+	$('<div>').data('arenaId', arenaId).addClass('arena-title').text(name).appendTo(button)
 	$('<ol>').addClass('players').appendTo(button)
 	$('#active-games').append(button)
 }
