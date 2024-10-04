@@ -7,6 +7,8 @@ my_pid_by_organizer = {}
 all_games = {}
 arena_by_id = {}
 
+log('history begin')
+
 async function get(options) {
 	let headers = {}
 	headers['Authorization'] = `Bearer ${token}`
@@ -182,3 +184,5 @@ function add_player_button(uid) {
 	let button = $('<div>').addClass('player button').text(player.name).data('uid', uid)
 	insertSorted(button, $('#players'))
 }
+
+log('history end')
