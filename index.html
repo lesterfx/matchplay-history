@@ -16,10 +16,9 @@
 	alert('I')
   </script>
   <script>
-	let script = document.createElement('script')
-	let time = Date.now()
+	var script = document.createElement('script')
 	script.src = `history.js?t=${time}`
-	document.body.appendChild(script)
+	document.head.appendChild(script)
 	</script>
 </head>
 <body>
