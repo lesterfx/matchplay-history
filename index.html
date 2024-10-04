@@ -46,8 +46,8 @@
 				message = JSON.stringify(obj, null, 2)
 			}
 			if (message == '{}') {
-				alert('empty message')
 				alert(typeof obj)
+				alert(obj)
 				message = String(obj)
 			}
 			$('#log').prepend($('<pre>').text(message))
