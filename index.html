@@ -37,9 +37,9 @@
 		}
 		async function load(src) {
 			try {
-				let time = Date.now()
-				let src = `${src}?t=${time}`
-				await loader(src)
+				let t = Date.now()
+				let s = `${src}?t=${t}`
+				await loader(s)
 				log("script successfully loaded"); 
 			} catch (err) {
 				log(err.toString())
