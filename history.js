@@ -104,7 +104,7 @@ async function get_other() {
 	let active_games = await get_games_from_tournament(tournament)
 }
 function main() {
-    alert('hello world')
+    alert('a')
     let token = window.getCoookie('token')
 	if (!token) {
 		$('#token').show()
