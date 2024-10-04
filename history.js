@@ -28,7 +28,7 @@ async function get(options) {
 	let requested = $.get(request)
 	requested.done(function (e) {
 		log('done')
-	}).error(function (e) {
+	}).fail(function (e) {
 		log('error:')
 		logobj(e)
 		throw e
