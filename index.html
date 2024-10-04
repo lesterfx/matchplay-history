@@ -42,8 +42,8 @@
 				await loader(src)
 				log("script successfully loaded"); 
 			} catch (err) {
-				log("error loading");
 				log(err)
+				log(err.line)
 			}
 		}
 		function loader(scriptUrl){
@@ -61,7 +61,7 @@
 		}
 		log('begin')
 		try {
-			load('history.js', 'script')
+			load('history.js')
 		} catch (err) {
 			alert(err)
 		}
