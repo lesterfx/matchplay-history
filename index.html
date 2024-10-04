@@ -26,11 +26,14 @@
 			let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
 		}
 		function log (obj) {
-			alert(obj)
 			let message
 			if (typeof obj === "string") {
 				message = obj
+			} else if (typeof obj === "error") {
+				alert(obj)
+				message = obj.toString() + '\nLine:' + obj.line
 			} else {
+				alert(obj)
 				message = JSON.stringify(obj, null, 2)
 			}
 			$('#log').append($('<pre>').text(message))

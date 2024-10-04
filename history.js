@@ -237,6 +237,7 @@ $(function() {
 });
 
 function insertSorted(element, parent) {
+	let added = false
 	parent.children().each(function(){
 		if ($(this).text() > $(element).text()) {
 			$(element).insertBefore($(this))
