@@ -104,13 +104,17 @@ async function get_other() {
 	let active_games = await get_games_from_tournament(tournament)
 }
 function main() {
-    alert('a')
-    let token = window.getCoookie('token')
+    alert('b')
+    let token = localStorage.getItem('token')
 	if (!token) {
-		$('#token').show()
+		$('#token-entry').show()
 		alert('token needed')
+		$('#token-form').on('submit', function (event) {
+			event.preventDefault()
+			localStorage.setItem('token', $('#token').val())
+		})
 	} else {
-		$('#token').hide()
+		$('#token-entry').hide()
 	}
     alert(token)
 }
