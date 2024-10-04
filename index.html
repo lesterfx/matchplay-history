@@ -43,7 +43,7 @@
 			} else {
 				message = JSON.stringify(obj, null, 2)
 			}
-			$('#log').append($('<pre>').text(message))
+			$('#log').append($('<pre>').text(message).title(String(new Error().stack)))
 		}
 		async function load(src) {
 			try {
