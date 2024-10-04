@@ -42,7 +42,6 @@ async function get_me() {
 	let data = await get({
 		endpoint: 'users/profile'
 	})
-	log('got result in get_me')
 	myUserId = data.userId
 }
 
@@ -132,9 +131,7 @@ function premain() {
 	}
 }
 async function main() {
-	log('get me')
 	await get_me()
-	log('got me')
 	my_tournaments = await get_my_tournaments()
 	await get_other()
 
@@ -149,8 +146,6 @@ let logobj = function (obj) {
 	log(JSON.stringify(obj, null, 2))
 }
 
-log('hello world')
-
 ////////////////////////////////////////////////////////////////
 
 $(function() {
@@ -159,11 +154,26 @@ $(function() {
 	} catch (err) {
 		alert(err)
 	}
+	$('#players').on('click', '.player.button', function () {
+
+	})
 });
+
+function insertSorted(element, parent) {
+	parent.children().each(function(){
+		if ($(this).text() > $(element).text()) {
+			$(element).insertBefore($(this)).fadeIn("fast");
+			added = true;
+			return false;
+		}
+	});
+	if(!added) $(element).appendTo($(targetList)).fadeIn("fast");
+}
 
 function add_player_button(uid) {
 	log('add_player_button')
 	let player = players[uid]
 	logobj(player)
-	let button = $('<div>').appendTo($('#players')).addClass('player button').text(player.name).data('uid', uid)
+	let button = $('<div>').addClass('player button').text(player.name).data('uid', uid)
+	insertSorted(button, $('#players'))
 }

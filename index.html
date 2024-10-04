@@ -15,10 +15,13 @@
 	}
   </script>
   <script>
-	var script = document.createElement('script')
-	let time = Date.now()
-	script.src = `history.js?t=${time}`
-	document.head.appendChild(script)
+	function load(src) {
+		let time = Date.now()
+		var script = document.createElement(script)
+		script.src = `${src}?t=${time}`
+		document.head.appendChild(script)
+	}
+	load('history.js', 'script')
 	</script>
 </head>
 <body>
