@@ -26,6 +26,7 @@
 			let li = $('<pre>').text(e).appendTo($('<li>').appendTo($('#log')))
 		}
 		let log = function (obj) {
+			alert(obj)
 			let message
 			if (typeof obj === "string") {
 				message = obj
@@ -36,11 +37,17 @@
 		}
 		function load(src) {
 			try {
+				log('load a')
 				let time = Date.now()
+				log('load b')
 				var script = document.createElement(script)
+				log('load c')
 				script.src = `${src}?t=${time}`
+				log('load d')
 				document.head.appendChild(script)
+				log('load e')
 			} catch (err) {
+				log('load error f')
 				log(err)
 			}
 		}
