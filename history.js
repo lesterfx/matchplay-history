@@ -199,6 +199,7 @@ async function get_other(id) {
 	$('#active-games').empty();
 	let tournament = all_data.tournament[id];
 	let active_games = await get_games_from_tournament(tournament);
+	log(`active_games: ${active_games}`)
 	active_games.reverse();
 	$('#active-tournament-title').append(title('tournament', tournament.tournamentId));
 	for (game of active_games) {
