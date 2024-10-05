@@ -164,7 +164,7 @@ async function get_games_from_tournament(tournament) {
 			log(uid);
 			if (uid == myUserId) {
 				log('skipping, that is me')
-				return;
+				continue
 			}
 			log(active_players);
 			if (active_players[uid]) {
