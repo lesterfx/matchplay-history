@@ -160,10 +160,16 @@ async function get_games_from_tournament(tournament) {
 		save_data('game', game);
 		log(game.userIds)
 		for (uid of game.userIds) {
-			log(uid)
-			if (uid == myUserId) return;
-			log(active_players)
+			log(uid);
+			if (uid == myUserId) {
+				log('skipping, that is me')
+				return;
+			}
+			log(active_players);
 			if (active_players[uid]) {
+				log(`${uid} is found in ${active_players}, ${JSON.stringify(active_players)}`)
+			} else {
+				log(`${uid} not found in ${active_players}, ${JSON.stringify(active_players)}`)
 			};
 		};
 	};
