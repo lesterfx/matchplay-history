@@ -66,3 +66,6 @@
 .spacer {
     flex-grow: 1;
 }
+#main {
+    scroll-behavior: smooth;
+}

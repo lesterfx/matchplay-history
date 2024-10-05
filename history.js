@@ -137,11 +137,15 @@ async function get_tournaments(uid) {
 }
 async function get_games_from_tournaments(tournaments) {
 	for (tournament in tournaments) {
+		log(`getting games from tournament ${tournament}`)
 		await get_games_from_tournament(tournament)
 	}
 }
 async function get_games_from_tournament(tournament) {
-	log(`doing get_games_from_tournament, active players  ${JSON.stringify(active_players)}`)
+	if (!tournament) {
+		throw Error('no tournament passed into get_games_from_tournament')
+	}
+	log(`doing get_games_from_tournament, active players  ${JSON.stringify(active_players, null, 4)}`)
 	let tid = tournament.tournamentId;
 	let pid;
 	if (my_pid_by_organizer[tid]) {
@@ -168,9 +172,9 @@ async function get_games_from_tournament(tournament) {
 			}
 			log(active_players);
 			if (active_players[uid]) {
-				log(`${uid} is found in ${active_players}, ${JSON.stringify(active_players)}`)
+				log(`${uid} is found in ${active_players}, ${JSON.stringify(active_players, null, 4)}`)
 			} else {
-				log(`${uid} not found in ${active_players}, ${JSON.stringify(active_players)}`)
+				log(`${uid} not found in ${active_players}, ${JSON.stringify(active_players, null, 4)}`)
 			};
 		};
 	};
@@ -220,7 +224,7 @@ async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
 	active_players = {};
 	$('#player-histories').empty();  // or don't?
-	log(JSON.stringify(all_data.game))
+	log(JSON.stringify(all_data.game, null, 4))
 	log(id)
 	log(all_data.game[id])
 	let uids = all_data.game[id].userIds;
@@ -232,7 +236,7 @@ async function compare_players_from_game(id) {
 		log(active_players)
 		add_active_player(uid);
 	};
-	log(`done compare_players_from_game, active players  ${JSON.stringify(active_players)}`)
+	log(`done compare_players_from_game, active players  ${JSON.stringify(active_players, null, 4)}`)
 	await merge_tournaments();
 }
 async function compare_player(id) {
@@ -243,7 +247,7 @@ async function compare_player(id) {
 	await merge_tournaments()
 }
 async function merge_tournaments() {
-	log(`merge_tournaments, active players ${JSON.stringify(active_players)}`)
+	log(`merge_tournaments, active players ${JSON.stringify(active_players, null, 4)}`)
 	let merged_tournaments = {};
 	for (uid in active_players) {
 		let tournaments = await get_tournaments(uid);
@@ -257,7 +261,7 @@ async function merge_tournaments() {
 		};
 	};
 	log(merged_tournaments);
-	log(`merged tournaments: ${JSON.stringify(merged_tournaments)}`);
+	log(`merged tournaments: ${JSON.stringify(merged_tournaments, null, 4)}`);
 	await get_games_from_tournaments(merged_tournaments);
 }
 function premain() {
@@ -302,10 +306,12 @@ async function clickthing() {
 			case 'tournament':
 				log('get other')
 				await get_other(id);
+				$('#active-tournament-title')[0].scrollIntoView()
 				break;
-			case 'game':
-				log('compare players from game')
-				await compare_players_from_game(id);
+				case 'game':
+					log('compare players from game')
+					await compare_players_from_game(id);
+					$('#active-tournament-title')[0].scrollIntoView()
 				break;
 			case 'player':
 				log('compare player')

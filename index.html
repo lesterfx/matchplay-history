@@ -40,7 +40,7 @@
 		}
 		function stringify(value) {
 			switch (typeof value) {
-				case 'string': case 'object': return JSON.stringify(value);
+				case 'string': case 'object': return JSON.stringify(value, null, 4);
 				default: return String(value);
 			}
 		};
