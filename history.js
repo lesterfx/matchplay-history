@@ -211,18 +211,19 @@ async function compare_players_from_game(id) {
 	await merge_tournaments();
 }
 async function compare_player(id) {
-
+	active_players = [id]
+	await merge_tournaments()
 }
 async function merge_tournaments() {
 	let merged_tournaments = {};
-	active_players.forEach(function (uid) {
+	active_players.forEach(async function (uid) {
 		let tournaments = await get_tournaments(uid);
 		tournaments.forEach(function (tournament) {
-			// let tid = tournament.tournamentId
-			// if (all_my_tournaments[tid]) {
-			// 	add_player_tournament(uid, tid)
-			// 	merged_tournaments[tid] = true
-			// }
+			let tid = tournament.tournamentId
+			if (all_my_tournaments[tid]) {
+				add_player_tournament(uid, tid)
+				merged_tournaments[tid] = true
+			}
 		});
 	});
 }
@@ -260,9 +261,7 @@ $(function() {
 	} catch (err) {
 		log(err);
 	}
-	$('#active-tournaments').on('click', '.box', clickthing);
-	$('#active-games').on('click', '.box', clickthing);
-	$('#players').on('click', '.box', clickthing);
+	$('.clickables').on('click', '.box', clickthing);
 });
 
 function clickthing() {
