@@ -239,12 +239,12 @@ $(function() {
 	} catch (err) {
 		log(err)
 	}
-	$('#active-tournaments').on('click', '.button', function () {
+	$('#active-tournaments').on('click', '.box', function () {
 		alert('click')
 		let tid = $(this).data('id')
 		get_other(tid)
 	})
-	$('#players').on('click', '.button', function () {
+	$('#players').on('click', '.box', function () {
 		alert('click')
 		let uid = $(this).data('userId')
 		alert(`player ${uid} clicked`)

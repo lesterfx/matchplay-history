@@ -7,7 +7,7 @@
 .boxgroup::after {
     content: "";
     display: inline-block;
-    flex-grow: 10;
+    flex-grow: 100;
   }
 .box {
     border: 1px solid #aaa;
