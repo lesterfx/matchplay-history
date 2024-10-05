@@ -327,7 +327,7 @@ function add_active_player(id) {
 
 function add_player_tournament(uid, tid) {
 	let trow = title('tournament', tid, 'h4');
-	let selector = `#player-histories div[data-player-id="${uid}"]` // .merged-tournaments`
+	let selector = `#player-histories` // div[data-player-id="${uid}"]` // .merged-tournaments`
 	log(selector)
 	$(selector).append(trow);
 }
