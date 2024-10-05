@@ -118,7 +118,7 @@ async function get_me() {
 }
 
 async function get_my_tournaments() {
-	return await get_tournaments(myUserId)
+	my_tournaments = await get_tournaments(myUserId)
 }
 
 async function get_tournaments(uid) {
@@ -128,6 +128,7 @@ async function get_tournaments(uid) {
 	})
 	data.forEach(function (tournament) {
 		save_data('tournament', tournament)
+		add_tournament(tournament)
 	})
 	return data
 }
@@ -186,8 +187,8 @@ async function get_tournament_details(tournament) {
 	})
 	return pid
 }
-async function get_other() {
-	let tournament = my_tournaments[0]
+async function get_other(id) {
+	let tournament = all_data.tournament[id]
 	let active_games = await get_games_from_tournament(tournament)
 	active_games.reverse()
 	$('#active-tournament-title').append(title('tournament', tournament.tournamentId))
@@ -211,7 +212,7 @@ async function merge_tournaments() {
 function premain() {
     token = localStorage.getItem('token')
 	if (!token) {
-	$('#token-entry').show()
+		$('#token-entry').show()
 		$('#token-form').on('submit', async function (event) {
 			event.preventDefault()
 			token = $('#token').val()
@@ -225,8 +226,8 @@ function premain() {
 }
 async function main() {
 	await get_me()
-	my_tournaments = await get_my_tournaments()
-	await get_other()
+	await get_my_tournaments()
+	await get_other(my_tournaments[0].tournamentId)
 	await merge_tournaments()
 	//todo.push(merge_tournaments)
 	//todo.push(get_games_from_tournaments)
@@ -241,7 +242,7 @@ $(function() {
 	} catch (err) {
 		log(err)
 	}
-	$('#players').on('click', '.player.button', function () {
+	$('#players').on('click', '.player-name.button', function () {
 		let uid = $(this).data('userId')
 		alert(`player ${uid} clicked`)
 	})
@@ -269,16 +270,14 @@ function title(kind, id) {
 	let element = $('<span>')
 	element.addClass(kind+'-name').data('id', id)
 	let name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id)
-	if (kind == 'player' && id == myUserId) {
-		name = 'Me'
-	}
+	if (kind == 'player' && id == myUserId) name = 'Me'
 	element.text(name)
 	return element
 }
 function save_data(kind, obj) {
 	let id = obj[kind+'Id']
 	all_data[kind][id] = obj
-	$(`.${kind}-title[data-id="${id}"`).text(obj.name)
+	$(`.${kind}-name[data-id="${id}"`).text(obj.name)
 }
 function spacer() {
 	return $('<div>').addClass('spacer')
@@ -291,13 +290,15 @@ function add_active_game(game, active) {
 	}
 	title('arena', game.arenaId).appendTo(box)
 	spacer().appendTo(box)
-	title('tournament', game.tournamentId).appendTo(box)
-	spacer().appendTo(box)
 	let plist = $('<ol>').addClass('players').appendTo(box)
 	game.userIds.forEach(function (uid) {
 		$('<li>').append(title('player', uid)).appendTo(plist)
 	})
+	spacer().appendTo(box)
+	title('tournament', game.tournamentId).appendTo(box)
 	$('#active-games').append(box)
 }
-
+function add_tournament(tournament) {
+	title('tournament', tournament.tournamentId).addClass('box').appendTo($('#active-tournaments'))
+}
 log('history end')

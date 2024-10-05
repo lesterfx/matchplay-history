@@ -12,15 +12,13 @@
     margin: 5px;
     min-width: 10em;
     display: inline-block;
+    flex-grow: 1;
 }
 .box.button {
     cursor: pointer;
 }
-.box.button:active {
-    background: #ccc;
-}
-.box.game.active {
-    background: #aaa;
+.box.active {
+    outline: 4px solid #08f;
 }
 #token-entry {
     display: none;
