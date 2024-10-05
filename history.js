@@ -214,7 +214,6 @@ async function compare_player(id) {
 
 }
 async function merge_tournaments() {
-	all_my_tournaments
 	let merged_tournaments = {}
 	active_players.forEach(function (uid) {
 		let tournaments = await get_tournaments(uid)
