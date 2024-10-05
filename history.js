@@ -319,7 +319,7 @@ function add_player_button(uid) {
 	insertSorted(button, $('#players'));
 }
 function add_active_player(id) {
-	let playerbox = $('<div />').data('playerid', id).addClass(`playerid-${id}`).data('wtf', 'definitely').addClass('player-history').appendTo($('#player-histories'))
+	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history').appendTo($('#player-histories'))
 	title('player', id, 'h3').prependTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').text(id).appendTo(playerbox);
@@ -328,7 +328,7 @@ function add_active_player(id) {
 
 function add_player_tournament(uid, tid) {
 	let trow = title('tournament', tid, 'h4');
-	let selector = `#player-histories div.player-history[data-playerid] div.merged-tournaments` // [data-playerid="${uid}"]` // .merged-tournaments`
+	let selector = `#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments`
 	log(selector)
 	$(selector).append(trow);
 }
@@ -344,7 +344,7 @@ function title(kind, id, element_type) {
 }
 function notitle(kind, id, element_type) {
 	let element = $(`<${element_type || "span"}>`);
-	element.data('id', id).data('kind', kind);
+	element.attr('data-kind', kind).attr('data-id', id);
 	return element;
 }
 function save_data(kind, obj) {
