@@ -142,11 +142,11 @@ async function get_games_from_tournaments(tournaments) {
 	}
 }
 async function get_games_from_tournament(tournament) {
-	if (!tournament) {
-		throw Error('no tournament passed into get_games_from_tournament')
-	}
 	log(`doing get_games_from_tournament, active players  ${JSON.stringify(active_players, null, 4)}`)
 	let tid = tournament.tournamentId;
+	if (!tid) {
+		throw Error(`no tournamentId in ${JSON.stringify(tournament, null, 4)} passed into get_games_from_tournament`)
+	}
 	let pid;
 	if (my_pid_by_organizer[tid]) {
 		pid = my_pid_by_organizer[tid];
@@ -183,6 +183,9 @@ async function get_games_from_tournament(tournament) {
 async function get_tournament_details(tournament) {
 	let tid = tournament.tournamentId;
 	log(`getting tournament ${tid} details`);
+	if (!tournament) {
+		throw Error('no tournament passed into get_tournament_details')
+	}
 	let tournament_details = await get({
 		endpoint: `tournaments/${tid}`,
 		query: {
