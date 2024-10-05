@@ -190,7 +190,7 @@ async function get_other() {
 	let tournament = my_tournaments[0]
 	let active_games = await get_games_from_tournament(tournament)
 	active_games.reverse()
-	$('#active-tournament-title').append(title('tournament', tournament))
+	$('#active-tournament-title').append(title('tournament', tournament.tournamentId))
 	let newest = true
 	active_games.forEach(function (game) {
 		if (newest) {
