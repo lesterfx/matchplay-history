@@ -34,7 +34,7 @@
 	</div>
 	<script>
 		window.onerror = function(error, url, line) {
-			let e = `${url}\nline ${line}\n\n${error}`
+			let e = `window.onerror\n${url}\nline ${line}\n\n${error}`
 			alert(e)
 			let li = $('<pre>').addClass('windowerror').text(e).prependTo($('#log'))
 		}
@@ -76,6 +76,7 @@
 		try {
 			load('history.js')
 		} catch (err) {
+			alert('error loading history.js')
 			alert(err)
 		}
 		</script>

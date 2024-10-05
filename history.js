@@ -136,7 +136,8 @@ async function get_tournaments(uid) {
 	return data;
 }
 async function get_games_from_tournaments(tournaments) {
-	for (tournament in tournaments) {
+	for (tid in tournaments) {
+		let tournament = all_data.tournament[tid]
 		log(`getting games from tournament ${tournament}`)
 		await get_games_from_tournament(tournament)
 	}
