@@ -8,7 +8,11 @@
     z-index: 0;
     position: relative;
 }
-.boxgroup+div.expander {
+.boxgroup.many {
+    max-height: 300px;
+    overflow-y: hidden;
+}
+.boxgroup.many+div.expander {
     margin-top: -50px;
     height: 50px;
     background: linear-gradient(transparent, rebeccapurple);
@@ -16,7 +20,7 @@
     position: relative;
     cursor: pointer;
 }
-.boxgroup.expanded+div.expander {
+.boxgroup:not(.expanded)+div.expander {
     display: none;
 }
 .merged-tournaments {

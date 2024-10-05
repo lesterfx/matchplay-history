@@ -245,7 +245,7 @@ async function compare_player(id) {
 async function merge_tournaments() {
 	log(`merge_tournaments, active players ${JSON.stringify(active_players)}`)
 	let merged_tournaments = {};
-	for (uid of active_players) {
+	for (uid in active_players) {
 		let tournaments = await get_tournaments(uid);
 		log(`${tournaments.length} tournaments`)
 		for (tournament of tournaments) {
