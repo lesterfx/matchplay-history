@@ -203,7 +203,9 @@ async function get_other(id) {
 async function compare_players_from_game(id) {
 	active_players = [];
 	$('#player-histories').empty();  // or don't?
-	all_data.games[id].userIds.forEach((uid) => {
+	let uids = all_data.games[id].userIds;
+	log(uids)
+	uids.forEach((uid) => {
 		if (uid == myUserId) return;
 		active_players.push(uid);
 		add_active_player(uid);
@@ -214,6 +216,7 @@ async function compare_players_from_game(id) {
 async function compare_player(id) {
 	active_players = [id]
 	log(active_players)
+	add_active_player(id);
 	await merge_tournaments()
 }
 async function merge_tournaments() {
@@ -229,7 +232,7 @@ async function merge_tournaments() {
 			}
 		});
 	});
-	log(`merged tournaments: ${merged_tournaments}`)
+	log(`merged tournaments: ${JSON.stringify(merged_tournaments)}`)
 }
 function premain() {
     token = localStorage.getItem('token');
@@ -273,12 +276,15 @@ async function clickthing() {
 	let id = $(this).data('id');
 	switch (kind) {
 		case 'tournament':
+			log('get othe')
 			await get_other(id);
 			break;
 		case 'game':
+			log('compare players from game')
 			await compare_players_from_game(id);
 			break;
 		case 'player':
+			log('compare player')
 			await compare_player(id);
 			break;
 		default:
