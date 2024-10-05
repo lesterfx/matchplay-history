@@ -203,8 +203,8 @@ async function get_other(id) {
 async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
 	active_players = [];
-	$('#player-histories').empty();  // or don't?
-	let uids = all_data.games[id].userIds;
+	// $('#player-histories').empty();  // or don't?
+	let uids = all_data.game[id].userIds;
 	log(uids)
 	uids.forEach((uid) => {
 		if (uid == myUserId) return;
@@ -215,6 +215,7 @@ async function compare_players_from_game(id) {
 	await merge_tournaments();
 }
 async function compare_player(id) {
+	// $('#player-histories').empty();  // or don't?
 	active_players = [id]
 	log(active_players)
 	add_active_player(id);
@@ -316,14 +317,14 @@ function add_player_button(uid) {
 }
 function add_active_player(id) {
 	let playerbox = $('<div />').data('player-id', id).addClass('player-history').appendTo($('#player-histories'));
-	title('player', id, 'div').appendTo(playerbox);
+	title('player', id, 'h4').appendTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
 }
 
 function add_player_tournament(uid, tid) {
-	let trow = title('tournament', tid, 'h4');
-	let selector = `#player-histories>div[data-player-id="${uid}"]>.merged-tournaments`
+	let trow = title('tournament', tid, 'h3');
+	let selector = `#player-histories div[data-player-id="${uid}"] .merged-tournaments`
 	log(selector)
 	$(selector).append(trow);
 }
