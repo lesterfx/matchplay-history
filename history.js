@@ -320,14 +320,14 @@ function add_player_button(uid) {
 }
 function add_active_player(id) {
 	let playerbox = $('<div />').data('player-id', id).addClass('player-history').appendTo($('#player-histories'));
-	title('player', id, 'h4').appendTo(playerbox);
+	title('player', id, 'h3').appendTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
 }
 
 function add_player_tournament(uid, tid) {
-	let trow = title('tournament', tid, 'h3');
-	let selector = `#player-histories div[data-player-id="${uid}"] .merged-tournaments`
+	let trow = title('tournament', tid, 'h4');
+	let selector = `#player-histories div[data-player-id="${uid}"]` // .merged-tournaments`
 	log(selector)
 	$(selector).append(trow);
 }
