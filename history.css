@@ -5,6 +5,7 @@
     max-width: 100%;
     background: #eee;
     min-height: 50px;
+    z-index: 0;
 }
 .boxgroup+div.expander {
     margin-top: -50px;
