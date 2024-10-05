@@ -8,7 +8,9 @@
     content: "";
     display: inline-block;
     flex-grow: 100;
-  }
+    flex-basis: 10em;
+    flex-shrink: 1;
+}
 .box {
     border: 1px solid #aaa;
     background: #ddd;
@@ -16,6 +18,7 @@
     padding: 10px;
     margin: 5px;
     min-width: 10em;
+    flex-basis: 10em;
     display: inline-block;
     flex-grow: 1;
 }

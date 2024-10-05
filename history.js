@@ -73,7 +73,7 @@
 
 
 myUserId = 0
-my_tournaments = []
+all_my_tournaments = {}
 active_players = []
 my_pid_by_organizer = {}
 all_data = {
@@ -117,8 +117,11 @@ async function get_me() {
 	myUserId = data.userId
 }
 
-async function get_my_tournaments() {
-	my_tournaments = await get_tournaments(myUserId)
+async function get_all_my_tournaments() {
+	all_my_tournaments = {}
+	(await get_tournaments(myUserId)).forEach(function (tournament) {
+		all_my_tournaments[tournament.tournamentId] = tournament
+	})
 }
 
 async function get_tournaments(uid) {
@@ -188,21 +191,40 @@ async function get_tournament_details(tournament) {
 	return pid
 }
 async function get_other(id) {
+	$('#active-games').empty()
 	let tournament = all_data.tournament[id]
 	let active_games = await get_games_from_tournament(tournament)
 	active_games.reverse()
 	$('#active-tournament-title').append(title('tournament', tournament.tournamentId))
 	active_games.forEach(function (game) {
-		// game.userIds.forEach((uid) => {
-		// 	if (uid == myUserId) return
-		// 	active_players.push(uid)
-		// })
 		add_active_game(game)
 	})
 }
-async function merge_tournaments() {
-	active_players.forEach(function (uid) {
+async function compare_players_from_game(id) {
+	active_players = []
+	$('#player-histories').empty()  // or don't?
+	all_data.games[id].userIds.forEach((uid) => {
+		if (uid == myUserId) return
+		active_players.push(uid)
+		add_active_player(uid)
+	})
+	await merge_tournaments()
+}
+async function compare_player(id) {
 
+}
+async function merge_tournaments() {
+	all_my_tournaments
+	let merged_tournaments = {}
+	active_players.forEach(function (uid) {
+		let tournaments = await get_tournaments(uid)
+		tournaments.forEach(function (tournament) {
+			let tid = tournament.tournamentId
+			if (all_my_tournaments[tid]) {
+				add_player_tournament(uid, tid)
+				merged_tournaments[tid] = true
+			}
+		})
 	})
 }
 function premain() {
@@ -222,8 +244,8 @@ function premain() {
 }
 async function main() {
 	await get_me()
-	await get_my_tournaments()
-	// await get_other(my_tournaments[0].tournamentId)
+	await get_all_my_tournaments()
+	// await get_other(all_my_tournaments[0].tournamentId)
 	// await merge_tournaments()
 
 	//todo.push(merge_tournaments)
@@ -239,18 +261,25 @@ $(function() {
 	} catch (err) {
 		log(err)
 	}
-	$('#active-tournaments').on('click', '.box', function () {
-		alert('click')
-		let tid = $(this).data('id')
-		get_other(tid)
-	})
-	$('#players').on('click', '.box', function () {
-		alert('click')
-		let uid = $(this).data('userId')
-		alert(`player ${uid} clicked`)
-	})
+	$('#active-tournaments').on('click', '.box', clickthing)
+	$('#active-games').on('click', '.box', clickthing)
+	$('#players').on('click', '.box', clickthing)
 });
 
+function clickthing() {
+	$(this).addClass('active').siblings().removeClass('active')
+	let kind = $(this).data('kind')
+	let id = $(this).data('id')
+	switch (kind) {
+		case 'tournament':
+			return get_other(id)
+		case 'game':
+			return compare_players_from_game(id)
+		case 'player':
+			return compare_player(id)
+		}
+	alert(`clicked a ${kind}, which isn't handled yet`)
+}
 function insertSorted(element, parent) {
 	let added = false
 	let etext = element.text().toLowerCase()
@@ -268,10 +297,21 @@ function add_player_button(uid) {
 	let button = title('player', uid).addClass('box')
 	insertSorted(button, $('#players'))
 }
+function add_active_player(id) {
+	let playerbox = $('<div />').data('player-id', id).addClass('player-history').appendTo($('#player-histories'))
+	title('player', id, 'div').appendTo(playerbox)
+	$('<div />').addClass('boxgroup').appendTo(playerbox)
+	$('<div />').addClass('merged-tournaments').appendTo(playerbox)
+}
 
-function title(kind, id) {
-	let element = $('<span>')
-	element.addClass(kind+'-name').data('id', id)
+function add_player_tournament(uid, tid) {
+	let trow = title('tournament', tid, 'h4')
+	$(`#player-histories>div[data-player-id="${uid}"]>.merged-tournaments`).append(trow)
+}
+
+function title(kind, id, element_type) {
+	let element = $(`<${element_type || span}>`)
+	element.addClass(kind+'-name').data('id', id).data('kind', kind)
 	let name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id)
 	if (kind == 'player' && id == myUserId) name = 'Me'
 	element.text(name)
