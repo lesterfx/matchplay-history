@@ -282,7 +282,7 @@ async function clickthing() {
 		let id = $(this).data('id');
 		switch (kind) {
 			case 'tournament':
-				log('get othe')
+				log('get other')
 				await get_other(id);
 				break;
 			case 'game':
@@ -319,15 +319,15 @@ function add_player_button(uid) {
 	insertSorted(button, $('#players'));
 }
 function add_active_player(id) {
-	let playerbox = $('<div />').data('player-id', id).addClass('player-history').appendTo($('#player-histories')).text(id)
+	let playerbox = $('<div />').data('player-id', id).addClass('player-history').appendTo($('#player-histories'))
 	title('player', id, 'h3').prependTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
-	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
+	$('<div />').addClass('merged-tournaments').text(id).appendTo(playerbox);
 }
 
 function add_player_tournament(uid, tid) {
 	let trow = title('tournament', tid, 'h4');
-	let selector = `#player-histories div.player-history div.merged-tournaments` // [data-player-id="${uid}"]` // .merged-tournaments`
+	let selector = `#player-histories div.player-history[data-player-id] div.merged-tournaments` // [data-player-id="${uid}"]` // .merged-tournaments`
 	log(selector)
 	$(selector).append(trow);
 }
