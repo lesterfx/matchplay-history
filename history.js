@@ -141,7 +141,7 @@ async function get_games_from_tournaments(tournaments) {
 	}
 }
 async function get_games_from_tournament(tournament) {
-	log(`doing get_games_from_tournament, active players ${active_players}`)
+	log(`doing get_games_from_tournament, active players  ${JSON.stringify(active_players)}`)
 	let tid = tournament.tournamentId;
 	let pid;
 	if (my_pid_by_organizer[tid]) {
@@ -226,13 +226,13 @@ async function compare_players_from_game(id) {
 	let uids = all_data.game[id].userIds;
 	log(uids)
 	for (uid of uids) {
-		if (uid == myUserId) return;
+		if (uid == myUserId) continue;
 		log(`adding ${uid} to active players`)
 		active_players[uid] = 1;
 		log(active_players)
 		add_active_player(uid);
 	};
-	log(`done compare_players_from_game, active players ${active_players}`)
+	log(`done compare_players_from_game, active players  ${JSON.stringify(active_players)}`)
 	await merge_tournaments();
 }
 async function compare_player(id) {
@@ -243,7 +243,7 @@ async function compare_player(id) {
 	await merge_tournaments()
 }
 async function merge_tournaments() {
-	log(`merge_tournaments, active players ${active_players}`)
+	log(`merge_tournaments, active players ${JSON.stringify(active_players)}`)
 	let merged_tournaments = {};
 	for (uid of active_players) {
 		let tournaments = await get_tournaments(uid);
@@ -316,6 +316,7 @@ async function clickthing() {
 		}
 		$(this).addClass('active').siblings().removeClass('active');
 	} catch (err) {
+		alert('error!')
 		alert(err)
 		log(err)
 	}

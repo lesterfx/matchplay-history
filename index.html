@@ -46,7 +46,6 @@
 		};
 		function log (obj) {
 			let message = stringify(obj)
-			if (message == '{}') alert(obj)
 			if (message.slice(0, 1) == '"') message = message.slice(1,-1)
 			$('#log').prepend($('<pre>').text(message))
 		}
