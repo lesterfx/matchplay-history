@@ -204,6 +204,9 @@ async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
 	active_players = [];
 	// $('#player-histories').empty();  // or don't?
+	log(all_data.game)
+	log(id)
+	log(all_data.game[id])
 	let uids = all_data.game[id].userIds;
 	log(uids)
 	uids.forEach((uid) => {
