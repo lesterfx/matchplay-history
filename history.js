@@ -157,8 +157,8 @@ async function get_games_from_tournament(tournament) {
 	});
 	log(`got ${games.length} games`);
 	for (game of games) {
+		save_data('game', game);
 		for (uid of game.userIds) {
-			save_data('game', game);
 			if (uid == myUserId) return;
 			if (active_players[uid]) {
 			};
@@ -208,7 +208,7 @@ async function get_other(id) {
 }
 async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
-	let active_players = [];
+	active_players = [];
 	$('#player-histories').empty();  // or don't?
 	log(JSON.stringify(all_data.game))
 	log(id)
@@ -220,15 +220,15 @@ async function compare_players_from_game(id) {
 		active_players.push(uid);
 		add_active_player(uid);
 	};
-	await merge_tournaments(active_players);
+	await merge_tournaments();
 }
 async function compare_player(id) {
 	$('#player-histories').empty();  // or don't?
-	let active_players = [id]
+	active_players = [id]
 	add_active_player(id);
-	await merge_tournaments(active_players)
+	await merge_tournaments()
 }
-async function merge_tournaments(active_players) {
+async function merge_tournaments() {
 	let merged_tournaments = {};
 	for (uid of active_players) {
 		let tournaments = await get_tournaments(uid);
