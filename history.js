@@ -214,16 +214,8 @@ async function compare_player(id) {
 
 }
 async function merge_tournaments() {
-	let merged_tournaments = {}
+	let merged_tournaments = {};
 	active_players.forEach(function (uid) {
-		let tournaments = await get_tournaments(uid)
-		tournaments.forEach(function (tournament) {
-			let tid = tournament.tournamentId
-			if (all_my_tournaments[tid]) {
-				add_player_tournament(uid, tid)
-				merged_tournaments[tid] = true
-			}
-		})
 	})
 }
 function premain() {
