@@ -247,7 +247,7 @@ async function merge_tournaments() {
 	let merged_tournaments = {};
 	for (uid in active_players) {
 		let tournaments = await get_tournaments(uid);
-		log(`${tournaments.length} tournaments`)
+		log(`${tournaments.length} tournaments`);
 		for (tournament of tournaments) {
 			let tid = tournament.tournamentId
 			if (all_my_tournaments[tid]) {
@@ -318,7 +318,9 @@ async function clickthing() {
 	} catch (err) {
 		alert('error!')
 		alert(err)
+		log($(`${err.message}\n${err.stack}`))
 		log(err)
+		throw(err)
 	}
 }
 function insertSorted(element, parent) {
