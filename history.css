@@ -4,7 +4,7 @@
     flex-wrap: wrap;
     max-width: 100%;
 }
-div.box {
+.box {
     border: 1px solid #aaa;
     background: #ddd;
     border-radius: 10px;
@@ -12,13 +12,13 @@ div.box {
     margin: 5px;
     min-width: 10em;
 }
-div.box.button {
+.box.button {
     cursor: pointer;
 }
-div.box.button:active {
+.box.button:active {
     background: #ccc;
 }
-div.box.game.active {
+.box.game.active {
     background: #aaa;
 }
 #token-entry {

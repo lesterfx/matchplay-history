@@ -74,7 +74,7 @@
 
 myUserId = 0
 my_tournaments = []
-active_players = {}
+active_players = []
 my_pid_by_organizer = {}
 all_data = {
 	player: {},
@@ -191,20 +191,22 @@ async function get_other() {
 	let active_games = await get_games_from_tournament(tournament)
 	active_games.reverse()
 	$('#active-tournament-title').append(title('tournament', tournament))
-	let got_one = false
+	let newest = true
 	active_games.forEach(function (game) {
-		if (!got_one) {
+		if (newest) {
 			game.userIds.forEach((uid) => {
 				if (uid == myUserId) return
-				active_players[uid] = true
+				active_players.push(uid)
 			})
 		}
-		add_active_game(game, got_one)
-		got_one = true
+		add_active_game(game, newest)
+		newest = false
 	})
 }
 async function merge_tournaments() {
+	active_players.forEach(function (uid) {
 
+	})
 }
 function premain() {
     token = localStorage.getItem('token')
@@ -247,15 +249,15 @@ $(function() {
 
 function insertSorted(element, parent) {
 	let added = false
-	let etext = $(element).text()
+	let etext = element.text().toLowerCase()
 	parent.children().each(function(){
-		if (($(this).text()) < etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
-			$(element).insertBefore($(this))
+		if (($(this).text().toLowerCase()) > etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
+			element.insertBefore($(this))
 			added = true;
 			return false;
 		}
 	});
-	if(!added) $(element).appendTo(parent)
+	if(!added) element.appendTo(parent)
 }
 
 function add_player_button(uid) {
@@ -267,6 +269,9 @@ function title(kind, id) {
 	let element = $('<span>')
 	element.addClass(kind+'-name').data('id', id)
 	let name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id)
+	if (kind == 'player' && id == myUserId) {
+		name = 'Me'
+	}
 	element.text(name)
 	return element
 }
