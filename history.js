@@ -319,7 +319,7 @@ function add_player_button(uid) {
 	insertSorted(button, $('#players'));
 }
 function add_active_player(id) {
-	let playerbox = $('<div />').data('playerid', id).addClass('player-history').appendTo($('#player-histories'))
+	let playerbox = $('<div />').data('playerid', id).addClass(`playerid-${id}`).data('wtf', 'definitely').addClass('player-history').appendTo($('#player-histories'))
 	title('player', id, 'h3').prependTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').text(id).appendTo(playerbox);
