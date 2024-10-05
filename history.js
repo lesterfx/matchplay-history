@@ -203,7 +203,7 @@ async function get_other(id) {
 async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
 	active_players = [];
-	// $('#player-histories').empty();  // or don't?
+	$('#player-histories').empty();  // or don't?
 	log(JSON.stringify(all_data.game))
 	log(id)
 	log(all_data.game[id])
@@ -218,7 +218,7 @@ async function compare_players_from_game(id) {
 	await merge_tournaments();
 }
 async function compare_player(id) {
-	// $('#player-histories').empty();  // or don't?
+	$('#player-histories').empty();  // or don't?
 	active_players = [id]
 	log(active_players)
 	add_active_player(id);
@@ -320,7 +320,7 @@ function add_player_button(uid) {
 }
 function add_active_player(id) {
 	let playerbox = $('<div />').data('player-id', id).addClass('player-history').appendTo($('#player-histories')).text(id)
-	title('player', id, 'h3').appendTo(playerbox);
+	title('player', id, 'h3').prependTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
 }

@@ -3,6 +3,15 @@
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 100%;
+    background: #eee;
+}
+.merged-tournaments {
+    background: #ddd;
+}
+#player-histories div.player-history {
+    border: 10px solid green;
+    min-width: 2em;
+    min-height: 2em;
 }
 .boxgroup::after {
     content: "";
