@@ -120,6 +120,7 @@ async function get_me() {
 async function get_all_my_tournaments() {
 	all_my_tournaments = {};
 	(await get_tournaments(myUserId)).forEach(function (tournament) {
+		add_tournament(tournament);
 		all_my_tournaments[tournament.tournamentId] = tournament;
 	})
 }
@@ -131,7 +132,6 @@ async function get_tournaments(uid) {
 	});
 	data.forEach(function (tournament) {
 		save_data('tournament', tournament);
-		add_tournament(tournament);
 	});
 	return data;
 }
@@ -201,6 +201,7 @@ async function get_other(id) {
 	});
 }
 async function compare_players_from_game(id) {
+	log('welcome to compareplayersfromgame!')
 	active_players = [];
 	$('#player-histories').empty();  // or don't?
 	let uids = all_data.games[id].userIds;
@@ -272,25 +273,29 @@ $(function() {
 });
 
 async function clickthing() {
-	let kind = $(this).data('kind');
-	let id = $(this).data('id');
-	switch (kind) {
-		case 'tournament':
-			log('get othe')
-			await get_other(id);
-			break;
-		case 'game':
-			log('compare players from game')
-			await compare_players_from_game(id);
-			break;
-		case 'player':
-			log('compare player')
-			await compare_player(id);
-			break;
-		default:
-			alert(`clicked a ${kind}, which isn't handled yet`);
+	try {
+		let kind = $(this).data('kind');
+		let id = $(this).data('id');
+		switch (kind) {
+			case 'tournament':
+				log('get othe')
+				await get_other(id);
+				break;
+			case 'game':
+				log('compare players from game')
+				await compare_players_from_game(id);
+				break;
+			case 'player':
+				log('compare player')
+				await compare_player(id);
+				break;
+			default:
+				alert(`clicked a ${kind}, which isn't handled yet`);
+		}
+		$(this).addClass('active').siblings().removeClass('active');
+	} catch (err) {
+		log(err)
 	}
-	$(this).addClass('active').siblings().removeClass('active');
 }
 function insertSorted(element, parent) {
 	let added = false;
@@ -318,7 +323,9 @@ function add_active_player(id) {
 
 function add_player_tournament(uid, tid) {
 	let trow = title('tournament', tid, 'h4');
-	$(`#player-histories>div[data-player-id="${uid}"]>.merged-tournaments`).append(trow);
+	let selector = `#player-histories>div[data-player-id="${uid}"]>.merged-tournaments`
+	log(selector)
+	$(selector).append(trow);
 }
 
 function title(kind, id, element_type) {
