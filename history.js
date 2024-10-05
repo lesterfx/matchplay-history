@@ -119,10 +119,10 @@ async function get_me() {
 
 async function get_all_my_tournaments() {
 	all_my_tournaments = {};
-	(await get_tournaments(myUserId)).forEach(function (tournament) {
+	for (tournament of (await get_tournaments(myUserId))) {
 		add_tournament(tournament);
 		all_my_tournaments[tournament.tournamentId] = tournament;
-	})
+	}
 }
 
 async function get_tournaments(uid) {
@@ -130,10 +130,15 @@ async function get_tournaments(uid) {
 		endpoint: 'tournaments',
 		query: {played: uid}
 	});
-	data.forEach(function (tournament) {
+	for (tournament of data) {
 		save_data('tournament', tournament);
-	});
+	};
 	return data;
+}
+async function get_games_from_tournaments(tournaments) {
+	for (tournament of tournaments) {
+		await get_games_from_tournament(tournament)
+	}
 }
 async function get_games_from_tournament(tournament) {
 	let tid = tournament.tournamentId;
@@ -151,14 +156,14 @@ async function get_games_from_tournament(tournament) {
 		query: {player: pid}
 	});
 	log('got games');
-	games.forEach(function (game) {
-		game.userIds.forEach(function (uid) {
+	for (game of games) {
+		for (uid of game.userIds) {
 			save_data('game', game);
 			if (uid == myUserId) return;
 			if (active_players[uid]) {
 			};
-		});
-	});
+		};
+	};
 	return games;
 }
 async function get_tournament_details(tournament) {
@@ -174,7 +179,7 @@ async function get_tournament_details(tournament) {
 	let pid;
 	// log(tournament_details);
 	log('adding players');
-	tournament_details.players.forEach(function (player) {
+	for (player of tournament_details.players) {
 		let uid = player.claimedBy;
 		if (uid == myUserId) {
 			pid = player.playerId;
@@ -183,11 +188,11 @@ async function get_tournament_details(tournament) {
 			all_data.player[uid] = player;
 			add_player_button(uid);
 		};
-	});
+	};
 	log('adding arenas');
-	tournament_details.arenas.forEach(function (arena) {
+	for (arena of tournament_details.arenas) {
 		save_data('arena', arena);
-	});
+	};
 	return pid;
 }
 async function get_other(id) {
@@ -196,48 +201,48 @@ async function get_other(id) {
 	let active_games = await get_games_from_tournament(tournament);
 	active_games.reverse();
 	$('#active-tournament-title').append(title('tournament', tournament.tournamentId));
-	active_games.forEach(function (game) {
+	for (game of active_games) {
 		add_active_game(game);
-	});
+	};
 }
 async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
-	active_players = [];
+	let active_players = [];
 	$('#player-histories').empty();  // or don't?
 	log(JSON.stringify(all_data.game))
 	log(id)
 	log(all_data.game[id])
 	let uids = all_data.game[id].userIds;
 	log(uids)
-	uids.forEach((uid) => {
+	for (uid of uids) {
 		if (uid == myUserId) return;
 		active_players.push(uid);
 		add_active_player(uid);
-	});
-	log(active_players)
-	await merge_tournaments();
+	};
+	await merge_tournaments(active_players);
 }
 async function compare_player(id) {
 	$('#player-histories').empty();  // or don't?
-	active_players = [id]
-	log(active_players)
+	let active_players = [id]
 	add_active_player(id);
-	await merge_tournaments()
+	await merge_tournaments(active_players)
 }
-async function merge_tournaments() {
+async function merge_tournaments(active_players) {
 	let merged_tournaments = {};
-	active_players.forEach(async function (uid) {
+	for (uid of active_players) {
 		let tournaments = await get_tournaments(uid);
 		log(`${tournaments.length} tournaments`)
-		tournaments.forEach(function (tournament) {
+		for (tournament of tournaments) {
 			let tid = tournament.tournamentId
 			if (all_my_tournaments[tid]) {
 				add_player_tournament(uid, tid)
 				merged_tournaments[tid] = true
 			}
-		});
-	});
-	log(`merged tournaments: ${JSON.stringify(merged_tournaments)}`)
+		};
+	};
+	log(merged_tournaments);
+	log(`merged tournaments: ${JSON.stringify(merged_tournaments)}`);
+	await get_games_from_tournaments(merged_tournaments)
 }
 function premain() {
     token = localStorage.getItem('token');
@@ -257,10 +262,7 @@ function premain() {
 async function main() {
 	await get_me();
 	await get_all_my_tournaments();
-	// await get_other(all_my_tournaments[0].tournamentId)
-	// await merge_tournaments()
 
-	//todo.push(merge_tournaments)
 	//todo.push(get_games_from_tournaments)
 	//todo.push(get_missing_tournament_details)
 }
@@ -319,11 +321,10 @@ function add_player_button(uid) {
 	insertSorted(button, $('#players'));
 }
 function add_active_player(id) {
-	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history').appendTo($('#player-histories'))
+	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history').appendTo($('#player-histories'));
 	title('player', id, 'h3').prependTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
-	$('<div />').addClass('merged-tournaments').text(id).appendTo(playerbox);
-	$('#player-histories').prepend($('<div>').text($('#player-histories').html()))
+	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
 }
 
 function add_player_tournament(uid, tid) {
@@ -364,9 +365,9 @@ function add_active_game(game) {
 	title('arena', game.arenaId).appendTo(box);
 	spacer().appendTo(box);
 	let plist = $('<ol>').addClass('players').appendTo(box);
-	game.userIds.forEach(function (uid) {
+	for (uid of game.userIds) {
 		$('<li>').append(title('player', uid)).appendTo(plist);
-	})
+	}
 	spacer().appendTo(box);
 	title('tournament', game.tournamentId).appendTo(box);
 	$('#active-games').append(box);
