@@ -239,11 +239,13 @@ $(function() {
 	} catch (err) {
 		log(err)
 	}
-	$('#active-tournaments').on('click', '.tournament-name.button', function () {
+	$('#active-tournaments').on('click', '.button', function () {
+		alert('click')
 		let tid = $(this).data('id')
 		get_other(tid)
 	})
-	$('#players').on('click', '.player-name.button', function () {
+	$('#players').on('click', '.button', function () {
+		alert('click')
 		let uid = $(this).data('userId')
 		alert(`player ${uid} clicked`)
 	})
@@ -263,7 +265,7 @@ function insertSorted(element, parent) {
 }
 
 function add_player_button(uid) {
-	let button = title('player', uid).addClass('box button')
+	let button = title('player', uid).addClass('box')
 	insertSorted(button, $('#players'))
 }
 
