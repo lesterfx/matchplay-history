@@ -136,7 +136,7 @@ async function get_tournaments(uid) {
 	return data;
 }
 async function get_games_from_tournaments(tournaments) {
-	for (tournament of tournaments) {
+	for (tournament in tournaments) {
 		await get_games_from_tournament(tournament)
 	}
 }
