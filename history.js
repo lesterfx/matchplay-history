@@ -204,7 +204,7 @@ async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
 	active_players = [];
 	// $('#player-histories').empty();  // or don't?
-	log(all_data.game)
+	log(JSON.stringify(all_data.game))
 	log(id)
 	log(all_data.game[id])
 	let uids = all_data.game[id].userIds;
@@ -349,7 +349,10 @@ function notitle(kind, id, element_type) {
 function save_data(kind, obj) {
 	let id = obj[kind+'Id'];
 	all_data[kind][id] = obj;
-	$(`.${kind}-name[data-id="${id}"`).text(obj.name);
+	log(`saved ${kind} ${id}`);
+	if (obj.name) {
+		$(`.${kind}-name[data-id="${id}"`).text(obj.name);
+	}
 }
 function spacer() {
 	return $('<div>').addClass('spacer');
