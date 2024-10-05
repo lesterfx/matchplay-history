@@ -74,7 +74,7 @@
 
 myUserId = 0
 all_my_tournaments = {}
-active_players = []
+active_players = {}
 my_pid_by_organizer = {}
 all_data = {
 	player: {},
@@ -158,8 +158,11 @@ async function get_games_from_tournament(tournament) {
 	log(`got ${games.length} games`);
 	for (game of games) {
 		save_data('game', game);
+		log(game.userIds)
 		for (uid of game.userIds) {
+			log(uid)
 			if (uid == myUserId) return;
+			log(active_players)
 			if (active_players[uid]) {
 			};
 		};
@@ -208,7 +211,7 @@ async function get_other(id) {
 }
 async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
-	active_players = [];
+	active_players = {};
 	$('#player-histories').empty();  // or don't?
 	log(JSON.stringify(all_data.game))
 	log(id)
@@ -217,14 +220,15 @@ async function compare_players_from_game(id) {
 	log(uids)
 	for (uid of uids) {
 		if (uid == myUserId) return;
-		active_players.push(uid);
+		active_players[uid] = true;
 		add_active_player(uid);
 	};
 	await merge_tournaments();
 }
 async function compare_player(id) {
 	$('#player-histories').empty();  // or don't?
-	active_players = [id]
+	active_players = {}
+	active_players[id] = true
 	add_active_player(id);
 	await merge_tournaments()
 }
@@ -301,6 +305,7 @@ async function clickthing() {
 		}
 		$(this).addClass('active').siblings().removeClass('active');
 	} catch (err) {
+		alert(err)
 		log(err)
 	}
 }
