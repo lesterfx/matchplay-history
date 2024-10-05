@@ -155,7 +155,7 @@ async function get_games_from_tournament(tournament) {
 		endpoint: `tournaments/${tid}/games`,
 		query: {player: pid}
 	});
-	log('got games');
+	log(`got ${games.length} games`);
 	for (game of games) {
 		for (uid of game.userIds) {
 			save_data('game', game);
@@ -340,8 +340,7 @@ function title(kind, id, element_type) {
 	element.addClass(kind+'-name');
 	let name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id);
 	if (kind == 'player' && id == myUserId) name = 'Me';
-	element.text(name);
-
+	element.text(`${name} (${kind} ${id})`);
 	return element;
 }
 function notitle(kind, id, element_type) {
@@ -351,6 +350,9 @@ function notitle(kind, id, element_type) {
 }
 function save_data(kind, obj) {
 	let id = obj[kind+'Id'];
+	if (all_data[kind][id]) {
+		log(`${kind} ${id} already known. is this bad?`)
+	}
 	all_data[kind][id] = obj;
 	log(`saved ${kind} ${id}`);
 	if (obj.name) {
