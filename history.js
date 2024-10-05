@@ -208,16 +208,19 @@ async function compare_players_from_game(id) {
 		active_players.push(uid);
 		add_active_player(uid);
 	});
+	log(active_players)
 	await merge_tournaments();
 }
 async function compare_player(id) {
 	active_players = [id]
+	log(active_players)
 	await merge_tournaments()
 }
 async function merge_tournaments() {
 	let merged_tournaments = {};
 	active_players.forEach(async function (uid) {
 		let tournaments = await get_tournaments(uid);
+		log(`${tournaments.length} tournaments`)
 		tournaments.forEach(function (tournament) {
 			let tid = tournament.tournamentId
 			if (all_my_tournaments[tid]) {
@@ -226,6 +229,7 @@ async function merge_tournaments() {
 			}
 		});
 	});
+	log(`merged tournaments: ${merged_tournaments}`)
 }
 function premain() {
     token = localStorage.getItem('token');
@@ -264,19 +268,23 @@ $(function() {
 	$('.clickables').on('click', '.box', clickthing);
 });
 
-function clickthing() {
-	$(this).addClass('active').siblings().removeClass('active');
+async function clickthing() {
 	let kind = $(this).data('kind');
 	let id = $(this).data('id');
 	switch (kind) {
 		case 'tournament':
-			return get_other(id);
+			await get_other(id);
+			break;
 		case 'game':
-			return compare_players_from_game(id);
+			await compare_players_from_game(id);
+			break;
 		case 'player':
-			return compare_player(id);
-		}
-	alert(`clicked a ${kind}, which isn't handled yet`);
+			await compare_player(id);
+			break;
+		default:
+			alert(`clicked a ${kind}, which isn't handled yet`);
+	}
+	$(this).addClass('active').siblings().removeClass('active');
 }
 function insertSorted(element, parent) {
 	let added = false;
