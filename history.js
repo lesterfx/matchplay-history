@@ -192,16 +192,12 @@ async function get_other(id) {
 	let active_games = await get_games_from_tournament(tournament)
 	active_games.reverse()
 	$('#active-tournament-title').append(title('tournament', tournament.tournamentId))
-	let newest = true
 	active_games.forEach(function (game) {
-		if (newest) {
-			game.userIds.forEach((uid) => {
-				if (uid == myUserId) return
-				active_players.push(uid)
-			})
-		}
-		add_active_game(game, newest)
-		newest = false
+		// game.userIds.forEach((uid) => {
+		// 	if (uid == myUserId) return
+		// 	active_players.push(uid)
+		// })
+		add_active_game(game)
 	})
 }
 async function merge_tournaments() {
@@ -227,8 +223,9 @@ function premain() {
 async function main() {
 	await get_me()
 	await get_my_tournaments()
-	await get_other(my_tournaments[0].tournamentId)
-	await merge_tournaments()
+	// await get_other(my_tournaments[0].tournamentId)
+	// await merge_tournaments()
+
 	//todo.push(merge_tournaments)
 	//todo.push(get_games_from_tournaments)
 	//todo.push(get_missing_tournament_details)
@@ -242,6 +239,10 @@ $(function() {
 	} catch (err) {
 		log(err)
 	}
+	$('#active-tournaments').on('click', '.tournament-name.button', function () {
+		let tid = $(this).data('id')
+		get_other(tid)
+	})
 	$('#players').on('click', '.player-name.button', function () {
 		let uid = $(this).data('userId')
 		alert(`player ${uid} clicked`)
@@ -282,12 +283,9 @@ function save_data(kind, obj) {
 function spacer() {
 	return $('<div>').addClass('spacer')
 }
-function add_active_game(game, active) {
+function add_active_game(game) {
 	log(game)
 	let box = $('<div>').addClass('game box')
-	if (active) {
-		box.addClass('active')
-	}
 	title('arena', game.arenaId).appendTo(box)
 	spacer().appendTo(box)
 	let plist = $('<ol>').addClass('players').appendTo(box)
