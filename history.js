@@ -153,9 +153,9 @@ async function get_games_from_tournament(tournament) {
 	log('got games');
 	games.forEach(function (game) {
 		game.userIds.forEach(function (uid) {
+			save_data('game', game);
 			if (uid == myUserId) return;
 			if (active_players[uid]) {
-				save_data('game', game);
 			};
 		});
 	});
