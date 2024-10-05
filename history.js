@@ -323,7 +323,7 @@ function add_active_player(id) {
 	title('player', id, 'h3').prependTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').text(id).appendTo(playerbox);
-	$('#player-histories').prepend($('#player-histories').html())
+	$('#player-histories').prepend($('<div>').text($('#player-histories').html()))
 }
 
 function add_player_tournament(uid, tid) {
