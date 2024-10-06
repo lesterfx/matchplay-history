@@ -157,6 +157,12 @@ async function get_games_from_tournaments(tournaments) {
 				};
 			};
 		};
+		$(`#player-histories`).css('background', 'red')
+		$(`#player-histories div.player-history`).css('background', 'yellow')
+		$(`#player-histories div.player-history[data-player-id="${uid}"]`).css('background', 'red')
+		$(`#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments`).css('background', 'green')
+		$(`#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments [data-kind]`).css('background', 'blue')
+		$(`#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments [data-kind="tournament"]`).css('background', 'purple')
 		$(`#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
 	};
 
