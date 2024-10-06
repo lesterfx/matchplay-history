@@ -83,14 +83,14 @@ all_data = {
 	game: {}
 }
 
-log('history begin')
+// log('history begin')
 
 limit_calls = 9;
 limit_period = 1.3;
 limit_last_reset = 0;
 limit_num_calls = 0;
 async function get(...args) {
-	while (limit_num_calls >= limit_calls) {  // was if, trying while...
+	if (limit_num_calls >= limit_calls) {  // try if or while...?
 		let wait = limit_period_remaining();
 		await Promise(resolve => setTimeout(resolve, wait));
 	}
@@ -123,11 +123,10 @@ async function get_unlimited(options) {
 		request.url += '?' + $.param(options.query)
 	}
 	request.dataType = 'json'
-	log(request.url)
+	log(`${request.url} - ${performance.now()}`)
 	let requested = $.get(request)
 	requested.fail(function (e) {
-		log('error:')
-		log(e.toString())
+		log(e.message)
 		throw e
 	})
 	response = await requested
@@ -172,7 +171,7 @@ async function get_games_from_tournaments(tournaments) {
 }
 async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
-	log(`getting games from tournament ${tournament}`)
+	// log(`getting games from tournament ${tournament}`)
 	let tournament_games = await get_games_from_tournament(tournament)
 	for (game of tournament_games) {
 		// log(game.userIds);
@@ -183,7 +182,7 @@ async function get_and_populate_games_from_tournament(tid) {
 				continue
 			}
 			if (active_players[uid]) {
-				log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
+				// log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
 				let won = did_i_win(game, uid)
 				add_player_game({
 					uid: uid,
@@ -197,7 +196,7 @@ async function get_and_populate_games_from_tournament(tid) {
 	$(`#player-histories div.player-history div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
 }
 async function get_games_from_tournament(tournament, add_players) {
-	log(`doing get_games_from_tournament, active players  ${stringify(active_players)}`)
+	// log(`doing get_games_from_tournament, active players  ${stringify(active_players)}`)
 	let tid = tournament.tournamentId;
 	if (!tid) {
 		throw Error(`no tournamentId in ${stringify(tournament)} passed into get_games_from_tournament`)
@@ -205,17 +204,17 @@ async function get_games_from_tournament(tournament, add_players) {
 	let pid;
 	if (my_pid_by_organizer[tid]) {
 		pid = my_pid_by_organizer[tid];
-		log(`already knew my pid: ${pid}`);
+		// log(`already knew my pid: ${pid}`);
 	} else {
 		pid = await get_tournament_details(tournament, add_players);
-		log(`my pid: ${pid}`);
+		// log(`my pid: ${pid}`);
 		my_pid_by_organizer[tid] = pid;
 	};
 	let games = await get({
 		endpoint: `tournaments/${tid}/games`,
 		query: {player: pid}
 	});
-	log(`got ${games.length} games`);
+	// log(`got ${games.length} games`);
 	for (game of games) {
 		save_data('game', game);
 	};
@@ -223,7 +222,7 @@ async function get_games_from_tournament(tournament, add_players) {
 }
 async function get_tournament_details(tournament, add_players) {
 	let tid = tournament.tournamentId;
-	log(`getting tournament ${tid} details`);
+	// log(`getting tournament ${tid} details`);
 	if (!tournament) {
 		throw Error('no tournament passed into get_tournament_details')
 	}
@@ -243,11 +242,11 @@ async function get_tournament_details(tournament, add_players) {
 		};
 		if (!all_data.user[uid] && add_players) {
 			all_data.user[uid] = player;
-			log(`adding player ${uid}`)
+			// log(`adding player ${uid}`)
 			add_player_button(uid);
 		};
 	};
-	log('adding arenas');
+	// log('adding arenas');
 	for (arena of tournament_details.arenas) {
 		save_data('arena', arena);
 	};
@@ -258,7 +257,7 @@ async function get_other(id) {
 	let tournament = all_data.tournament[id];
 	active_players = {}
 	let active_games = await get_games_from_tournament(tournament, true);
-	log(`active_games: ${active_games}`)
+	// log(`active_games: ${active_games}`)
 	active_games.reverse();
 	$('#active-tournament-title').empty().append(title('tournament', tournament.tournamentId));
 	for (game of active_games) {
@@ -266,25 +265,25 @@ async function get_other(id) {
 	};
 }
 async function compare_players_from_game(id) {
-	log('welcome to compareplayersfromgame!')
+	// log('welcome to compareplayersfromgame!')
 	active_players = {};
 	// $('#player-histories').empty();  // or don't?
-	log(all_data.game);
-	log(id);
-	log(all_data.game[id]);
+	// log(all_data.game);
+	// log(id);
+	// log(all_data.game[id]);
 	let uids = all_data.game[id].userIds;
-	log(uids);
+	// log(uids);
 	for (uid of uids) {
 		if (uid == myUserId) continue;
-		log(`adding ${uid} to active players`);
+		// log(`adding ${uid} to active players`);
 		if (add_active_player(uid)) {
 			active_players[uid] = 1;
-			log(active_players);
+			// log(active_players);
 		} else {
-			log(`${uid} already activated`)
+			// log(`${uid} already activated`)
 		}
 	};
-	log(`done compare_players_from_game, active players  ${stringify(active_players)}`)
+	// log(`done compare_players_from_game, active players  ${stringify(active_players)}`)
 	await merge_tournaments();
 }
 async function compare_player(id) {
@@ -296,11 +295,11 @@ async function compare_player(id) {
 	}
 }
 async function merge_tournaments() {
-	log(`merge_tournaments, active players ${stringify(active_players)}`)
+	// log(`merge_tournaments, active players ${stringify(active_players)}`)
 	let merged_tournaments = {};
 	for (uid in active_players) {
 		let tournaments = await get_tournaments(uid);
-		log(`${tournaments.length} tournaments`);
+		// log(`${tournaments.length} tournaments`);
 		for (tournament of tournaments) {
 			let tid = tournament.tournamentId
 			if (all_my_tournaments[tid]) {
@@ -309,8 +308,8 @@ async function merge_tournaments() {
 			}
 		};
 	};
-	log(merged_tournaments);
-	log(`merged tournaments: ${stringify(merged_tournaments)}`);
+	// log(merged_tournaments);
+	// log(`merged tournaments: ${stringify(merged_tournaments)}`);
 	await get_games_from_tournaments(merged_tournaments);
 }
 function did_i_win(game, uid) {
@@ -371,17 +370,17 @@ async function clickthing() {
 		let id = $(this).data('id');
 		switch (kind) {
 			case 'tournament':
-				log('get other');
+				// log('get other');
 				await get_other(id);
 				$('#active-tournament-title')[0].scrollIntoView();
 				break;
 				case 'game':
-					log('compare players from game');
+					// log('compare players from game');
 					await compare_players_from_game(id);
 					$('#active-tournament-title')[0].scrollIntoView();
 				break;
 			case 'user':
-				log('compare player');
+				// log('compare player');
 				await compare_player(id);
 				$('#active-tournament-title')[0].scrollIntoView();
 				break;
@@ -429,7 +428,7 @@ function add_active_player(id) {
 	return true
 }
 function add_player_tournament(uid, tid) {
-	let trow = title('tournament', tid, 'div').prepend('loading').append('...');
+	let trow = title('tournament', tid, 'div').prepend('Loading ').append('...');
 	let selector = `#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments`
 	trow.appendTo($(selector));
 }
@@ -438,7 +437,7 @@ function title(kind, id, element_type) {
 	let element = notitle(kind, id, element_type);
 	element.addClass(kind+'-name');
 	let name;
-	if (kind == 'player' && id == myUserId) {
+	if (kind == 'user' && id == myUserId) {
 		name = 'Me';
 	} else {
 		name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id);
@@ -453,13 +452,13 @@ function notitle(kind, id, element_type) {
 }
 function save_data(kind, obj) {
 	let id = obj[kind+'Id'];
-	if (all_data[kind][id]) {
-		log(`${kind} ${id} already known. is this bad?`)
-	}
-	all_data[kind][id] = obj;
-	log(`saved ${kind} ${id}`);
-	if (obj.name) {
-		$(`.${kind}-name[data-id="${id}"`).text(obj.name);
+	if (!all_data[kind][id]) {
+		//log(`${kind} ${id} already known. is this bad?`)
+		all_data[kind][id] = obj;
+		// log(`saved ${kind} ${id}`);
+		if (obj.name) {
+			$(`.${kind}-name[data-id="${id}"`).text(obj.name);
+		}
 	}
 }
 function spacer() {
@@ -479,7 +478,7 @@ function add_active_game(game) {
 	$('#active-games').append(box);
 }
 function game_element(game, inc_players, inc_tournament) {
-	log(game);
+	// log(game);
 	let box = notitle('game', game.gameId, 'div').addClass('box');
 	title('arena', game.arenaId).appendTo(box);
 	spacer().appendTo(box);
@@ -504,4 +503,4 @@ function fakefill(element) {
 	}
 	return element;
 }
-log('history end');
+// log('history end');
