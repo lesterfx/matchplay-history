@@ -22,7 +22,6 @@ html {
         --active-color: #08f;
     }
 }
-
 .boxgroup {
     display: flex;
     flex-direction: row;
