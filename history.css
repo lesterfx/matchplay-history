@@ -47,6 +47,12 @@
 .box.active {
     outline: 4px solid #08f;
 }
+.box.won {
+    background: green;
+}
+.box.lost {
+    background: red;
+}
 #token-entry {
     display: none;
 }
@@ -66,6 +72,6 @@
 .spacer {
     flex-grow: 1;
 }
-#main {
+html {
     scroll-behavior: smooth;
 }
