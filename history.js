@@ -166,7 +166,7 @@ async function get_games_from_tournaments(tournaments) {
 
 
 }
-async function get_games_from_tournament(tournament) {
+async function get_games_from_tournament(tournament, add_players) {
 	log(`doing get_games_from_tournament, active players  ${stringify(active_players)}`)
 	let tid = tournament.tournamentId;
 	if (!tid) {
@@ -177,7 +177,7 @@ async function get_games_from_tournament(tournament) {
 		pid = my_pid_by_organizer[tid];
 		log(`already knew my pid: ${pid}`);
 	} else {
-		pid = await get_tournament_details(tournament);
+		pid = await get_tournament_details(tournament, add_players);
 		log(`my pid: ${pid}`);
 		my_pid_by_organizer[tid] = pid;
 	};
