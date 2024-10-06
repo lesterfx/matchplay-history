@@ -125,7 +125,7 @@ async function get_all_my_tournaments() {
 	}
 }
 
-async function get_tournaments(uid) {
+async function get_tournaments(uid) {  // paginate
 	let data = await get({
 		endpoint: 'tournaments',
 		query: {played: uid}
@@ -136,7 +136,7 @@ async function get_tournaments(uid) {
 	return data;
 }
 async function get_games_from_tournaments(tournaments) {
-	for (tid in tournaments) {
+	for (tid in tournaments) {  // parallelize
 		let tournament = all_data.tournament[tid]
 		log(`getting games from tournament ${tournament}`)
 		let tournament_games = await get_games_from_tournament(tournament)
@@ -157,12 +157,6 @@ async function get_games_from_tournaments(tournaments) {
 				};
 			};
 		};
-		$(`#player-histories`).css('background', 'red')
-		$(`#player-histories div.player-history`).css('background', 'yellow')
-		$(`#player-histories div.player-history`).css('background', 'red')
-		$(`#player-histories div.player-history div.merged-tournaments`).css('background', 'green')
-		$(`#player-histories div.player-history div.merged-tournaments [data-kind]`).css('background', 'blue')
-		$(`#player-histories div.player-history div.merged-tournaments [data-kind="tournament"]`).css('background', 'purple')
 		$(`#player-histories div.player-history div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
 	};
 
@@ -244,7 +238,7 @@ async function get_other(id) {
 async function compare_players_from_game(id) {
 	log('welcome to compareplayersfromgame!')
 	active_players = {};
-	$('#player-histories').empty();  // or don't?
+	// $('#player-histories').empty();  // or don't?
 	log(all_data.game);
 	log(id);
 	log(all_data.game[id]);
@@ -253,19 +247,23 @@ async function compare_players_from_game(id) {
 	for (uid of uids) {
 		if (uid == myUserId) continue;
 		log(`adding ${uid} to active players`);
-		active_players[uid] = 1;
-		log(active_players);
-		add_active_player(uid);
+		if (add_active_player(uid)) {
+			active_players[uid] = 1;
+			log(active_players);
+		} else {
+			log(`${uid} already activated`)
+		}
 	};
 	log(`done compare_players_from_game, active players  ${stringify(active_players)}`)
 	await merge_tournaments();
 }
 async function compare_player(id) {
-	$('#player-histories').empty();  // or don't?
+	// $('#player-histories').empty();  // or don't?
 	active_players = {}
 	active_players[id] = true
-	add_active_player(id);
-	await merge_tournaments()
+	if (add_active_player(id)) {
+		await merge_tournaments()
+	}
 }
 async function merge_tournaments() {
 	log(`merge_tournaments, active players ${stringify(active_players)}`)
@@ -389,10 +387,18 @@ function add_player_button(uid) {
 	insertSorted(button, $('#players'));
 }
 function add_active_player(id) {
-	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history').appendTo($('#player-histories'));
+	let already_exists = $(`#player-histories div.player-history[data-player-id="${uid}"]`)
+	if (already_exists.length) {
+		already_exists.prependTo($('#player-histories'));
+		return false;
+	};
+	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history');
 	title('user', id, 'h3').prependTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
+
+	playerbox.prependTo($('#player-histories'));
+	return true
 }
 function add_player_tournament(uid, tid) {
 	let trow = title('tournament', tid, 'h4');
