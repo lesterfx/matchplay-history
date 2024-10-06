@@ -260,16 +260,16 @@ async function merge_tournaments() {
 	let games_from_tournaments = await get_games_from_tournaments(merged_tournaments);
 	for (tid in games_from_tournaments) {
 		for (game of games_from_tournaments[tid]) {
-			log(game.userIds);
+			// log(game.userIds);
 			for (uid of game.userIds) {
-				log(uid);
+				// log(uid);
 				if (uid == myUserId) {
-					log('skipping, that is me')
+					// log('skipping, that is me')
 					continue
 				}
 				if (active_players[uid]) {
 					log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
-					let did_i_win = 
+					let did_i_win = did_i_win(game, uid)
 					add_player_game(uid, game, did_i_win)
 				} else {
 					// log(`uid ${uid} not found in active_players: ${stringify(active_players)}`)
