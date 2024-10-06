@@ -284,7 +284,7 @@ async function merge_tournaments() {
 function did_i_win(game, uid) {
 	let myPlayerId
 	let otherPlayerId
-	for (let i=0; i<length(game.userIds); i++) {
+	for (let i=0; i<game.userIds.length(); i++) {
 		let userId = game.userIds[i]
 		let playerId = game.playerIds[i]
 		if (userId == myUserId) {
