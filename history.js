@@ -164,11 +164,11 @@ async function get_games_from_tournaments(tournaments) {
 	for (tid in tournaments) {  // parallelize
 		tids.push(tid);
 	}
-	// for (tid of tids) {
-	// 	get_and_populate_games_from_tournament(tid);
-	// }
-	const promises = tids.map(get_and_populate_games_from_tournament);
-	await Promise.all(promises);
+	for (tid of tids) {
+		get_and_populate_games_from_tournament(tid);
+	}
+	// const promises = tids.map(get_and_populate_games_from_tournament);
+	// await Promise.all(promises);
 }
 async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
@@ -189,7 +189,7 @@ async function get_and_populate_games_from_tournament(tid) {
 					uid: uid,
 					game: game,
 					won: won,
-					order: tid
+					order: -tid
 				})
 			};
 		};
@@ -431,8 +431,7 @@ function add_active_player(id) {
 function add_player_tournament(uid, tid) {
 	let trow = title('tournament', tid, 'div').prepend('loading').append('...');
 	let selector = `#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments`
-	log(selector)
-	$(selector).append(trow);
+	trow.appendTo($(selector));
 }
 
 function title(kind, id, element_type) {

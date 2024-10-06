@@ -49,7 +49,7 @@ html {
 .box.fake {
     height: 0;
     visibility: hidden;
-    order: 1;
+    order: 1000000;
 }
 .box {
     border: 1px solid var(--border);
