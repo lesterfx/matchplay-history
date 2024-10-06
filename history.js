@@ -191,7 +191,7 @@ async function get_games_from_tournament(tournament) {
 	};
 	return games;
 }
-async function get_tournament_details(tournament) {
+async function get_tournament_details(tournament, add_players) {
 	let tid = tournament.tournamentId;
 	log(`getting tournament ${tid} details`);
 	if (!tournament) {
@@ -205,15 +205,13 @@ async function get_tournament_details(tournament) {
 		}
 	});
 	let pid;
-	// log(tournament_details);
-	log('adding players');
 	for (player of tournament_details.players) {
 		let uid = player.claimedBy;
 		if (uid == myUserId) {
 			pid = player.playerId;
 			continue;
 		};
-		if (!all_data.user[uid]) {
+		if (!all_data.user[uid] && add_players) {
 			all_data.user[uid] = player;
 			log(`adding player ${uid}`)
 			add_player_button(uid);
@@ -229,7 +227,7 @@ async function get_other(id) {
 	$('#active-games').empty();
 	let tournament = all_data.tournament[id];
 	active_players = {}
-	let active_games = await get_games_from_tournament(tournament);
+	let active_games = await get_games_from_tournament(tournament, true);
 	log(`active_games: ${active_games}`)
 	active_games.reverse();
 	$('#active-tournament-title').append(title('tournament', tournament.tournamentId));
