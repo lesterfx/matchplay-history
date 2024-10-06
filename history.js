@@ -269,13 +269,34 @@ async function merge_tournaments() {
 				}
 				if (active_players[uid]) {
 					log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
-					add_player_game(uid, game)
+					let did_i_win = 
+					add_player_game(uid, game, did_i_win)
 				} else {
 					// log(`uid ${uid} not found in active_players: ${stringify(active_players)}`)
 				};
 			};
 		};
+		$(`#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
 	};
+}
+function did_i_win(game, uid) {
+	let myPlayerId
+	let otherPlayerId
+	for (let i=0; i<length(game.userIds); i++) {
+		let userId = game.userIds[i]
+		let playerId = game.playerIds[i]
+		if (userId == myUserId) {
+			myPlayerId = playerId
+		}
+		if (userId == uid) {
+			otherPlayerId = playerId
+		}
+	}
+	let result = game.resultPositions
+	if (!result || !result.length) {
+		result = game.suggestions[0].results
+	}
+	return result.indexOf(myPlayerId) < result.indexOf(otherPlayerId)
 
 }
 function premain() {
@@ -313,6 +334,7 @@ $(function() {
 });
 
 async function clickthing() {
+	$(this).addClass('active').siblings().removeClass('active');
 	try {
 		let kind = $(this).data('kind');
 		let id = $(this).data('id');
@@ -334,8 +356,8 @@ async function clickthing() {
 			default:
 				alert(`clicked a ${kind}, which isn't handled yet`);
 		}
-		$(this).addClass('active').siblings().removeClass('active');
 	} catch (err) {
+		$(this).removeClass('active');
 		alert('error!')
 		alert(err)
 		log($(`${err.message}\n${err.stack}`))
@@ -402,7 +424,9 @@ function spacer() {
 }
 function add_player_game(uid, game, did_i_win) {
 	let box = game_element(game, false, true);
-	box.toggleClass('won', did_i_win).toggleClass('lost', !did_i_win);
+	if (typeof did_i_win !== 'undefined') {
+		box.toggleClass('won', did_i_win).toggleClass('lost', !did_i_win);
+	}
 	let parent = $(`#player-histories div.player-history[data-player-id="${uid}"] .boxgroup`);
 	box.appendTo(parent);
 }

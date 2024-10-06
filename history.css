@@ -30,7 +30,7 @@
     content: "";
     display: inline-block;
     flex-grow: 100;
-    flex-basis: 10em;
+    flex-basis: 20em;
     flex-shrink: 1;
 }
 .box {
@@ -39,8 +39,8 @@
     border-radius: 10px;
     padding: 10px;
     margin: 5px;
-    min-width: 10em;
-    flex-basis: 10em;
+    min-width: 20em;
+    flex-basis: 20em;
     display: inline-block;
     flex-grow: 1;
 }
@@ -48,10 +48,12 @@
     outline: 4px solid #08f;
 }
 .box.won {
-    background: green;
+    background: #040;
+    border-color: #afa;
 }
 .box.lost {
-    background: red;
+    background: #400;
+    border-color: #faa;
 }
 #token-entry {
     display: none;
