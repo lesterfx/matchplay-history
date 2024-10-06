@@ -9,7 +9,7 @@ html {
     --lost-border: #faa;
     --active-color: #08f;
 }
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
     html {
         --text: #000;
         --page-background: #fff;
