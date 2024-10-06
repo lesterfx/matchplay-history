@@ -77,7 +77,7 @@ all_my_tournaments = {}
 active_players = {}
 my_pid_by_organizer = {}
 all_data = {
-	player: {},
+	user: {},
 	arena: {},
 	tournament: {},
 	game: {}
