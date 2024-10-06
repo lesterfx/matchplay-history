@@ -95,6 +95,8 @@ html {
 }
 html {
     scroll-behavior: smooth;
+}
+body {
     background: var(--page-background);
     color: var(--text);
 }
