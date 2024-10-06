@@ -85,7 +85,31 @@ all_data = {
 
 log('history begin')
 
-async function get(options) {
+limit_calls = 9;
+limit_period = 1.3;
+limit_last_reset = 0;
+limit_num_calls = 0;
+async function get(...args) {
+	if (limit_num_calls >= limit_calls) {
+		let wait = limit_period_remaining();
+		await Promise(resolve => setTimeout(resolve, wait));
+	}
+	let period_remaining = limit_period_remaining();
+	if (period_remaining <= 0) {
+		limit_num_calls = 0;
+		limit_last_reset = performance.now();
+	};
+	limit_num_calls ++;
+
+	return await get_unlimited(...args)
+}
+
+function limit_period_remaining() {
+	let elapsed = performance.now() - limit_last_reset
+	return limit_period - elapsed
+}
+
+async function get_unlimited(options) {
 	let headers = {}
 	headers['Authorization'] = `Bearer ${token}`
 	headers['Content-Type'] = 'application/json'
@@ -230,7 +254,7 @@ async function get_other(id) {
 	let active_games = await get_games_from_tournament(tournament, true);
 	log(`active_games: ${active_games}`)
 	active_games.reverse();
-	$('#active-tournament-title').append(title('tournament', tournament.tournamentId));
+	$('#active-tournament-title').empty().append(title('tournament', tournament.tournamentId));
 	for (game of active_games) {
 		add_active_game(game);
 	};
@@ -393,7 +417,7 @@ function add_active_player(id) {
 		return false;
 	};
 	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history');
-	title('user', id, 'h3').prependTo(playerbox);
+	title('user', id, 'h2').prependTo(playerbox);
 	$('<div />').addClass('boxgroup').appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
 
@@ -401,7 +425,7 @@ function add_active_player(id) {
 	return true
 }
 function add_player_tournament(uid, tid) {
-	let trow = title('tournament', tid, 'h4');
+	let trow = title('tournament', tid, 'div').prepend('loading').append('...');
 	let selector = `#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments`
 	log(selector)
 	$(selector).append(trow);

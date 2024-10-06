@@ -46,12 +46,10 @@ html {
 .boxgroup:not(.expanded)+div.expander {
     display: none;
 }
-.boxgroup::after {
-    content: "";
+.box.fake {
     height: 0;
     visibility: hidden;
 }
-.boxgroup::after,
 .box {
     border: 1px solid var(--border);
     background: var(--background);
@@ -103,4 +101,5 @@ body {
 #main {
     background: var(--page-background);
     color: var(--text);
+    font-family: sans-serif;
 }
