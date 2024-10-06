@@ -9,7 +9,7 @@ html {
     --lost-border: #faa;
     --active-color: #08f;
 }
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
     html {
         --text: #000;
         --page-background: #fff;
@@ -72,7 +72,7 @@ html {
 }
 .box.lost {
     background: var(--lost-background);
-    border-color: var(--won-background);
+    border-color: var(--lost-border);
 }
 #token-entry {
     display: none;
@@ -97,6 +97,10 @@ html {
     scroll-behavior: smooth;
 }
 body {
+    background: var(--page-background);
+    color: var(--text);
+}
+#main {
     background: var(--page-background);
     color: var(--text);
 }

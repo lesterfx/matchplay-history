@@ -349,7 +349,7 @@ async function clickthing() {
 					await compare_players_from_game(id);
 					$('#active-tournament-title')[0].scrollIntoView()
 				break;
-			case 'player':
+			case 'user':
 				log('compare player')
 				await compare_player(id);
 				break;
