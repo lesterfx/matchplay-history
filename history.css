@@ -49,6 +49,7 @@ html {
 .box.fake {
     height: 0;
     visibility: hidden;
+    order: 1;
 }
 .box {
     border: 1px solid var(--border);
@@ -97,9 +98,9 @@ html {
 body {
     background: var(--page-background);
     color: var(--text);
+    font-family: sans-serif;
 }
 #main {
     background: var(--page-background);
     color: var(--text);
-    font-family: sans-serif;
 }

@@ -160,35 +160,41 @@ async function get_tournaments(uid) {  // paginate
 	return data;
 }
 async function get_games_from_tournaments(tournaments) {
+	let tids = [];
 	for (tid in tournaments) {  // parallelize
-		let tournament = all_data.tournament[tid]
-		log(`getting games from tournament ${tournament}`)
-		let tournament_games = await get_games_from_tournament(tournament)
-		for (game of tournament_games) {
-			// log(game.userIds);
-			for (uid of game.userIds) {
-				// log(uid);
-				if (uid == myUserId) {
-					// log('skipping, that is me')
-					continue
-				}
-				if (active_players[uid]) {
-					log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
-					let won = did_i_win(game, uid)
-					add_player_game(uid, game, won)
-				} else {
-					// log(`uid ${uid} not found in active_players: ${stringify(active_players)}`)
-				};
+		tids.push(tid);
+	}
+	// for (tid of tids) {
+	// 	get_and_populate_games_from_tournament(tid);
+	// }
+	const promises = tids.map(get_and_populate_games_from_tournament);
+	await Promise.all(promises);
+}
+async function get_and_populate_games_from_tournament(tid) {
+	let tournament = all_data.tournament[tid]
+	log(`getting games from tournament ${tournament}`)
+	let tournament_games = await get_games_from_tournament(tournament)
+	for (game of tournament_games) {
+		// log(game.userIds);
+		for (uid of game.userIds) {
+			// log(uid);
+			if (uid == myUserId) {
+				// log('skipping, that is me')
+				continue
+			}
+			if (active_players[uid]) {
+				log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
+				let won = did_i_win(game, uid)
+				add_player_game({
+					uid: uid,
+					game: game,
+					won: won,
+					order: tid
+				})
 			};
 		};
-		$(`#player-histories div.player-history div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
 	};
-
-
-
-
-
-
+	$(`#player-histories div.player-history div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
 }
 async function get_games_from_tournament(tournament, add_players) {
 	log(`doing get_games_from_tournament, active players  ${stringify(active_players)}`)
@@ -248,7 +254,7 @@ async function get_tournament_details(tournament, add_players) {
 	return pid;
 }
 async function get_other(id) {
-	$('#active-games').empty();
+	fakefill($('#active-games').empty());
 	let tournament = all_data.tournament[id];
 	active_players = {}
 	let active_games = await get_games_from_tournament(tournament, true);
@@ -345,9 +351,6 @@ function premain() {
 async function main() {
 	await get_me();
 	await get_all_my_tournaments();
-
-	//todo.push(get_games_from_tournaments)
-	//todo.push(get_missing_tournament_details)
 }
 
 ////////////////////////////////////////////////////////////////
@@ -368,18 +371,19 @@ async function clickthing() {
 		let id = $(this).data('id');
 		switch (kind) {
 			case 'tournament':
-				log('get other')
+				log('get other');
 				await get_other(id);
-				$('#active-tournament-title')[0].scrollIntoView()
+				$('#active-tournament-title')[0].scrollIntoView();
 				break;
 				case 'game':
-					log('compare players from game')
+					log('compare players from game');
 					await compare_players_from_game(id);
-					$('#active-tournament-title')[0].scrollIntoView()
+					$('#active-tournament-title')[0].scrollIntoView();
 				break;
 			case 'user':
-				log('compare player')
+				log('compare player');
 				await compare_player(id);
+				$('#active-tournament-title')[0].scrollIntoView();
 				break;
 			default:
 				alert(`clicked a ${kind}, which isn't handled yet`);
@@ -434,9 +438,13 @@ function add_player_tournament(uid, tid) {
 function title(kind, id, element_type) {
 	let element = notitle(kind, id, element_type);
 	element.addClass(kind+'-name');
-	let name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id);
-	if (kind == 'player' && id == myUserId) name = 'Me';
-	element.text(`${name} (${kind} ${id})`);
+	let name;
+	if (kind == 'player' && id == myUserId) {
+		name = 'Me';
+	} else {
+		name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id);
+	}
+	element.text(name);  // `${name} (${kind} ${id})`);
 	return element;
 }
 function notitle(kind, id, element_type) {
@@ -458,12 +466,13 @@ function save_data(kind, obj) {
 function spacer() {
 	return $('<div>').addClass('spacer');
 }
-function add_player_game(uid, game, did_i_win) {
-	let box = game_element(game, false, true);
+function add_player_game(options) {
+	let box = game_element(options.game, false, true);
+	box.css('order', options.order)
 	if (typeof did_i_win !== 'undefined') {
-		box.toggleClass('won', did_i_win).toggleClass('lost', !did_i_win);
+		box.toggleClass('won', options.won).toggleClass('lost', !options.won);
 	}
-	let parent = $(`#player-histories div.player-history[data-player-id="${uid}"] .boxgroup`);
+	let parent = $(`#player-histories div.player-history[data-player-id="${options.uid}"] .boxgroup`);
 	box.appendTo(parent);
 }
 function add_active_game(game) {
@@ -489,5 +498,11 @@ function game_element(game, inc_players, inc_tournament) {
 }
 function add_tournament(tournament) {
 	title('tournament', tournament.tournamentId).addClass('box').appendTo($('#active-tournaments'));
+}
+function fakefill(element) {
+	for (i=0;i<10;i++) {
+		element.append($('<div>').addClass('fake box'))
+	}
+	return element;
 }
 log('history end');
