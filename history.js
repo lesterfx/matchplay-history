@@ -136,13 +136,35 @@ async function get_tournaments(uid) {
 	return data;
 }
 async function get_games_from_tournaments(tournaments) {
-	let games_from_tournaments = {}
 	for (tid in tournaments) {
 		let tournament = all_data.tournament[tid]
 		log(`getting games from tournament ${tournament}`)
-		games_from_tournaments[tid] = await get_games_from_tournament(tournament)
-	}
-	return games_from_tournaments
+		let tournament_games = await get_games_from_tournament(tournament)
+		for (game of tournament_games) {
+			// log(game.userIds);
+			for (uid of game.userIds) {
+				// log(uid);
+				if (uid == myUserId) {
+					// log('skipping, that is me')
+					continue
+				}
+				if (active_players[uid]) {
+					log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
+					let won = did_i_win(game, uid)
+					add_player_game(uid, game, won)
+				} else {
+					// log(`uid ${uid} not found in active_players: ${stringify(active_players)}`)
+				};
+			};
+		};
+		$(`#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
+	};
+
+
+
+
+
+
 }
 async function get_games_from_tournament(tournament) {
 	log(`doing get_games_from_tournament, active players  ${stringify(active_players)}`)
@@ -257,27 +279,7 @@ async function merge_tournaments() {
 	};
 	log(merged_tournaments);
 	log(`merged tournaments: ${stringify(merged_tournaments)}`);
-	let games_from_tournaments = await get_games_from_tournaments(merged_tournaments);
-	for (tid in games_from_tournaments) {
-		for (game of games_from_tournaments[tid]) {
-			// log(game.userIds);
-			for (uid of game.userIds) {
-				// log(uid);
-				if (uid == myUserId) {
-					// log('skipping, that is me')
-					continue
-				}
-				if (active_players[uid]) {
-					log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
-					let did_i_win = did_i_win(game, uid)
-					add_player_game(uid, game, did_i_win)
-				} else {
-					// log(`uid ${uid} not found in active_players: ${stringify(active_players)}`)
-				};
-			};
-		};
-		$(`#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
-	};
+	await get_games_from_tournaments(merged_tournaments);
 }
 function did_i_win(game, uid) {
 	let myPlayerId
