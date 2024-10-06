@@ -86,7 +86,7 @@ all_data = {
 // log('history begin')
 
 limit_calls = 9;
-limit_period = 1.3;
+limit_period = 1300;
 limit_last_reset = 0;
 limit_num_calls = 0;
 async function get(...args) {

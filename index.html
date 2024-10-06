@@ -57,7 +57,7 @@
 	</div>
 	<script>
 		window.onerror = function(error, url, line) {
-			let e = `window.onerror\n${url}\nline ${line}\n\n${error}`
+			let e = `window.onerror\n${url}\nline ${line}\n\n${error.message}`
 			alert(e)
 			let li = $('<pre>').addClass('windowerror').text(e).prependTo($('#log'))
 		}
