@@ -90,7 +90,7 @@ limit_period = 1.3;
 limit_last_reset = 0;
 limit_num_calls = 0;
 async function get(...args) {
-	if (limit_num_calls >= limit_calls) {
+	while (limit_num_calls >= limit_calls) {  // was if, trying while...
 		let wait = limit_period_remaining();
 		await Promise(resolve => setTimeout(resolve, wait));
 	}
@@ -422,7 +422,7 @@ function add_active_player(id) {
 	};
 	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history');
 	title('user', id, 'h2').prependTo(playerbox);
-	$('<div />').addClass('boxgroup').appendTo(playerbox);
+	fakefill($('<div />').addClass('boxgroup')).appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
 
 	playerbox.prependTo($('#player-histories'));
