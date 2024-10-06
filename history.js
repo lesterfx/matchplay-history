@@ -401,13 +401,13 @@ function spacer() {
 	return $('<div>').addClass('spacer');
 }
 function add_player_game(uid, game, did_i_win) {
-	let box = game_element(game, false, true)
-	box.toggleClass('won', did_i_win).toggleClass('lost', !did_i_win)
-	let parent = $(`#player-histories div.player-history[data-player-id="${uid}"] .boxgroup`)
-	box.appendTo(parent)
+	let box = game_element(game, false, true);
+	box.toggleClass('won', did_i_win).toggleClass('lost', !did_i_win);
+	let parent = $(`#player-histories div.player-history[data-player-id="${uid}"] .boxgroup`);
+	box.appendTo(parent);
 }
 function add_active_game(game) {
-	let box = game_element(game, true, false)
+	let box = game_element(game, true, false);
 	$('#active-games').append(box);
 }
 function game_element(game, inc_players, inc_tournament) {
@@ -425,6 +425,7 @@ function game_element(game, inc_players, inc_tournament) {
 	if (inc_tournament) {
 		title('tournament', game.tournamentId).appendTo(box);
 	}
+	return box;
 }
 function add_tournament(tournament) {
 	title('tournament', tournament.tournamentId).addClass('box').appendTo($('#active-tournaments'));
