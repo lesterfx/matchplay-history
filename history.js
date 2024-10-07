@@ -108,9 +108,8 @@ async function rate_limit() {
     limit_prev = limit_phase
     limit_phase = (limit_phase+1) % limit_last.length
     let wait = next_call - now
-    if (wait > 0) {
-        await Promise(resolve => setTimeout(resolve, wait));
-    }
+	await Promise(resolve => setTimeout(resolve, wait));
+	log(`waited ${wait}ms`)
     return wait
 }
 

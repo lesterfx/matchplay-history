@@ -36,7 +36,7 @@ html {
     flex-grow: 1;
     border-radius: 20px;
     border: 1px solid var(--border);
-    margin-top: -1px;
+    margin-top: -2px;
     margin-bottom: 30px;
     padding: 10px;
     background: var(--group-background);
@@ -124,10 +124,10 @@ body {
     padding: 10px;
     font-size: 1.3em;
     margin-left: 25px;
-    z-index: 1;
 }
 .tabs>input:checked+label {
     background-color: var(--group-background);
+    z-index: 1;
 }
 .tabs>label~label {
     margin-left: -1px;
