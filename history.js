@@ -85,33 +85,30 @@ all_data = {
 
 // log('history begin')
 
-limit_calls = 9;
+
 limit_period = 1300;
-limit_last_reset = 0;
-limit_num_calls = 0;
+limit_phase = 0;
+limit_last = [0,0,0,0,0,0,0,0,0];
+limit_min_step
 async function rate_limit() {
-	let waited = 0
-	if (limit_num_calls >= limit_calls) {  // try if or while...?
-		let wait = limit_period_remaining();
-		waited += wait
-		await Promise(resolve => setTimeout(resolve, wait));
-	}
-	let period_remaining = limit_period_remaining();
-	if (period_remaining <= 0) {
-		limit_num_calls = 0;
-		limit_last_reset = performance.now();
-	};
-	limit_num_calls ++;
-	return waited
-}
-function limit_period_remaining() {
-	let elapsed = performance.now() - limit_last_reset
-	return limit_period - elapsed
+    let now = performance.now()
+    let next_call = Math.max(
+        now,
+        limit_last[limit_phase] + limit_period,
+        limit_last[(limit_phase-1)%limit_last.length] + limit_min_step
+    )
+    limit_last[limit_phase] = next_call
+    limit_phase = (limit_phase+1) % limit_last.length
+    let wait = next_call - now
+    if (wait > 0) {
+        await Promise(resolve => setTimeout(resolve, wait));
+    }
+    return wait
 }
 
 async function get(options) {
-	let headers = {}
-	headers['Authorization'] = `Bearer ${token}`
+    let headers = {}
+    headers['Authorization'] = `Bearer ${token}`
 	headers['Content-Type'] = 'application/json'
 	headers['Accept'] = 'application/json'
 
