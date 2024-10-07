@@ -87,17 +87,19 @@ all_data = {
 
 
 limit_period = 1300;
+limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
 limit_phase = 0;
-limit_last = [0,0,0,0,0,0,0,0,0];
+limit_last = new Array(9).fill(-limit_period);
 limit_min_step = 0.01  // probably unnecessary
 async function rate_limit() {
     let now = performance.now()
     let next_call = Math.max(
         now,
         limit_last[limit_phase] + limit_period,
-        limit_last[(limit_phase-1)%limit_last.length] + limit_min_step
+        limit_last[limit_prev] + limit_min_step
     )
     limit_last[limit_phase] = next_call
+    limit_prev = limit_phase
     limit_phase = (limit_phase+1) % limit_last.length
     let wait = next_call - now
     if (wait > 0) {
