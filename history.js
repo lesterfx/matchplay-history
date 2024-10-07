@@ -89,7 +89,7 @@ all_data = {
 limit_period = 1300;
 limit_phase = 0;
 limit_last = [0,0,0,0,0,0,0,0,0];
-limit_min_step
+limit_min_step = 0.01  // probably unnecessary
 async function rate_limit() {
     let now = performance.now()
     let next_call = Math.max(
