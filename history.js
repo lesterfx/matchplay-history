@@ -93,11 +93,17 @@ limit_last = new Array(9).fill(-limit_period);
 limit_min_step = 0.01  // probably unnecessary
 async function rate_limit() {
     let now = performance.now()
+    
+    let option1 = now
+    let option2 = limit_last[limit_phase] + limit_period
+    let option3 = limit_last[limit_prev] + limit_min_step
+
     let next_call = Math.max(
-        now,
-        limit_last[limit_phase] + limit_period,
-        limit_last[limit_prev] + limit_min_step
+        option1,
+        option2,
+        option3
     )
+    log(`at ${now}, Math.max(\n${option1}\n${option2}\n${option3}\n) = ${next_call}`)
     limit_last[limit_phase] = next_call
     limit_prev = limit_phase
     limit_phase = (limit_phase+1) % limit_last.length
