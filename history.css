@@ -1,8 +1,9 @@
 html {
     --text: #000;
     --page-background: #fff;
-    --background: #ddd;
-    --border: #aaa;
+    --group-background: #ddd;
+    --background: #bbb;
+    --border: #999;
     --won-background: #bfb;
     --won-border: #050;
     --lost-background: #fbb;
@@ -13,8 +14,9 @@ html {
     html {
         --text: #fff;
         --page-background: #000;
-        --background: #222;
-        --border: #555;
+        --group-background: #222;
+        --background: #444;
+        --border: #666;
         --won-background: #040;
         --won-border: #afa;
         --lost-background: #400;
@@ -103,4 +105,27 @@ body {
 #main {
     background: var(--page-background);
     color: var(--text);
+}
+.tabs {
+    padding: 5px;
+}
+.tabs>input {
+    /* display: none; */
+}
+.tabs>input+label {
+    background-color: var(--group-background);
+    border: 1px solid var(--border);
+    border-radius: 10px 0 0 10px;
+}
+.tabs>input:checked+label {
+    background-color: var(--background);
+}
+.tabs>input+label+div {
+    display: none;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--group-background);
+}
+.tabs>input+label+div {
+    display: block;
 }

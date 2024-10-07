@@ -89,9 +89,11 @@ limit_calls = 9;
 limit_period = 1300;
 limit_last_reset = 0;
 limit_num_calls = 0;
-async function get(...args) {
+async function rate_limit() {
+	let waited = 0
 	if (limit_num_calls >= limit_calls) {  // try if or while...?
 		let wait = limit_period_remaining();
+		waited += wait
 		await Promise(resolve => setTimeout(resolve, wait));
 	}
 	let period_remaining = limit_period_remaining();
@@ -100,16 +102,14 @@ async function get(...args) {
 		limit_last_reset = performance.now();
 	};
 	limit_num_calls ++;
-
-	return await get_unlimited(...args)
+	return waited
 }
-
 function limit_period_remaining() {
 	let elapsed = performance.now() - limit_last_reset
 	return limit_period - elapsed
 }
 
-async function get_unlimited(options) {
+async function get(options) {
 	let headers = {}
 	headers['Authorization'] = `Bearer ${token}`
 	headers['Content-Type'] = 'application/json'
@@ -123,7 +123,10 @@ async function get_unlimited(options) {
 		request.url += '?' + $.param(options.query)
 	}
 	request.dataType = 'json'
-	log(`${request.url} - ${performance.now()}`)
+	log(`${request.url}\n${performance.now()}`)
+	let waited = await rate_limit()
+	log(`waited ${waited}ms`)
+	log(`${request.url}\n${performance.now()}`)
 	let requested = $.get(request)
 	requested.fail(function (e) {
 		log(e.message)
@@ -225,6 +228,9 @@ async function get_tournament_details(tournament, add_players) {
 	// log(`getting tournament ${tid} details`);
 	if (!tournament) {
 		throw Error('no tournament passed into get_tournament_details')
+	}
+	if (add_players) {
+		fakefill($('#players').empty())
 	}
 	let tournament_details = await get({
 		endpoint: `tournaments/${tid}`,
