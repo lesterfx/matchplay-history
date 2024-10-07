@@ -86,11 +86,11 @@ all_data = {
 // log('history begin')
 
 
-limit_period = 1300;
-limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
-limit_phase = 0;
-limit_last = new Array(9).fill(-limit_period);
-limit_min_step = 10  // probably unnecessary
+let limit_period = 1300;
+let limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
+let limit_phase = 0;
+let limit_last = new Array(9).fill(-limit_period);
+let limit_min_step = 10  // probably unnecessary
 async function rate_limit() {
     let now = performance.now()
     
@@ -113,9 +113,51 @@ async function rate_limit() {
     }
     return wait
 }
-
 async function get(options) {
-    let headers = {}
+    const headers = new Headers();
+	
+    headers.set('Authorization', `Bearer ${token}`);
+	headers.set('Content-Type', 'application/json');
+	headers.set('Accept', 'application/json');
+
+	const options = {
+		headers: headers,
+	};
+
+	base_url = 'https://app.matchplay.events/api/'
+	let request_url = base_url + options.endpoint
+
+	const data = {
+		var1: 'value1',
+		var2: 'value2'
+	};
+	const searchParams = new URLSearchParams(data);
+	if (options.query) {
+		request_url += '?' + new URLSearchParams(data).toString();
+	}
+	const req = new Request(request_url, options);
+
+	let waited = await rate_limit()
+	log(`waited ${waited}ms`)
+	log(`${request_url}\n${performance.now()}`)
+
+	try {
+		const response = await fetch(req);
+		if (!response.ok) {
+			log(response.status)
+			log(`${response.url}: ${response.status}\n\n${response.body}`)
+			throw new Error(`Response status: ${response.status}`);
+		}
+		const json = await response.json();
+		return json.data
+	  } catch (error) {
+		log(`${request_url}:\n${error.message}`)
+		throw error
+	  }
+}
+
+async function get_old(options) {
+    let headers = Headers()
     headers['Authorization'] = `Bearer ${token}`
 	headers['Content-Type'] = 'application/json'
 	headers['Accept'] = 'application/json'

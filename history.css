@@ -28,16 +28,29 @@ html {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    max-width: 100%;
     min-height: 50px;
     z-index: 0;
     position: relative;
     justify-items: stretch;
+
+    order: 1;
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    margin-top: -1px;
+    padding: 10px;
+    background: var(--group-background);
 }
 .box.fake {
     height: 0;
     visibility: hidden;
     order: 1000000;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-top: none;
+    border-bottom: none;
 }
 .box {
     border: 1px solid var(--border);
@@ -107,20 +120,14 @@ body {
     border-radius: 10px 10px 0 0;
     padding: 10px;
     font-size: 1.3em;
+    margin-left: 10px;
 }
 .tabs>input:checked+label {
     background-color: var(--group-background);
 }
-.tabs>input+label+div {
-    order: 1;
-    width: 100%;
-    display: none;
-    border-radius: 0 20px 20px 20px;
-    border: 1px solid var(--border);
-    margin-top: -1px;
-    padding: 10px;
-    background: var(--group-background);
+.tabs>label~label {
+    margin-left: -1px;
 }
-.tabs>input:checked+label+div {
-    display: block;
+.tabs>input:not(:checked)+label+div {
+    display: none;
 }
