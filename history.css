@@ -108,24 +108,30 @@ body {
 }
 .tabs {
     padding: 5px;
+    display: flex;
+    flex-wrap: wrap;
 }
 .tabs>input {
-    /* display: none; */
+    display: none;
 }
 .tabs>input+label {
+    order: 0;
     background-color: var(--group-background);
     border: 1px solid var(--border);
-    border-radius: 10px 0 0 10px;
+    border-radius: 10px 10px 0 0;
+    padding: 10px;
+    font-size: 1.3em;
 }
 .tabs>input:checked+label {
     background-color: var(--background);
 }
 .tabs>input+label+div {
+    order: 1;
     display: none;
     border-radius: 10px;
     border: 1px solid var(--border);
     background: var(--group-background);
 }
-.tabs>input+label+div {
+.tabs>input:checked+label+div {
     display: block;
 }
