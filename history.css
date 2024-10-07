@@ -109,6 +109,7 @@ body {
     padding: 5px;
     display: flex;
     flex-wrap: wrap;
+    position: relative;
 }
 .tabs>input {
     display: none;
@@ -116,17 +117,23 @@ body {
 .tabs>input+label {
     order: 0;
     background-color: var(--page-background);
-    border: 1px solid var(--border);
+    border-style: solid;
+    border-width: 1px 1px 0 1px;
+    border-color: var(--border);
     border-radius: 10px 10px 0 0;
     padding: 10px;
     font-size: 1.3em;
     margin-left: 25px;
+    z-index: 1;
 }
 .tabs>input:checked+label {
     background-color: var(--group-background);
 }
 .tabs>label~label {
     margin-left: -1px;
+}
+.tabs>input+label+div {
+    width: 100%;
 }
 .tabs>input:not(:checked)+label+div {
     display: none;

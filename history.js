@@ -103,7 +103,7 @@ async function rate_limit() {
         option2,
         option3
     )
-    log(`at ${now}, Math.max(\n${option1}\n${option2}\n${option3}\n) = ${next_call}`)
+    log(`Math.max(\n    ${option1}\n    ${option2}\n    ${option3}\n) = ${next_call}`)
     limit_last[limit_phase] = next_call
     limit_prev = limit_phase
     limit_phase = (limit_phase+1) % limit_last.length
@@ -113,6 +113,7 @@ async function rate_limit() {
     }
     return wait
 }
+
 async function get(options) {
     const headers = new Headers();
 	
@@ -139,16 +140,17 @@ async function get(options) {
 	try {
 		const response = await fetch(req);
 		if (!response.ok) {
-			log(response.status)
-			log(`${response.url}: ${response.status}\n\n${response.body}`)
+			alert('error! logging...')
+			log(`${response.url} error: ${response.status}\n\n${response.body}`)
 			throw new Error(`Response status: ${response.status}`);
 		}
 		const json = await response.json();
 		return json.data
-	  } catch (error) {
-		log(`${request_url}:\n${error.message}`)
+	} catch (error) {
+		alert('error... logging!')
+		log(`${request_url} error:\n${error.message}`)
 		throw error
-	  }
+	}
 }
 
 async function get_old(options) {
