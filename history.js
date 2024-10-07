@@ -208,12 +208,12 @@ async function get_games_from_tournaments(tournaments) {
 	for (tid in tournaments) {  // parallelize
 		tids.push(tid);
 	}
-	for (tid of tids) {
-		log(`populating games from tid ${tid}`)
-		get_and_populate_games_from_tournament(tid);
-	}
-	// const promises = tids.map(get_and_populate_games_from_tournament);
-	// await Promise.all(promises);
+	// for (tid of tids) {
+		// log(`populating games from tid ${tid}`)
+		// get_and_populate_games_from_tournament(tid);
+	// }
+	const promises = tids.map(get_and_populate_games_from_tournament);
+	await Promise.all(promises);
 }
 async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]

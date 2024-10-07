@@ -138,3 +138,6 @@ body {
 .tabs>input:not(:checked)+label+div {
     display: none;
 }
+h2 {
+    padding-top: 1em;
+}
