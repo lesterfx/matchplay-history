@@ -120,7 +120,7 @@ async function get(options) {
 	headers.set('Content-Type', 'application/json');
 	headers.set('Accept', 'application/json');
 
-	const options = {
+	const opts = {
 		headers: headers,
 	};
 
@@ -135,7 +135,7 @@ async function get(options) {
 	if (options.query) {
 		request_url += '?' + new URLSearchParams(data).toString();
 	}
-	const req = new Request(request_url, options);
+	const req = new Request(request_url, opts);
 
 	let waited = await rate_limit()
 	log(`waited ${waited}ms`)

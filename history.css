@@ -120,7 +120,7 @@ body {
     border-radius: 10px 10px 0 0;
     padding: 10px;
     font-size: 1.3em;
-    margin-left: 10px;
+    margin-left: 25px;
 }
 .tabs>input:checked+label {
     background-color: var(--group-background);
