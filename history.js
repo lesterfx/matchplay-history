@@ -90,7 +90,7 @@ limit_period = 1300;
 limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
 limit_phase = 0;
 limit_last = new Array(9).fill(-limit_period);
-limit_min_step = 0.01  // probably unnecessary
+limit_min_step = 10  // probably unnecessary
 async function rate_limit() {
     let now = performance.now()
     
@@ -128,7 +128,6 @@ async function get(options) {
 		request.url += '?' + $.param(options.query)
 	}
 	request.dataType = 'json'
-	log(`${request.url}\n${performance.now()}`)
 	let waited = await rate_limit()
 	log(`waited ${waited}ms`)
 	log(`${request.url}\n${performance.now()}`)
