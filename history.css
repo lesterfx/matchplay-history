@@ -32,12 +32,12 @@ html {
     z-index: 0;
     position: relative;
     justify-items: stretch;
-
     order: 1;
-    width: 100%;
+    flex-grow: 1;
     border-radius: 20px;
     border: 1px solid var(--border);
     margin-top: -1px;
+    margin-bottom: 30px;
     padding: 10px;
     background: var(--group-background);
 }

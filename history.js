@@ -127,13 +127,8 @@ async function get(options) {
 	base_url = 'https://app.matchplay.events/api/'
 	let request_url = base_url + options.endpoint
 
-	const data = {
-		var1: 'value1',
-		var2: 'value2'
-	};
-	const searchParams = new URLSearchParams(data);
 	if (options.query) {
-		request_url += '?' + new URLSearchParams(data).toString();
+		request_url += '?' + new URLSearchParams(options.query).toString();
 	}
 	const req = new Request(request_url, opts);
 
@@ -425,17 +420,17 @@ async function clickthing() {
 			case 'tournament':
 				// log('get other');
 				await get_other(id);
-				$('#active-tournament-title')[0].scrollIntoView();
+				document.querySelector('#active-tournament-title').scrollIntoView();
 				break;
 				case 'game':
 					// log('compare players from game');
 					await compare_players_from_game(id);
-					$('#active-tournament-title')[0].scrollIntoView();
+					document.querySelector('#player-histories').scrollIntoView();
 				break;
 			case 'user':
 				// log('compare player');
 				await compare_player(id);
-				$('#active-tournament-title')[0].scrollIntoView();
+				document.querySelector('#player-histories').scrollIntoView();
 				break;
 			default:
 				alert(`clicked a ${kind}, which isn't handled yet`);
@@ -444,7 +439,7 @@ async function clickthing() {
 		$(this).removeClass('active');
 		alert('error!')
 		alert(err)
-		log($(`${err.message}\n${err.stack}`))
+		log(`${err.message}\n${err.stack}`)
 		log(err)
 		throw(err)
 	}
