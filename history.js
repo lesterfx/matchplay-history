@@ -167,6 +167,7 @@ async function get_games_from_tournaments(tournaments) {
 		tids.push(tid);
 	}
 	for (tid of tids) {
+		log(`populating games from tid ${tid}`)
 		get_and_populate_games_from_tournament(tid);
 	}
 	// const promises = tids.map(get_and_populate_games_from_tournament);
@@ -273,7 +274,7 @@ async function get_other(id) {
 async function compare_players_from_game(id) {
 	// log('welcome to compareplayersfromgame!')
 	active_players = {};
-	// $('#player-histories').empty();  // or don't?
+	$('#player-histories').empty();  // or don't?
 	// log(all_data.game);
 	// log(id);
 	// log(all_data.game[id]);
@@ -293,7 +294,7 @@ async function compare_players_from_game(id) {
 	await merge_tournaments();
 }
 async function compare_player(id) {
-	// $('#player-histories').empty();  // or don't?
+	$('#player-histories').empty();  // or don't?
 	active_players = {}
 	active_players[id] = true
 	if (add_active_player(id)) {

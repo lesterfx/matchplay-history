@@ -32,21 +32,7 @@ html {
     min-height: 50px;
     z-index: 0;
     position: relative;
-}
-.boxgroup.many {
-    max-height: 300px;
-    overflow-y: hidden;
-}
-.boxgroup.many+div.expander {
-    margin-top: -50px;
-    height: 50px;
-    background: linear-gradient(transparent, rebeccapurple);
-    z-index: 1;
-    position: relative;
-    cursor: pointer;
-}
-.boxgroup:not(.expanded)+div.expander {
-    display: none;
+    justify-items: stretch;
 }
 .box.fake {
     height: 0;
@@ -116,20 +102,23 @@ body {
 }
 .tabs>input+label {
     order: 0;
-    background-color: var(--group-background);
+    background-color: var(--page-background);
     border: 1px solid var(--border);
     border-radius: 10px 10px 0 0;
     padding: 10px;
     font-size: 1.3em;
 }
 .tabs>input:checked+label {
-    background-color: var(--background);
+    background-color: var(--group-background);
 }
 .tabs>input+label+div {
     order: 1;
+    width: 100%;
     display: none;
-    border-radius: 10px;
+    border-radius: 0 20px 20px 20px;
     border: 1px solid var(--border);
+    margin-top: -1px;
+    padding: 10px;
     background: var(--group-background);
 }
 .tabs>input:checked+label+div {
