@@ -321,7 +321,6 @@ ready(() => {
 	} catch (err) {
 		catcher(err)
 	}
-	$('.clickables').on('click', '.box', clickthing);
 });
 
 async function handler(callback) {
