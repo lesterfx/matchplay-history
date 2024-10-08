@@ -472,7 +472,7 @@ function add_player_button(uid) {
 	insertSorted(button, $('#players'));
 }
 function add_active_player(id) {
-	let already_exists = $(`#player-histories div.player-history[data-player-id="${uid}"]`)
+	let already_exists = $(`#player-histories div.player-history[data-playerid="${uid}"]`)
 	if (already_exists.length) {
 		already_exists.prependTo($('#player-histories'));
 		return false;
@@ -510,7 +510,7 @@ function add_active_player(id) {
 }
 function add_player_tournament(uid, tid) {
 	let trow = title('tournament', tid, 'div').prepend('Loading ').append('...');
-	let selector = `#player-histories div.player-history[data-player-id="${uid}"] div.merged-tournaments`
+	let selector = `#player-histories div.player-history[data-playerid="${uid}"] div.merged-tournaments`
 	trow.appendTo($(selector));
 }
 
@@ -548,10 +548,11 @@ function spacer() {
 function update_player_standing(uid) {
 	let won = winloss[uid].won
 	let lost = winloss[uid].lost
-	let parent = document.querySelector(`#player-histories div.player-history[data-player-id="${uid}"]`)
+	let parent = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"]`)
 	let percent = won / (won+lost) * 100;
+
 	parent.querySelector('.vs-bars').style.cssText = `--percent: ${percent}%`;
-	parent.querySelector('.vs-text').innerHTML = `${won} &mdash; ${lost} vs `
+	parent.querySelector('.vs-text').innerHTML = `${won} &mdash; ${lost} vs `;
 }
 function add_player_game(options) {
 	let box = game_element(options.game, false, true);
@@ -559,7 +560,7 @@ function add_player_game(options) {
 	if (typeof did_i_win !== 'undefined') {
 		box.toggleClass('won', options.won).toggleClass('lost', !options.won);
 	}
-	let parent = $(`#player-histories div.player-history[data-player-id="${options.uid}"] .boxgroup`);
+	let parent = $(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
 	box.appendTo(parent);
 }
 function add_active_game(game) {
