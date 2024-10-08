@@ -422,8 +422,9 @@ function title(kind, id, element_type) {
 	return element;
 }
 function notitle(kind, id, element_type) {
-	let element = $(`<${element_type || "span"}>`);
-	element.attr('data-kind', kind).attr('data-id', id);
+	let element = document.createElement(element_type || 'span')
+	element.dataset.kind = kind
+	element.dataset.id = id
 	return element;
 }
 function save_data(kind, obj) {
