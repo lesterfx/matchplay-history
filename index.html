@@ -64,7 +64,9 @@
 				if (message.slice(0, 1) == '"') message = obj
 				let el = document.createElement('pre')
 				el.textContent = message
-				document.querySelector('#log').prepend(el)
+				let logobj = document.querySelector('#log')
+				logobj.prepend(el)
+				logobj.scrollIntoView()
 			}
 			function catcher(err) {
 				log(`${err.message}\n${err.stack}`)

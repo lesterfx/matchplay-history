@@ -452,7 +452,8 @@ function add_player_game(options) {
 	let box = game_element(options.game, false, true);
 	box.style.order = options.order
 	if (typeof did_i_win !== 'undefined') {
-		box.toggleClass('won', options.won).toggleClass('lost', !options.won);
+		box.classList.toggle('won', options.won);
+		box.classList.toggle('lost', !options.won);
 	}
 	let parent = $(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
 	box.appendTo(parent);

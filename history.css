@@ -100,11 +100,11 @@ body {
     background: var(--page-background);
     color: var(--text);
     font-family: sans-serif;
+    padding-bottom: 100vh;
 }
 #main {
     background: var(--page-background);
     color: var(--text);
-    padding-bottom: 100vh;
 }
 .tabs {
     padding-top: 2em;
