@@ -323,8 +323,8 @@ ready(() => {
 	}
 });
 
-async function handler(callback) {
-	let handle = async () => {
+function handler(callback) {
+	let handle = async function () {
 		try {
 			for (child of this.parentNode.children) child.classList.remove('active')
 				this.classLIst.add('active')

@@ -47,7 +47,8 @@
 		</div>
 		<script>
 			window.onerror = function(message, source, lineno, colno, error) {
-				let e = `window.onerror\n${source}\nline ${lineno}:${colno}\n\n${message}\n\n${error.message}\n${err.stack}`
+				let e = `window.onerror\n${source}\nline ${lineno}:${colno}\n\n${message}`
+				if (error) e += `\n\n${error.message}\n${error.stack}`
 				alert(e)
 				log(e)
 			};
