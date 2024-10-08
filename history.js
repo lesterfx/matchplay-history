@@ -103,7 +103,7 @@ async function* get_tournaments_paginated(uid) {  // paginate
 				need_more = false
 				log(`${tournament.tournamentId} already low enough!`)
 			}
-			if (query.page >= meta.last_page) {
+			if (query.page >= response.meta.last_page) {
 				log(`${query.page} is the last page! ${meta.last_page}`)
 				need_more = false
 			}
@@ -166,7 +166,7 @@ async function get_and_populate_games_from_tournament(tid) {
 	};
 	let listnodes = document.querySelectorAll(`#player-histories div.player-history div.merged-tournaments`);
 	for (listnode of listnodes) {
-		listnode.querySelector(`[data-kind="tournament"][data-id="${tid}"]`).remove();
+		for (let node of listnode.querySelectorAll(`[data-kind="tournament"][data-id="${tid}"]`)) node.remove();
 		if (listnode.innerHTML == '') listnode.remove()
 	}
 }
