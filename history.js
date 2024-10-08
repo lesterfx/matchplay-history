@@ -287,7 +287,10 @@ function rankiness(game) {
 	if (!result || !result.length) {
 		result = game.suggestions[0].results
 	}
-	return rank(game, myUserId) / (result.length-1)
+	return {
+		place: rank(game, myUserId),
+		players: (result.length-1)
+	}
 }
 function token_needed(message) {
 	document.querySelector('#token-entry').style.display = 'block';
@@ -469,21 +472,35 @@ function add_active_game(game) {
 function game_element(game, inc_players, inc_tournament, won) {
 	// log(game);
 	let box = notitle('game', game.gameId, 'div');
+	let wordrank
 	if (typeof won !== 'undefined') {
+		log(typeof won)
 		if (typeof won === 'null') {
 			let win_rank = rankiness(game)
-			if (win_rank == 0) {
+			if (win_rank.place == 1) {
 				box.classList.add('won');
-			} else if (win_rank == 1) {
+				wordrank = '(won)'
+			} else if (win_rank.place == win_rank.players) {
 				box.classList.add('lost');
+				wordrank = '(lost)'
+			} else {
+				wordrank = ['zero?', '1st', '2nd', '3rd', '4th', 'fifth?'][win_rank.place];
 			}
 		} else {
+			if (won) {
+				wordrank = '(won)'
+			} else {
+				wordrank = '(lost)'
+			}
 			box.classList.toggle('won', won);
 			box.classList.toggle('lost', !won);
 		}
 	}
 	box.classList.add('box');
-	box.append(title('arena', game.arenaId));
+	let tit = title('arena', game.arenaId);
+	tit.append(spacer());
+	tit.append(wordrank);
+	box.append(tit);
 	box.append(spacer());
 	if (inc_players) {
 		let plist = document.createElement('ol');
