@@ -279,7 +279,7 @@ async function get_tournament_details(tournament, add_players) {
 		throw Error('no tournament passed into get_tournament_details')
 	}
 	if (add_players) {
-		fakefill($('#players').empty())
+		fakefill(document.querySelector('#players')).innerHTML = ''
 	}
 	let tournament_details = await get({
 		endpoint: `tournaments/${tid}`,
@@ -308,7 +308,7 @@ async function get_tournament_details(tournament, add_players) {
 	return pid;
 }
 async function get_other(id) {
-	fakefill($('#active-games').empty());
+	fakefill(document.querySelector('#active-games')).innerHTML = '';
 	let tournament = all_data.tournament[id];
 	active_players = {}
 	let active_games = await get_games_from_tournament(tournament, true);
@@ -478,15 +478,34 @@ function add_active_player(id) {
 		return false;
 	};
 	winloss[id] = {won: 0, lost: 0}
-	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history');
-	let h2 = $('<h2>').addClass('player-name').prependTo(playerbox)
-	$('<span>').addClass('vs-bars').appendTo(h2)
-	$('<span>').addClass('vs-text').html('0 &mdash; 0 vs ').appendTo(h2)
-	title('user', id).appendTo(h2);
-	fakefill($('<div />').addClass('boxgroup')).appendTo(playerbox);
-	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
 
-	playerbox.prependTo($('#player-histories'));
+	let playerbox = document.createElement('div')
+	playerbox.classList.add('player-history')
+	playerbox.dataset.playerid = id
+
+	let h2 = document.createElement('h2')
+	h2.classList.add('player-name')
+	playerbox.prepend(h2)
+
+	let vsBars = document.createElement('span')
+	vsBars.classList.add('vs-bars')
+	h2.append(vsBars)
+
+	let vsText = document.createElement('span')
+	vsText.classList.add('vs-text')
+	vsText.innerHTML = '0 &mdash; 0 vs '
+	h2.append(vsText)
+
+	h2.append(title('user', id)[0])
+
+	let boxgroup = document.createElement('div')
+	boxgroup.classList.add('boxgroup')
+	playerbox.append(fakefill(boxgroup))
+	let merged = document.createElement('div')
+	merged.classList.add('merged-tournaments')
+	playerbox.append(merged)
+
+	document.querySelector('#player-histories').prepend(playerbox);
 	return true
 }
 function add_player_tournament(uid, tid) {
@@ -569,7 +588,9 @@ function add_tournament(tournament) {
 }
 function fakefill(element) {
 	for (i=0;i<10;i++) {
-		element.append($('<div>').addClass('fake box'))
+		let new_el = document.createElement('div')
+		new_el.classList.add('fake', 'box')
+		element.appendChild(new_el)
 	}
 	return element;
 }

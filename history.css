@@ -144,6 +144,7 @@ span.vs-bars {
     border-radius: 10px;
     width: 5em;
     height: 1em;
+    margin-right: 5px;
     border: 1px solid var(--border);
     --percent: 50%;
     background: linear-gradient(to right, var(--won-background) var(--percent), var(--lost-background) var(--percent));
