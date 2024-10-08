@@ -66,6 +66,10 @@ html {
 .box.active {
     outline: 4px solid var(--active-color);
 }
+.box.winmix {
+    background: color-mix(in hsl shorter hue, var(--won-background) var(--winmix), var(--lost-background));
+    border-color: color-mix(in hsl shorter hue, var(--won-border) var(--winmix), var(--lost-border));
+}
 .box.won {
     background: var(--won-background);
     border-color: var(--won-border);

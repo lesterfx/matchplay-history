@@ -277,7 +277,7 @@ function rank(game, uid) {
 	if (!result || !result.length) {
 		result = game.suggestions[0].results
 	}
-	return result.indexOf(playerId) + 1
+	return result.indexOf(playerId)
 }
 function did_i_win(game, uid) {
 	return rank(game, myUserId) < rank(game, uid)
@@ -289,7 +289,7 @@ function rankiness(game) {
 	}
 	return {
 		place: rank(game, myUserId),
-		players: result.length
+		maxplace: result.length - 1
 	}
 }
 function token_needed(message) {
@@ -473,18 +473,19 @@ function game_element(game, inc_players, inc_tournament, won) {
 	// log(game);
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank
-	log(won)
-	log(typeof won)
 	if (typeof won == 'undefined') {
 		let win_rank = rankiness(game)
-		if (win_rank.place == 1) {
-			box.classList.add('won');
+		if (win_rank.place == 0) {
+			box.classList.add('winmix');
+			let percent = win_rank.place / win_rank.maxplace * 100
+			box.style.cssText = `--winmix: ${percent}%`;
 			wordrank = '(won)'
-		} else if (win_rank.place == win_rank.players) {
+		} else if (win_rank.place == win_rank.maxplace) {
 			box.classList.add('lost');
 			wordrank = '(lost)'
 		} else {
-			wordrank = ['zero?', '1st', '2nd', '3rd', '4th', 'fifth?'][win_rank.place];
+			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place];
+			
 		}
 	} else {
 		if (won) {
