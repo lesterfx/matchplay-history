@@ -1,77 +1,3 @@
-// 75 lines to not overlap the html file
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 60 lines to not overlap the html file
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 45 lines to not overlap the html file
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 30 lines to not overlap the html file
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// 15 lines to not overlap the html file
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 myUserId = 0
 all_my_tournaments = {}
 active_players = {}
@@ -210,7 +136,7 @@ async function get_and_populate_games_from_tournament(tid) {
 			};
 		};
 	};
-	$(`#player-histories div.player-history div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
+	document.querySelector(`#player-histories div.player-history div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
 }
 async function get_games_from_tournament(tournament, add_players) {
 	// log(`doing get_games_from_tournament, active players  ${stringify(active_players)}`)
@@ -309,7 +235,7 @@ async function compare_players_from_game(id) {
 	await merge_tournaments();
 }
 async function compare_player(id) {
-	$('#player-histories').empty();  // or don't?
+	document.querySelector('#player-histories').innerHTML = ''
 	active_players = {}
 	active_players[id] = true
 	if (add_active_player(id)) {
@@ -358,15 +284,15 @@ function did_i_win(game, uid) {
 function premain() {
     token = localStorage.getItem('token');
 	if (!token) {
-		$('#token-entry').show();
+		document.querySelector('#token-entry').style.display = 'block';
 		$('#token-form').on('submit', async function (event) {
 			event.preventDefault();
-			token = $('#token').val();
+			token = document.querySelector('#token').val();
 			localStorage.setItem('token', token);
 			main().catch(log);
 		});
 	} else {
-		$('#token-entry').hide();
+		document.querySelector('#token-entry').style.display = 'none';
 		main().catch(log);
 	};
 };
@@ -391,8 +317,8 @@ async function clickthing() {
 		for (child of this.parentNode.children) child.classList.remove('active')
 		this.classList.add('active')
 
-		let kind = $(this).data('kind');
-		let id = $(this).data('id');
+		let kind = this.dataset.kind;
+		let id = this.dataset.id;
 		switch (kind) {
 			case 'tournament':
 				// log('get other');
@@ -422,9 +348,9 @@ async function clickthing() {
 function insertSorted(element, parent) {
 	let added = false;
 	let etext = element.text().toLowerCase();
-	parent.children().each(function() {
-		if ((this.textContent.toLowerCase()) > etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
-			element.insertBefore($(this));
+	parent.children.forEach(function (el) {
+		if ((el.textContent.toLowerCase()) > etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
+			element.insertBefore($(el));
 			added = true;
 			return false;
 		}
@@ -434,7 +360,7 @@ function insertSorted(element, parent) {
 
 function add_player_button(uid) {
 	let button = title('user', uid).addClass('box');
-	insertSorted(button, $('#players'));
+	insertSorted(button, document.querySelector('#players'));
 }
 function add_active_player(id) {
 	let already_exists = $(`#player-histories div.player-history[data-playerid="${uid}"]`)

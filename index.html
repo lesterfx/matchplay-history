@@ -51,25 +51,21 @@
 			window.onerror = function(error, url, line) {
 				let e = `window.onerror\n${url}\nline ${line}\n\n${error.toString()}`
 				alert(e)
-				let li = $('<pre>').addClass('windowerror').text(e).prependTo($('#log'))
+				log(e)
 			}
-		</script>
-		<script>
 			function stringify(value) {
 				switch (typeof value) {
 					case 'string': case 'object': return JSON.stringify(value, null, 4);
 					default: return String(value);
 				}
 			};
-		</script>
-		<script>
 			function log (obj) {
 				let message = stringify(obj)
 				if (message.slice(0, 1) == '"') message = obj
-				$('#log').prepend($('<pre>').text(message))
+				let el = document.createElement('pre')
+				el.textContent = message
+				document.querySelector('#log').prepend(el)
 			}
-		</script>
-		<script>
 			async function load(src, loader) {
 				try {
 					let t = Date.now()
@@ -81,18 +77,12 @@
 					log(err.line)
 				}
 			}
-		</script>
-		<script>
 			async function loadjs(src) {
 				await load(src, scriptloader)
 			}
-		</script>
-		<script>
 			async function loadcss(src) {
 				await load(src, cssloader)
 			}
-		</script>
-		<script>
 			async function cssloader(src) {
 				await new Promise(function (res, rej) {
 					let el = document.createElement('link')
@@ -104,8 +94,6 @@
 					document.head.append(el)
 				})
 			}
-		</script>
-		<script>
 			async function scriptloader(scriptUrl){
 				await new Promise(function (res, rej) {
 					let script = document.createElement('script');
@@ -119,8 +107,6 @@
 					document.head.append(script);
 				})
 			}
-		</script>
-		<script>
 			try {
 				loadcss('history.css')
 				loadjs('history.js')
