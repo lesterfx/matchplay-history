@@ -172,4 +172,5 @@ span.vs-bars {
     background: var(--background);
     padding: 5px;
     margin-bottom: 5px;
+    border-radius: 5px;
 }

@@ -135,7 +135,9 @@ async function get_and_populate_games_from_tournament(tid) {
 			};
 		};
 	};
-	document.querySelector(`#player-histories div.player-history div.merged-tournaments [data-kind="tournament"][data-id="${tid}"]`).remove();
+	let listnode = document.querySelector(`#player-histories div.player-history div.merged-tournaments`);
+	listnode.querySelector(`[data-kind="tournament"][data-id="${tid}"]`).remove();
+	if (listnode.innerHTML == '') listnode.remove()
 }
 async function get_games_from_tournament(tournament, add_players) {
 	// log(`doing get_games_from_tournament, active players  ${stringify(active_players)}`)
@@ -262,25 +264,30 @@ async function merge_tournaments() {
 	// log(`merged tournaments: ${stringify(merged_tournaments)}`);
 	await get_games_from_tournaments(merged_tournaments);
 }
-function did_i_win(game, uid) {
-	let myPlayerId
-	let otherPlayerId
+function rank(game, uid) {
+	let playerId
 	for (let i=0; i<game.userIds.length; i++) {
 		let userId = game.userIds[i]
-		let playerId = game.playerIds[i]
-		if (userId == myUserId) {
-			myPlayerId = playerId
-		}
 		if (userId == uid) {
-			otherPlayerId = playerId
+			playerId = game.playerIds[i]
+			break
 		}
 	}
 	let result = game.resultPositions
 	if (!result || !result.length) {
 		result = game.suggestions[0].results
 	}
-	return result.indexOf(myPlayerId) < result.indexOf(otherPlayerId)
-
+	return result.indexOf(playerId)
+}
+function did_i_win(game, uid) {
+	return rank(game, myUserId) < rank(game, uid)
+}
+function rankiness(game) {
+	let result = game.resultPositions
+	if (!result || !result.length) {
+		result = game.suggestions[0].results
+	}
+	return rank(game, myUserId) / (result.length-1)
 }
 function token_needed(message) {
 	document.querySelector('#token-entry').style.display = 'block';
@@ -449,23 +456,32 @@ function update_player_standing(uid) {
 	parent.querySelector('.vs-text').innerHTML = `${won} &mdash; ${lost} vs `;
 }
 function add_player_game(options) {
-	let box = game_element(options.game, false, true);
+	let box = game_element(options.game, false, true, options.won);
 	box.style.order = options.order
-	if (typeof did_i_win !== 'undefined') {
-		box.classList.toggle('won', options.won);
-		box.classList.toggle('lost', !options.won);
-	}
 	let parent = document.querySelector(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
 	parent.append(box);
 }
 function add_active_game(game) {
-	let box = game_element(game, true, false);
+	let box = game_element(game, true, false, null);
 	box.addEventListener('click', handler(compare_players_from_game))
 	document.querySelector('#active-games').append(box);
 }
-function game_element(game, inc_players, inc_tournament) {
+function game_element(game, inc_players, inc_tournament, won) {
 	// log(game);
 	let box = notitle('game', game.gameId, 'div');
+	if (typeof won !== 'undefined') {
+		if (typeof won === 'null') {
+			let win_rank = rankiness(game)
+			if (win_rank == 0) {
+				box.classList.add('won');
+			} else if (win_rank == 1) {
+				box.classList.add('lost');
+			}
+		} else {
+			box.classList.toggle('won', options.won);
+			box.classList.toggle('lost', !options.won);
+		}
+	}
 	box.classList.add('box');
 	box.append(title('arena', game.arenaId));
 	box.append(spacer());
