@@ -438,6 +438,7 @@ function add_player_tournament(uid, tid) {
 function title(kind, id, element_type) {
 	let element = notitle(kind, id, element_type);
 	element.classList.add(kind+'-name');
+	element.classList.add('title');
 	let name;
 	if (kind == 'user' && id == myUserId) {
 		name = 'Me';
@@ -521,8 +522,8 @@ function game_element(game, inc_players, inc_tournament, won) {
 	}
 	box.classList.add('box');
 	let tit = title('arena', game.arenaId);
-	tit.append(spacer());
 	tit.append(wordrank);
+
 	box.append(tit);
 	box.append(spacer());
 	if (inc_players) {
@@ -534,7 +535,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 			li.append(title('user', uid));
 			plist.append(li);
 		}
-		box.append(spacer());
+		if (inc_tournament) box.append(spacer());
 	}
 	if (inc_tournament) {
 		box.append(title('tournament', game.tournamentId));

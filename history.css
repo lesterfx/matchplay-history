@@ -96,6 +96,7 @@ html {
 }
 .spacer {
     flex-grow: 1;
+    min-height: 1em;
 }
 html {
     scroll-behavior: smooth;
@@ -177,4 +178,9 @@ span.vs-bars {
     padding: 5px;
     margin-bottom: 5px;
     border-radius: 5px;
+}
+.title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
