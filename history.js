@@ -31,7 +31,6 @@ async function rate_limit() {
 	await new Promise(resolve => setTimeout(resolve, wait));
     return wait
 }
-
 async function get(options) {
     const headers = new Headers();
 	
@@ -50,29 +49,29 @@ async function get(options) {
 		request_url += '?' + new URLSearchParams(options.query).toString();
 	}
 	const req = new Request(request_url, opts);
-
-	let waited = await rate_limit()
-	
-	try {
-		const response = await fetch(req);
-		if (!response.ok) {
-			alert('error 39')
-			log(`${response.url} error: ${response.status}\n${response.headers}\n\n${response.body}`)
-			throw new Error(`Response status: ${response.status}`);
+	while (1) {
+		await rate_limit()
+		try {
+			const response = await fetch(req.clone());
+			if (!response.ok) {
+				if (response.status == 429) continue;
+				log(`${response.url} error: ${response.status}\n${response.headers.toString()}\n\n${response.body.toString()}`)
+				throw new Error(`Response status: ${response.status}`);
+			}
+			const json = await response.json();
+			return json
+		} catch (error) {
+			catcher(error)
+			break
 		}
-		const json = await response.json();
-		return json.data
-	} catch (error) {
-		alert('error 57')
-		catcher(error)
 	}
 }
 
 async function get_me() {
-	let data = await get({
+	let response = await get({
 		endpoint: 'users/profile'
 	});
-	myUserId = data.userId;
+	myUserId = response.data.userId;
 }
 
 async function get_all_my_tournaments() {
@@ -83,15 +82,30 @@ async function get_all_my_tournaments() {
 	}
 }
 
+async function* get_tournaments_paginated(uid) {  // paginate
+	let query = {played: uid}
+	do {
+		let response = await get({
+			endpoint: 'tournaments',
+			query: query
+		});
+		let data = response.data
+		log(response.meta)
+		for (tournament of data) {
+			save_data('tournament', tournament);
+		};
+		yield data;
+	} while (0)
+}
 async function get_tournaments(uid) {  // paginate
-	let data = await get({
+	let response = await get({
 		endpoint: 'tournaments',
 		query: {played: uid}
 	});
-	for (tournament of data) {
+	for (tournament of response.data) {
 		save_data('tournament', tournament);
 	};
-	return data;
+	return response.data;
 }
 async function get_games_from_tournaments(tournaments) {
 	let tids = [];
@@ -154,10 +168,11 @@ async function get_games_from_tournament(tournament, add_players) {
 		// log(`my pid: ${pid}`);
 		my_pid_by_organizer[tid] = pid;
 	};
-	let games = await get({
+	let response = await get({
 		endpoint: `tournaments/${tid}/games`,
 		query: {player: pid}
 	});
+	let games = response.data
 	// log(`got ${games.length} games`);
 	for (game of games) {
 		save_data('game', game);
@@ -173,13 +188,14 @@ async function get_tournament_details(tournament, add_players) {
 	if (add_players) {
 		fakefill(document.querySelector('#players'), true)
 	}
-	let tournament_details = await get({
+	let response = await get({
 		endpoint: `tournaments/${tid}`,
 		query: {
 			includePlayers: 1,
 			includeArenas: 1
 		}
 	});
+	let tournament_details = response.data;
 	let pid;
 	for (player of tournament_details.players) {
 		let uid = player.claimedBy;
