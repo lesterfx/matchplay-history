@@ -274,13 +274,14 @@ async function compare_player(id) {
 	}
 }
 async function merge_tournaments() {
+	let tournaments
 	document.querySelector('#player-histories').scrollIntoView();
 	// log(`merge_tournaments, active players ${stringify(active_players)}`)
 	let merged_tournaments = {};
 	for (uid in active_players) {
-		for (let tournaments of await get_tournaments_paginated(uid)) {
+		for await (tournaments of get_tournaments_paginated(uid)) {
 			// log(`${tournaments.length} tournaments`);
-			for (tournament of tournaments) {
+			for (let tournament of tournaments) {
 				let tid = tournament.tournamentId
 				if (all_my_tournaments[tid]) {
 					add_player_tournament(uid, tid)
