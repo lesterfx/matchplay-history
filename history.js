@@ -56,14 +56,14 @@ async function get(options) {
 	try {
 		const response = await fetch(req);
 		if (!response.ok) {
-			alert('error! logging...')
+			alert('error 39')
 			log(`${response.url} error: ${response.status}\n${response.headers}\n\n${response.body}`)
 			throw new Error(`Response status: ${response.status}`);
 		}
 		const json = await response.json();
 		return json.data
 	} catch (error) {
-		alert('error... logging!')
+		alert('error 57')
 		log(`${request_url} error:\n${error.message}`)
 		throw error
 	}
@@ -205,7 +205,9 @@ async function get_other(id) {
 	let active_games = await get_games_from_tournament(tournament, true);
 	// log(`active_games: ${active_games}`)
 	active_games.reverse();
-	$('#active-tournament-title').empty().append(title('tournament', tournament.tournamentId));
+	let tit = document.querySelector('#active-tournament-title')
+	tit.textContent = ''
+	tit.append(title('tournament', tournament.tournamentId));
 	for (game of active_games) {
 		add_active_game(game);
 	};
@@ -336,8 +338,7 @@ async function clickthing() {
 				alert(`clicked a ${kind}, which isn't handled yet`);
 		}
 	} catch (err) {
-		alert('error!')
-		alert(err)
+		alert('error 24')
 		log(`${err.message}\n${err.stack}`)
 		log(err)
 		this.classList.remove('active');
@@ -347,15 +348,15 @@ async function clickthing() {
 }
 function insertSorted(element, parent) {
 	let added = false;
-	let etext = element.text().toLowerCase();
-	parent.children.forEach(function (el) {
+	let etext = element.textContent.toLowerCase();
+	for (el of parent.children) {
 		if ((el.textContent.toLowerCase()) > etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
-			element.insertBefore($(el));
+			$(element).insertBefore(el);
 			added = true;
 			return false;
 		}
-	});
-	if(!added) element.appendTo(parent);
+	};
+	if(!added) parent.append(element);
 }
 
 function add_player_button(uid) {
@@ -387,7 +388,7 @@ function add_active_player(id) {
 	vsText.innerHTML = '0 &mdash; 0 vs '
 	h2.append(vsText)
 
-	h2.append(title('user', id)[0])
+	h2.append(title('user', id))
 
 	let merged = document.createElement('div')
 	merged.classList.add('merged-tournaments')
@@ -401,9 +402,11 @@ function add_active_player(id) {
 	return true
 }
 function add_player_tournament(uid, tid) {
-	let trow = title('tournament', tid, 'div').prepend('Loading ').append('...');
+	let trow = title('tournament', tid, 'div');
+	trow.prepend('Loading ');
+	trow.append('...');
 	let selector = `#player-histories div.player-history[data-playerid="${uid}"] div.merged-tournaments`
-	trow.appendTo($(selector));
+	document.querySelector(selector).append(trow)
 }
 
 function title(kind, id, element_type) {
@@ -435,7 +438,9 @@ function save_data(kind, obj) {
 	}
 }
 function spacer() {
-	return $('<div>').addClass('spacer');
+	let el = document.createElement('div')
+	el.classList.add('spacer')
+	return el
 }
 function update_player_standing(uid) {
 	let won = winloss[uid].won
@@ -461,23 +466,30 @@ function add_active_game(game) {
 }
 function game_element(game, inc_players, inc_tournament) {
 	// log(game);
-	let box = notitle('game', game.gameId, 'div').addClass('box');
-	title('arena', game.arenaId).appendTo(box);
-	spacer().appendTo(box);
+	let box = notitle('game', game.gameId, 'div')
+	box.classList.add('box');
+	box.append(title('arena', game.arenaId))
+	box.append(spacer());
 	if (inc_players) {
-		let plist = $('<ol>').addClass('players').appendTo(box);
+		let plist = document.createElement('ol')
+		plist.classList.add('players')
+		box.append(plist);
 		for (uid of game.userIds) {
-			$('<li>').append(title('user', uid)).appendTo(plist);
+			let li = document.createElement('li')
+			li.append(title('user', uid))
+			plist.append(li)
 		}
-		spacer().appendTo(box);
+		box.append(spacer())
 	}
 	if (inc_tournament) {
-		title('tournament', game.tournamentId).appendTo(box);
+		box.append(title('tournament', game.tournamentId));
 	}
 	return box;
 }
 function add_tournament(tournament) {
-	title('tournament', tournament.tournamentId).addClass('box').appendTo($('#active-tournaments'));
+	let tel = title('tournament', tournament.tournamentId)
+	tel.classList.add('box')
+	document.querySelector('#active-tournaments').append(box);
 }
 function fakefill(element, empty) {
 	if (empty) element.innerHTML = ''
