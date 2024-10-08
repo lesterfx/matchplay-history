@@ -282,16 +282,20 @@ function did_i_win(game, uid) {
 	return result.indexOf(myPlayerId) < result.indexOf(otherPlayerId)
 
 }
+function token_needed(message) {
+	document.querySelector('#token-entry').style.display = 'block';
+	document.querySelector('#token-form').addEventListener('submit', async function (event) {
+		event.preventDefault();
+		token = document.querySelector('#token').val();
+		localStorage.setItem('token', token);
+		document.querySelector('#token-entry').style.display = 'none';
+		main().catch(catcher);
+	});
+}
 function premain() {
     token = localStorage.getItem('token');
 	if (!token) {
-		document.querySelector('#token-entry').style.display = 'block';
-		$('#token-form').on('submit', async function (event) {
-			event.preventDefault();
-			token = document.querySelector('#token').val();
-			localStorage.setItem('token', token);
-			main().catch(catcher);
-		});
+		token_needed()
 	} else {
 		document.querySelector('#token-entry').style.display = 'none';
 		main().catch(catcher);
@@ -304,7 +308,14 @@ async function main() {
 
 ////////////////////////////////////////////////////////////////
 
-$(function() {
+let ready = (callback) => {
+	if (document.readyState != 'loading') {
+		callback();
+	} else {
+		document.addEventListener('DOMCOntentLoaded', callback);
+	}
+}
+ready(() => {
 	try {
 		premain();
 	} catch (err) {
@@ -313,40 +324,26 @@ $(function() {
 	$('.clickables').on('click', '.box', clickthing);
 });
 
-async function clickthing() {
-	try {
-		for (child of this.parentNode.children) child.classList.remove('active')
-		this.classList.add('active')
-
-		let kind = this.dataset.kind;
-		let id = this.dataset.id;
-		switch (kind) {
-			case 'tournament':
-				// log('get other');
-				await get_other(id);
-				break;
-			case 'game':
-				// log('compare players from game');
-				await compare_players_from_game(id);
-				break;
-			case 'user':
-				// log('compare player');
-				await compare_player(id);
-				break;
-			default:
-				alert(`clicked a ${kind}, which isn't handled yet`);
+async function handler(callback) {
+	let handle = () => {
+		try {
+			for (child of this.parentNode.children) child.classList.remove('active')
+				this.classLIst.add('active')
+			let id = this.dataset.id
+			callback(id)
+		} catch (err) {
+			this.classList.remove('active')
+			catcher(err)
 		}
-	} catch (err) {
-		this.classList.remove('active');
-		catcher(err)
 	}
+	return handle
 }
 function insertSorted(element, parent) {
 	let added = false;
 	let etext = element.textContent.toLowerCase();
 	for (el of parent.children) {
 		if ((el.textContent.toLowerCase()) > etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
-			$(element).insertBefore(el);
+			parent.insertBefore(element, el);
 			added = true;
 			return false;
 		}
@@ -357,17 +354,19 @@ function insertSorted(element, parent) {
 function add_player_button(uid) {
 	let button = title('user', uid);
 	button.classList.add('box');
+	button.addEventListener('click', handler(compare_player))
 	insertSorted(button, document.querySelector('#players'));
 }
 function add_active_player(id) {
-	let already_exists = $(`#player-histories div.player-history[data-playerid="${uid}"]`)
-	if (already_exists.length) {
-		already_exists.prependTo($('#player-histories'));
+	let playerbox = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"]`)
+	if (playerbox) {
+		document.querySelector('#player-histories').prepend(playerbox);
 		return false;
 	};
+
 	winloss[id] = {won: 0, lost: 0}
 
-	let playerbox = document.createElement('div')
+	playerbox = document.createElement('div')
 	playerbox.classList.add('player-history')
 	playerbox.dataset.playerid = id
 
@@ -430,7 +429,9 @@ function save_data(kind, obj) {
 		all_data[kind][id] = obj;
 		// log(`saved ${kind} ${id}`);
 		if (obj.name) {
-			$(`.${kind}-name[data-id="${id}"`).text(obj.name);
+			for (obj of document.querySelectorAll(`.${kind}-name[data-id="${id}"`)) {
+				obj.text(obj.name);
+			}
 		}
 	}
 }
@@ -455,12 +456,13 @@ function add_player_game(options) {
 		box.classList.toggle('won', options.won);
 		box.classList.toggle('lost', !options.won);
 	}
-	let parent = $(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
+	let parent = document.querySelector(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
 	parent.append(box);
 }
 function add_active_game(game) {
 	let box = game_element(game, true, false);
-	$('#active-games').append(box);
+	box.addEventListener('click', handler(compare_players_from_game))
+	document.querySelector('#active-games').append(box);
 }
 function game_element(game, inc_players, inc_tournament) {
 	// log(game);
@@ -487,6 +489,7 @@ function game_element(game, inc_players, inc_tournament) {
 function add_tournament(tournament) {
 	let box = title('tournament', tournament.tournamentId);
 	box.classList.add('box');
+	box.addEventListener('click', handler(get_other))
 	document.querySelector('#active-tournaments').append(box);
 }
 function fakefill(element, empty) {
