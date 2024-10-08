@@ -277,7 +277,7 @@ function rank(game, uid) {
 	if (!result || !result.length) {
 		result = game.suggestions[0].results
 	}
-	return result.indexOf(playerId)
+	return result.indexOf(playerId) + 1
 }
 function did_i_win(game, uid) {
 	return rank(game, myUserId) < rank(game, uid)
@@ -289,7 +289,7 @@ function rankiness(game) {
 	}
 	return {
 		place: rank(game, myUserId),
-		players: (result.length-1)
+		players: result.length
 	}
 }
 function token_needed(message) {
