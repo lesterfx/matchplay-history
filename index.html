@@ -1,118 +1,134 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width" />
-  <title>history</title>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-</head>
-<body>
-	<h1>Match Play History</h1>
-	<div id="token-entry">
-		<h2>API Token Required</h2>
-		<form id="token-form">
-			<input type="password" placeholder="api token" name="token" id="token">
-			<input type="submit">
-		</form>
-	</div>
-	<div id="main">
-		<h2>All My Tournaments</h2>
-		<div id="active-tournaments" class="clickables boxgroup">
-			<div class="fake box"></div>
-			<div class="fake box"></div>
-			<div class="fake box"></div>
-			<div class="fake box"></div>
-			<div class="fake box"></div>
-			<div class="fake box"></div>
-			<div class="fake box"></div>
-			<div class="fake box"></div>
-			<div class="fake box"></div>
-			<div class="fake box"></div>
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width" />
+	<title>history</title>
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+	</head>
+	<body>
+		<h1>Match Play History</h1>
+		<div id="token-entry">
+			<h2>API Token Required</h2>
+			<form id="token-form">
+				<input type="password" placeholder="api token" name="token" id="token">
+				<input type="submit">
+			</form>
 		</div>
+		<div id="main">
+			<h2>All My Tournaments</h2>
+			<div id="active-tournaments" class="clickables boxgroup">
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+				<div class="fake box"></div>
+			</div>
 
-		<div id="active-tournament" class="tabs">
-			<h2 id="active-tournament-title"></h2>
+			<div id="active-tournament" class="tabs">
+				<h2 id="active-tournament-title"></h2>
 
-			<input type="radio" name="tournamenttabs" id="gamestab" checked>
-			<label for="gamestab">Games</label>
-			<div id="active-games" class="clickables boxgroup"></div>
+				<input type="radio" name="tournamenttabs" id="gamestab" checked>
+				<label for="gamestab">Games</label>
+				<div id="active-games" class="clickables boxgroup"></div>
 
-			<input type="radio" name="tournamenttabs" id="playerstab">
-			<label for="playerstab">Players</label>
-			<div id="players" class="clickables boxgroup"></div>
+				<input type="radio" name="tournamenttabs" id="playerstab">
+				<label for="playerstab">Players</label>
+				<div id="players" class="clickables boxgroup"></div>
 
+			</div>
+			<div id="player-histories"></div>
 		</div>
-		<div id="player-histories"></div>
-	</div>
-	<h2>Log</h2>
-	<div id="log">
-	</div>
-	<script>
-		window.onerror = function(error, url, line) {
-			let e = `window.onerror\n${url}\nline ${line}\n\n${error.toString()}`
-			alert(e)
-			let li = $('<pre>').addClass('windowerror').text(e).prependTo($('#log'))
-		}
-		function stringify(value) {
-			switch (typeof value) {
-				case 'string': case 'object': return JSON.stringify(value, null, 4);
-				default: return String(value);
+		<h2>Log</h2>
+		<div id="log">
+		</div>
+		<script>
+			window.onerror = function(error, url, line) {
+				let e = `window.onerror\n${url}\nline ${line}\n\n${error.toString()}`
+				alert(e)
+				let li = $('<pre>').addClass('windowerror').text(e).prependTo($('#log'))
 			}
-		};
-		function log (obj) {
-			let message = stringify(obj)
-			if (message.slice(0, 1) == '"') message = obj
-			$('#log').prepend($('<pre>').text(message))
-		}
-		async function load(src, loader) {
+		</script>
+		<script>
+			function stringify(value) {
+				switch (typeof value) {
+					case 'string': case 'object': return JSON.stringify(value, null, 4);
+					default: return String(value);
+				}
+			};
+		</script>
+		<script>
+			function log (obj) {
+				let message = stringify(obj)
+				if (message.slice(0, 1) == '"') message = obj
+				$('#log').prepend($('<pre>').text(message))
+			}
+		</script>
+		<script>
+			async function load(src, loader) {
+				try {
+					let t = Date.now()
+					let s = `${src}?t=${t}`
+					await loader(s)
+					log("script successfully loaded"); 
+				} catch (err) {
+					log(err.toString())
+					log(err.line)
+				}
+			}
+		</script>
+		<script>
+			async function loadjs(src) {
+				await load(src, scriptloader)
+			}
+		</script>
+		<script>
+			async function loadcss(src) {
+				await load(src, cssloader)
+			}
+		</script>
+		<script>
+			async function cssloader(src) {
+				await new Promise(function (res, rej) {
+					let el = document.createElement('link')
+					el.addEventListener('error', rej)
+					el.addEventListener('load', res)
+					el.async = true
+					el.setAttribute('rel', 'stylesheet')
+					el.setAttribute('href', src)
+					document.head.append(el)
+				})
+			}
+		</script>
+		<script>
+			async function scriptloader(scriptUrl){
+				await new Promise(function (res, rej) {
+					let script = document.createElement('script');
+					script.addEventListener('error',rej);
+					script.addEventListener('load',res);
+					script.src = scriptUrl;
+					script.type = 'text/javascript';
+					script.onerror = rej;
+					script.async = true;
+					script.onload = res;
+					document.head.append(script);
+				})
+			}
+		</script>
+		<script>
 			try {
-				let t = Date.now()
-				let s = `${src}?t=${t}`
-				await loader(s)
-				log("script successfully loaded"); 
+				await loadcss('history.css')
+				await loadjs('history.js')
 			} catch (err) {
-				log(err.toString())
-				log(err.line)
+				alert('load error')
+				alert(err)
+				log(err)
 			}
-		}
-		async function loadjs(src) {
-			await load(src, scriptloader)
-		}
-		async function loadcss(src) {
-			await load(src, cssloader)
-		}
-		async function cssloader(src) {
-			await new Promise(function (res, rej) {
-				let el = document.createElement('link')
-				el.addEventListener('error', rej)
-				el.addEventListener('load', res)
-				el.async = true
-				el.setAttribute('rel', 'stylesheet')
-				el.setAttribute('href', src)
-				document.head.append(el)
-			})
-		}
-		async function scriptloader(scriptUrl){
-			await new Promise(function (res, rej) {
-				let script = document.createElement('script');
-				script.addEventListener('error',rej);
-				script.addEventListener('load',res);
-				script.src = scriptUrl;
-				script.type = 'text/javascript';
-				script.onerror = rej;
-				script.async = true;
-				script.onload = res;
-				document.head.append(script);
-			})
-		}
-		try {
-			await loadcss('history.css')
-			await loadjs('history.js')
-		} catch (err) {
-			alert('load error')
-			alert(err)
-			log(err)
-		}
 		</script>
 	</body>
 </html>
