@@ -411,14 +411,14 @@ function add_player_tournament(uid, tid) {
 
 function title(kind, id, element_type) {
 	let element = notitle(kind, id, element_type);
-	element.addClass(kind+'-name');
+	element.classList.add(kind+'-name');
 	let name;
 	if (kind == 'user' && id == myUserId) {
 		name = 'Me';
 	} else {
 		name = (all_data[kind][id] && all_data[kind][id].name) || (kind + id);
 	}
-	element.text(name);  // `${name} (${kind} ${id})`);
+	element.textContent = name;  // `${name} (${kind} ${id})`);
 	return element;
 }
 function notitle(kind, id, element_type) {

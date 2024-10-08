@@ -153,3 +153,6 @@ span.vs-bars {
 #player-histories {
     padding-top: 1em;
 }
+.arena-name {
+    font-style: italic;
+}
