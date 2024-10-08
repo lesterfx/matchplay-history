@@ -215,7 +215,7 @@ async function get_other(id) {
 async function compare_players_from_game(id) {
 	// log('welcome to compareplayersfromgame!')
 	active_players = {};
-	$('#player-histories').empty();  // or don't?
+	document.querySelector('#player-histories').innerHTML = '';  // or don't?
 	winloss = {}
 	// log(all_data.game);
 	// log(id);
@@ -360,7 +360,8 @@ function insertSorted(element, parent) {
 }
 
 function add_player_button(uid) {
-	let button = title('user', uid).addClass('box');
+	let button = title('user', uid);
+	button.classList.add('box');
 	insertSorted(button, document.querySelector('#players'));
 }
 function add_active_player(id) {
