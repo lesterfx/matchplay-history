@@ -141,14 +141,15 @@ body {
 }
 span.vs-bars {
     display: inline-block;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     width: 5em;
     height: 1em;
     margin-right: 5px;
-    border: 2px solid;
+    border-width: 2px;
+    border-style: solid;
     --percent: 50%;
-    border-image: linear-gradient(to right, var(--won-border) var(--percent), var(--lost-border) var(--percent));
-    background: linear-gradient(to right, var(--won-background) var(--percent), var(--lost-background) var(--percent));
+    border-image: linear-gradient(to right, var(--won-border) -10% var(--percent), var(--lost-border) var(--percent) 110%);
+    background: linear-gradient(to right, var(--won-background) -10% var(--percent), var(--lost-background) var(--percent) 110%);
 }
 #player-histories {
     padding-top: 1em;
