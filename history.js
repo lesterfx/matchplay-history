@@ -421,7 +421,7 @@ $(function() {
 
 async function clickthing() {
 	try {
-		this.parentNode.childNodes.classList.remove('active')
+		for (child of this.parentNode.children) child.classList.remove('active')
 		this.classList.add('active')
 
 		let kind = $(this).data('kind');
