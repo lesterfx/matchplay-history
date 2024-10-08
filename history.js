@@ -64,8 +64,7 @@ async function get(options) {
 		return json.data
 	} catch (error) {
 		alert('error 57')
-		log(`${request_url} error:\n${error.message}`)
-		throw error
+		catcher(error)
 	}
 }
 
@@ -291,11 +290,11 @@ function premain() {
 			event.preventDefault();
 			token = document.querySelector('#token').val();
 			localStorage.setItem('token', token);
-			main().catch(log);
+			main().catch(catcher);
 		});
 	} else {
 		document.querySelector('#token-entry').style.display = 'none';
-		main().catch(log);
+		main().catch(catcher);
 	};
 };
 async function main() {
@@ -309,11 +308,16 @@ $(function() {
 	try {
 		premain();
 	} catch (err) {
-		log(err);
+		catcher(err)
 	}
 	$('.clickables').on('click', '.box', clickthing);
 });
 
+function catcher(err) {
+	log(`${err.message}\n${err.stack}`)
+	log(err)
+	throw(err)
+}
 async function clickthing() {
 	try {
 		for (child of this.parentNode.children) child.classList.remove('active')
@@ -338,12 +342,8 @@ async function clickthing() {
 				alert(`clicked a ${kind}, which isn't handled yet`);
 		}
 	} catch (err) {
-		alert('error 24')
-		log(`${err.message}\n${err.stack}`)
-		log(err)
 		this.classList.remove('active');
-		this.scrollIntoView();
-		throw(err)
+		catcher(err)
 	}
 }
 function insertSorted(element, parent) {
