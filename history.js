@@ -431,10 +431,10 @@ async function clickthing() {
 				document.querySelector('#active-tournament-title').scrollIntoView();
 				await get_other(id);
 				break;
-				case 'game':
-					// log('compare players from game');
-					document.querySelector('#player-histories').scrollIntoView();
-					await compare_players_from_game(id);
+			case 'game':
+				// log('compare players from game');
+				document.querySelector('#player-histories').scrollIntoView();
+				await compare_players_from_game(id);
 				break;
 			case 'user':
 				// log('compare player');
@@ -445,12 +445,12 @@ async function clickthing() {
 				alert(`clicked a ${kind}, which isn't handled yet`);
 		}
 	} catch (err) {
-		this.classList.remove('active');
-		this.scrollIntoView();
 		alert('error!')
 		alert(err)
 		log(`${err.message}\n${err.stack}`)
 		log(err)
+		this.classList.remove('active');
+		this.scrollIntoView();
 		throw(err)
 	}
 }
