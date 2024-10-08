@@ -139,5 +139,13 @@ body {
     display: none;
 }
 h2 {
-    padding-top: 1em;
+    margin-top: 1em;
+}
+span.vs-bars {
+    display: inline-block;
+    width: 5em;
+    height: 1em;
+    border: 1px solid var(--border);
+    --percent: 50%;
+    background: linear-gradient(to right, var(--won-background) var(--percent), var(--lost-background) var(--percent));
 }

@@ -230,6 +230,12 @@ async function get_and_populate_games_from_tournament(tid) {
 			if (active_players[uid]) {
 				// log(`uid ${uid} is found in active_players: ${stringify(active_players)}`)
 				let won = did_i_win(game, uid)
+				if (won) {
+					winloss[uid].won ++;
+				} else {
+					winloss[uid].lost ++;
+				}
+				update_player_standing(uid)
 				add_player_game({
 					uid: uid,
 					game: game,
@@ -317,6 +323,7 @@ async function compare_players_from_game(id) {
 	// log('welcome to compareplayersfromgame!')
 	active_players = {};
 	$('#player-histories').empty();  // or don't?
+	winloss = {}
 	// log(all_data.game);
 	// log(id);
 	// log(all_data.game[id]);
@@ -413,31 +420,33 @@ $(function() {
 });
 
 async function clickthing() {
-	$(this).addClass('active').siblings().removeClass('active');
+	this.parentNode.childNodes().classList.remove('active')
+	this.classList.add('active')
 	try {
 		let kind = $(this).data('kind');
 		let id = $(this).data('id');
 		switch (kind) {
 			case 'tournament':
 				// log('get other');
-				await get_other(id);
 				document.querySelector('#active-tournament-title').scrollIntoView();
+				await get_other(id);
 				break;
 				case 'game':
 					// log('compare players from game');
-					await compare_players_from_game(id);
 					document.querySelector('#player-histories').scrollIntoView();
+					await compare_players_from_game(id);
 				break;
 			case 'user':
 				// log('compare player');
-				await compare_player(id);
 				document.querySelector('#player-histories').scrollIntoView();
+				await compare_player(id);
 				break;
 			default:
 				alert(`clicked a ${kind}, which isn't handled yet`);
 		}
 	} catch (err) {
-		$(this).removeClass('active');
+		this.classList.remove('active');
+		this.scrollIntoView();
 		alert('error!')
 		alert(err)
 		log(`${err.message}\n${err.stack}`)
@@ -449,7 +458,7 @@ function insertSorted(element, parent) {
 	let added = false;
 	let etext = element.text().toLowerCase();
 	parent.children().each(function() {
-		if (($(this).text().toLowerCase()) > etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
+		if ((this.textContent.toLowerCase()) > etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
 			element.insertBefore($(this));
 			added = true;
 			return false;
@@ -468,8 +477,12 @@ function add_active_player(id) {
 		already_exists.prependTo($('#player-histories'));
 		return false;
 	};
+	winloss[id] = {won: 0, lost: 0}
 	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history');
-	title('user', id, 'h2').prependTo(playerbox);
+	let h2 = $('<h2>').addClass('player-name').prependTo(playerbox)
+	$('<span>').addClass('vs-bars').appendTo(h2)
+	$('<span>').addClass('vs-text').appendTo(h2)
+	title('user', id).appendTo(h2);
 	fakefill($('<div />').addClass('boxgroup')).appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
 
@@ -512,6 +525,12 @@ function save_data(kind, obj) {
 }
 function spacer() {
 	return $('<div>').addClass('spacer');
+}
+function update_player_standing(uid, won, lost) {
+	let parent = document.querySelector(`#player-histories div.player-history[data-player-id="${uid}"]`)
+	let percent = won / (won+lost) * 100;
+	parent.querySelector('.vs-bars').style.cssText = `--percent: ${percent}%`;
+	parent.querySelector('.vs-text').innerHTML = `${won} &mdash; ${lost} vs`
 }
 function add_player_game(options) {
 	let box = game_element(options.game, false, true);
