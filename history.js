@@ -279,7 +279,7 @@ async function get_tournament_details(tournament, add_players) {
 		throw Error('no tournament passed into get_tournament_details')
 	}
 	if (add_players) {
-		fakefill(document.querySelector('#players')).innerHTML = ''
+		fakefill(document.querySelector('#players'), true)
 	}
 	let tournament_details = await get({
 		endpoint: `tournaments/${tid}`,
@@ -308,7 +308,7 @@ async function get_tournament_details(tournament, add_players) {
 	return pid;
 }
 async function get_other(id) {
-	fakefill(document.querySelector('#active-games')).innerHTML = '';
+	fakefill(document.querySelector('#active-games'), true)
 	let tournament = all_data.tournament[id];
 	active_players = {}
 	let active_games = await get_games_from_tournament(tournament, true);
@@ -587,11 +587,12 @@ function game_element(game, inc_players, inc_tournament) {
 function add_tournament(tournament) {
 	title('tournament', tournament.tournamentId).addClass('box').appendTo($('#active-tournaments'));
 }
-function fakefill(element) {
+function fakefill(element, empty) {
+	if (empty) element.innerHTML = ''
 	for (i=0;i<10;i++) {
 		let new_el = document.createElement('div')
 		new_el.classList.add('fake', 'box')
-		element.appendChild(new_el)
+		element.append(new_el)
 	}
 	return element;
 }
