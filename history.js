@@ -86,7 +86,7 @@ all_data = {
 // log('history begin')
 
 
-let limit_period = 1000;
+let limit_period = 1100;
 let limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
 let limit_phase = 0;
 let limit_last = new Array(10).fill(-limit_period);
@@ -131,7 +131,7 @@ async function get(options) {
 		const response = await fetch(req);
 		if (!response.ok) {
 			alert('error! logging...')
-			log(`${response.url} error: ${response.status}\n\n${response.body}`)
+			log(`${response.url} error: ${response.status}\n${response.headers}\n\n${response.body}`)
 			throw new Error(`Response status: ${response.status}`);
 		}
 		const json = await response.json();
