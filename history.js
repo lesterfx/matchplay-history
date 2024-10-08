@@ -1,8 +1,9 @@
-myUserId = 0
-all_my_tournaments = {}
-active_players = {}
-my_pid_by_organizer = {}
-all_data = {
+let myUserId = 0
+let all_my_tournaments = {}
+let my_lowest_tournament
+let active_players = {}
+let my_pid_by_organizer = {}
+let all_data = {
 	user: {},
 	arena: {},
 	tournament: {},
@@ -76,6 +77,7 @@ async function get_me() {
 
 async function get_all_my_tournaments() {
 	all_my_tournaments = {};
+	my_lowest_tournament = undefined
 	for (tournament of (await get_tournaments(myUserId))) {
 		add_tournament(tournament);
 		all_my_tournaments[tournament.tournamentId] = tournament;
@@ -83,7 +85,11 @@ async function get_all_my_tournaments() {
 }
 
 async function* get_tournaments_paginated(uid) {  // paginate
-	let query = {played: uid}
+	let query = {
+		played: uid,
+		page: 1
+	}
+	let need_more = true
 	do {
 		let response = await get({
 			endpoint: 'tournaments',
@@ -92,9 +98,13 @@ async function* get_tournaments_paginated(uid) {  // paginate
 		let data = response.data
 		log(response.meta)
 		for (tournament of data) {
+			if (tournament < my_lowest_tournament) {
+				need_more = false
+			}
 			save_data('tournament', tournament);
 		};
 		yield data;
+		query['page'] ++;
 	} while (0)
 }
 async function get_tournaments(uid) {  // paginate
@@ -268,14 +278,15 @@ async function merge_tournaments() {
 	// log(`merge_tournaments, active players ${stringify(active_players)}`)
 	let merged_tournaments = {};
 	for (uid in active_players) {
-		let tournaments = await get_tournaments(uid);
-		// log(`${tournaments.length} tournaments`);
-		for (tournament of tournaments) {
-			let tid = tournament.tournamentId
-			if (all_my_tournaments[tid]) {
-				add_player_tournament(uid, tid)
-				merged_tournaments[tid] = true
-			}
+		for (let tournaments of await get_tournaments_paginated(uid)) {
+			// log(`${tournaments.length} tournaments`);
+			for (tournament of tournaments) {
+				let tid = tournament.tournamentId
+				if (all_my_tournaments[tid]) {
+					add_player_tournament(uid, tid)
+					merged_tournaments[tid] = true
+				}
+			};
 		};
 	};
 	// log(merged_tournaments);
@@ -449,7 +460,7 @@ function title(kind, id, element_type) {
 	return element;
 }
 function notitle(kind, id, element_type) {
-	let element = document.createElement(element_type || 'span')
+	let element = document.createElement(element_type || 'div')
 	element.dataset.kind = kind
 	element.dataset.id = id
 	return element;
@@ -522,7 +533,9 @@ function game_element(game, inc_players, inc_tournament, won) {
 	}
 	box.classList.add('box');
 	let tit = title('arena', game.arenaId);
-	tit.append(wordrank);
+	let wordspan = document.createElement('span');
+	wordspan.textContent = wordrank;
+	tit.append(wordspan);
 
 	box.append(tit);
 	box.append(spacer());
@@ -543,7 +556,13 @@ function game_element(game, inc_players, inc_tournament, won) {
 	return box;
 }
 function add_tournament(tournament) {
-	let box = title('tournament', tournament.tournamentId);
+	let tid = tournament.tournamentId
+	if (my_lowest_tournament) {
+		my_lowest_tournament = Math.min(my_lowest_tournament, tid)
+	} else {
+		my_lowest_tournament = tid
+	}
+	let box = title('tournament', tid);
 	box.classList.add('box');
 	box.addEventListener('click', handler(get_other))
 	document.querySelector('#active-tournaments').append(box);
