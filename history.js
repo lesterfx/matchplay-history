@@ -318,7 +318,7 @@ async function get_other(id) {
 	for (game of active_games) {
 		add_active_game(game);
 	};
-	document.querySelector('#active-tournament-title').scrollIntoView();
+	document.querySelector('#active-tournament').scrollIntoView();
 }
 async function compare_players_from_game(id) {
 	// log('welcome to compareplayersfromgame!')

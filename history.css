@@ -145,8 +145,11 @@ span.vs-bars {
     width: 5em;
     height: 1em;
     margin-right: 5px;
-    border: 1px solid var(--border);
+    border: 2px solid;
     --percent: 50%;
     border-image: linear-gradient(to right, var(--won-border) var(--percent), var(--lost-border) var(--percent));
     background: linear-gradient(to right, var(--won-background) var(--percent), var(--lost-background) var(--percent));
+}
+#player-histories {
+    padding-top: 1em;
 }
