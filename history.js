@@ -488,8 +488,8 @@ function game_element(game, inc_players, inc_tournament) {
 	return box;
 }
 function add_tournament(tournament) {
-	let tel = title('tournament', tournament.tournamentId)
-	tel.classList.add('box')
+	let box = title('tournament', tournament.tournamentId)
+	box.classList.add('box')
 	document.querySelector('#active-tournaments').append(box);
 }
 function fakefill(element, empty) {
