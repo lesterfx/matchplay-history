@@ -86,7 +86,8 @@
 				let el = document.createElement('link')
 				el.addEventListener('error', rej)
 				el.addEventListener('load', res)
-				el.setAttribute('re', 'stylesheet')
+				el.async = true
+				el.setAttribute('rel', 'stylesheet')
 				el.setAttribute('href', src)
 				document.head.append(el)
 			})
