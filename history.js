@@ -473,28 +473,25 @@ function game_element(game, inc_players, inc_tournament, won) {
 	// log(game);
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank
-	if (typeof won !== 'undefined') {
-		log(typeof won)
-		if (typeof won === 'null') {
-			let win_rank = rankiness(game)
-			if (win_rank.place == 1) {
-				box.classList.add('won');
-				wordrank = '(won)'
-			} else if (win_rank.place == win_rank.players) {
-				box.classList.add('lost');
-				wordrank = '(lost)'
-			} else {
-				wordrank = ['zero?', '1st', '2nd', '3rd', '4th', 'fifth?'][win_rank.place];
-			}
+	if (typeof won == 'undefined') {
+		let win_rank = rankiness(game)
+		if (win_rank.place == 1) {
+			box.classList.add('won');
+			wordrank = '(won)'
+		} else if (win_rank.place == win_rank.players) {
+			box.classList.add('lost');
+			wordrank = '(lost)'
 		} else {
-			if (won) {
-				wordrank = '(won)'
-			} else {
-				wordrank = '(lost)'
-			}
-			box.classList.toggle('won', won);
-			box.classList.toggle('lost', !won);
+			wordrank = ['zero?', '1st', '2nd', '3rd', '4th', 'fifth?'][win_rank.place];
 		}
+	} else {
+		if (won) {
+			wordrank = '(won)'
+		} else {
+			wordrank = '(lost)'
+		}
+		box.classList.toggle('won', won);
+		box.classList.toggle('lost', !won);
 	}
 	box.classList.add('box');
 	let tit = title('arena', game.arenaId);
