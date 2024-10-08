@@ -148,8 +148,8 @@ span.vs-bars {
     border-width: 2px;
     border-style: solid;
     --percent: 50%;
-    border-image: linear-gradient(to right, var(--won-border) -10% var(--percent), var(--lost-border) var(--percent) 110%);
-    background: linear-gradient(to right, var(--won-background) -10% var(--percent), var(--lost-background) var(--percent) 110%);
+    border-image: linear-gradient(to right, var(--won-border) var(--percent), var(--lost-border) var(--percent)) no-repeat;
+    background: linear-gradient(to right, var(--won-background) var(--percent), var(--lost-background) var(--percent)) no-repeat;
 }
 #player-histories {
     padding-top: 1em;

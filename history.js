@@ -352,6 +352,7 @@ async function compare_player(id) {
 	}
 }
 async function merge_tournaments() {
+	document.querySelector('#player-histories').scrollIntoView();
 	// log(`merge_tournaments, active players ${stringify(active_players)}`)
 	let merged_tournaments = {};
 	for (uid in active_players) {
@@ -367,7 +368,6 @@ async function merge_tournaments() {
 	};
 	// log(merged_tournaments);
 	// log(`merged tournaments: ${stringify(merged_tournaments)}`);
-	document.querySelector('#player-histories').scrollIntoView();
 	await get_games_from_tournaments(merged_tournaments);
 }
 function did_i_win(game, uid) {
