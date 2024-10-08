@@ -46,11 +46,11 @@
 		<div id="log">
 		</div>
 		<script>
-			window.onerror = function(error, url, line) {
-				let e = `window.onerror\n${url}\nline ${line}\n\n${error.toString()}`
+			window.onerror = function(message, source, lineno, colno, error) {
+				let e = `window.onerror\n${source}\nline ${lineno}:${colno}\n\n${message}\n\n${error.message}\n${err.stack}`
 				alert(e)
 				log(e)
-			}
+			};
 			function stringify(value) {
 				switch (typeof value) {
 					case 'string': case 'object': return JSON.stringify(value, null, 4);

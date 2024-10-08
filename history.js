@@ -324,15 +324,15 @@ ready(() => {
 });
 
 async function handler(callback) {
-	let handle = () => {
+	let handle = async () => {
 		try {
 			for (child of this.parentNode.children) child.classList.remove('active')
 				this.classLIst.add('active')
 			let id = this.dataset.id
-			callback(id)
+			await callback(id)
 		} catch (err) {
 			this.classList.remove('active')
-			catcher(err)
+			await catcher(err)
 		}
 	}
 	return handle
