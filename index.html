@@ -66,15 +66,18 @@
 				el.textContent = message
 				document.querySelector('#log').prepend(el)
 			}
+			function catcher(err) {
+				log(`${err.message}\n${err.stack}`)
+				log(err)
+				throw(err)
+			}
 			async function load(src, loader) {
 				try {
 					let t = Date.now()
 					let s = `${src}?t=${t}`
 					await loader(s)
-					log("script successfully loaded"); 
 				} catch (err) {
-					log(err.toString())
-					log(err.line)
+					catcher(err)
 				}
 			}
 			async function loadjs(src) {
@@ -111,9 +114,7 @@
 				loadcss('history.css')
 				loadjs('history.js')
 			} catch (err) {
-				alert('error 12')
-				alert(err)
-				log(err)
+				catcher(err)
 			}
 		</script>
 	</body>

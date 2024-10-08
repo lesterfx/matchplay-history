@@ -104,6 +104,7 @@ body {
 #main {
     background: var(--page-background);
     color: var(--text);
+    padding-bottom: 100vh;
 }
 .tabs {
     padding-top: 2em;

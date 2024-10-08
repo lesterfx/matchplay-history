@@ -313,11 +313,6 @@ $(function() {
 	$('.clickables').on('click', '.box', clickthing);
 });
 
-function catcher(err) {
-	log(`${err.message}\n${err.stack}`)
-	log(err)
-	throw(err)
-}
 async function clickthing() {
 	try {
 		for (child of this.parentNode.children) child.classList.remove('active')
@@ -455,7 +450,7 @@ function update_player_standing(uid) {
 }
 function add_player_game(options) {
 	let box = game_element(options.game, false, true);
-	box.css('order', options.order)
+	box.style.order = options.order
 	if (typeof did_i_win !== 'undefined') {
 		box.toggleClass('won', options.won).toggleClass('lost', !options.won);
 	}
