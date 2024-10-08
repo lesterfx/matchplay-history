@@ -478,8 +478,8 @@ function game_element(game, inc_players, inc_tournament, won) {
 				box.classList.add('lost');
 			}
 		} else {
-			box.classList.toggle('won', options.won);
-			box.classList.toggle('lost', !options.won);
+			box.classList.toggle('won', won);
+			box.classList.toggle('lost', !won);
 		}
 	}
 	box.classList.add('box');
