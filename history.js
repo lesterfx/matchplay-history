@@ -420,9 +420,10 @@ $(function() {
 });
 
 async function clickthing() {
-	this.parentNode.childNodes().classList.remove('active')
-	this.classList.add('active')
 	try {
+		this.parentNode.childNodes.classList.remove('active')
+		this.classList.add('active')
+
 		let kind = $(this).data('kind');
 		let id = $(this).data('id');
 		switch (kind) {
