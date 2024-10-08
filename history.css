@@ -67,8 +67,8 @@ html {
     outline: 4px solid var(--active-color);
 }
 .box.winmix {
-    background: color-mix(in hsl shorter hue, var(--won-background) var(--winmix), var(--lost-background));
-    border-color: color-mix(in hsl shorter hue, var(--won-border) var(--winmix), var(--lost-border));
+    background: color-mix(in hsl shorter hue, var(--won-background), var(--lost-background), var(--winmix));
+    border-color: color-mix(in hsl shorter hue, var(--won-border), var(--lost-border), var(--winmix));
 }
 .box.won {
     background: var(--won-background);
