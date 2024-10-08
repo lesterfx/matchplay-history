@@ -465,7 +465,7 @@ function add_player_game(options) {
 	parent.append(box);
 }
 function add_active_game(game) {
-	let box = game_element(game, true, false, null);
+	let box = game_element(game, true, false);
 	box.addEventListener('click', handler(compare_players_from_game))
 	document.querySelector('#active-games').append(box);
 }
@@ -473,6 +473,8 @@ function game_element(game, inc_players, inc_tournament, won) {
 	// log(game);
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank
+	log(won)
+	log(typeof won)
 	if (typeof won == 'undefined') {
 		let win_rank = rankiness(game)
 		if (win_rank.place == 1) {
