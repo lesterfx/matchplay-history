@@ -456,7 +456,7 @@ function add_player_game(options) {
 		box.classList.toggle('lost', !options.won);
 	}
 	let parent = $(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
-	box.appendTo(parent);
+	parent.append(box);
 }
 function add_active_game(game) {
 	let box = game_element(game, true, false);
@@ -464,20 +464,20 @@ function add_active_game(game) {
 }
 function game_element(game, inc_players, inc_tournament) {
 	// log(game);
-	let box = notitle('game', game.gameId, 'div')
+	let box = notitle('game', game.gameId, 'div');
 	box.classList.add('box');
-	box.append(title('arena', game.arenaId))
+	box.append(title('arena', game.arenaId));
 	box.append(spacer());
 	if (inc_players) {
-		let plist = document.createElement('ol')
-		plist.classList.add('players')
+		let plist = document.createElement('ol');
+		plist.classList.add('players');
 		box.append(plist);
 		for (uid of game.userIds) {
-			let li = document.createElement('li')
-			li.append(title('user', uid))
-			plist.append(li)
+			let li = document.createElement('li');
+			li.append(title('user', uid));
+			plist.append(li);
 		}
-		box.append(spacer())
+		box.append(spacer());
 	}
 	if (inc_tournament) {
 		box.append(title('tournament', game.tournamentId));
@@ -485,16 +485,16 @@ function game_element(game, inc_players, inc_tournament) {
 	return box;
 }
 function add_tournament(tournament) {
-	let box = title('tournament', tournament.tournamentId)
-	box.classList.add('box')
+	let box = title('tournament', tournament.tournamentId);
+	box.classList.add('box');
 	document.querySelector('#active-tournaments').append(box);
 }
 function fakefill(element, empty) {
-	if (empty) element.innerHTML = ''
+	if (empty) element.innerHTML = '';
 	for (i=0;i<10;i++) {
-		let new_el = document.createElement('div')
-		new_el.classList.add('fake', 'box')
-		element.append(new_el)
+		let new_el = document.createElement('div');
+		new_el.classList.add('fake', 'box');
+		element.append(new_el);
 	}
 	return element;
 }
