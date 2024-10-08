@@ -475,17 +475,18 @@ function game_element(game, inc_players, inc_tournament, won) {
 	let wordrank
 	if (typeof won == 'undefined') {
 		let win_rank = rankiness(game)
+		let percent = win_rank.place / win_rank.maxplace * 100
+		log(`--winmix: ${percent}%`)
+		box.style.cssText = `--winmix: ${percent}%`;
+		box.classList.add('winmix');
+		
 		if (win_rank.place == 0) {
-			box.classList.add('winmix');
-			let percent = win_rank.place / win_rank.maxplace * 100
-			box.style.cssText = `--winmix: ${percent}%`;
 			wordrank = '(won)'
 		} else if (win_rank.place == win_rank.maxplace) {
 			box.classList.add('lost');
 			wordrank = '(lost)'
 		} else {
 			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place];
-			
 		}
 	} else {
 		if (won) {
