@@ -86,30 +86,23 @@ all_data = {
 // log('history begin')
 
 
-let limit_period = 1300;
+let limit_period = 1000;
 let limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
 let limit_phase = 0;
-let limit_last = new Array(9).fill(-limit_period);
+let limit_last = new Array(10).fill(-limit_period);
 let limit_min_step = 10  // probably unnecessary
 async function rate_limit() {
     let now = performance.now()
-    
-    let option1 = now
-    let option2 = limit_last[limit_phase] + limit_period
-    let option3 = limit_last[limit_prev] + limit_min_step
-
     let next_call = Math.max(
-        option1,
-        option2,
-        option3
+        now,
+        limit_last[limit_phase] + limit_period,
+        limit_last[limit_prev] + limit_min_step
     )
-    log(`Math.max(\n    ${option1}\n    ${option2}\n    ${option3}\n) = ${next_call}`)
     limit_last[limit_phase] = next_call
     limit_prev = limit_phase
     limit_phase = (limit_phase+1) % limit_last.length
     let wait = next_call - now
 	await new Promise(resolve => setTimeout(resolve, wait));
-	log(`waited ${wait}ms`)
     return wait
 }
 
@@ -133,9 +126,7 @@ async function get(options) {
 	const req = new Request(request_url, opts);
 
 	let waited = await rate_limit()
-	log(`waited ${waited}ms`)
-	log(`${request_url}\n${performance.now()}`)
-
+	
 	try {
 		const response = await fetch(req);
 		if (!response.ok) {
@@ -151,32 +142,6 @@ async function get(options) {
 		throw error
 	}
 }
-
-async function get_old(options) {
-    let headers = Headers()
-    headers['Authorization'] = `Bearer ${token}`
-	headers['Content-Type'] = 'application/json'
-	headers['Accept'] = 'application/json'
-
-	let request = {}
-	request.headers = headers
-	let base_url = 'https://app.matchplay.events/api/'
-	request.url = base_url + options.endpoint
-	if (options.query) {
-		request.url += '?' + $.param(options.query)
-	}
-	request.dataType = 'json'
-	let waited = await rate_limit()
-	log(`waited ${waited}ms`)
-	log(`${request.url}\n${performance.now()}`)
-	let requested = $.get(request)
-	requested.fail(function (e) {
-		log(e.message)
-		throw e
-	})
-	response = await requested
-	return response.data
-};
 
 async function get_me() {
 	let data = await get({
@@ -498,12 +463,13 @@ function add_active_player(id) {
 
 	h2.append(title('user', id)[0])
 
-	let boxgroup = document.createElement('div')
-	boxgroup.classList.add('boxgroup')
-	playerbox.append(fakefill(boxgroup))
 	let merged = document.createElement('div')
 	merged.classList.add('merged-tournaments')
 	playerbox.append(merged)
+	
+	let boxgroup = document.createElement('div')
+	boxgroup.classList.add('boxgroup')
+	playerbox.append(fakefill(boxgroup))
 
 	document.querySelector('#player-histories').prepend(playerbox);
 	return true
