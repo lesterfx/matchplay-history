@@ -106,6 +106,7 @@ body {
     color: var(--text);
 }
 .tabs {
+    padding-top: 2em;
     padding: 5px;
     display: flex;
     flex-wrap: wrap;
@@ -138,11 +139,9 @@ body {
 .tabs>input:not(:checked)+label+div {
     display: none;
 }
-h2 {
-    margin-top: 1em;
-}
 span.vs-bars {
     display: inline-block;
+    border-radius: 10px;
     width: 5em;
     height: 1em;
     border: 1px solid var(--border);

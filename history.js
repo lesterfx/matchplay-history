@@ -318,6 +318,7 @@ async function get_other(id) {
 	for (game of active_games) {
 		add_active_game(game);
 	};
+	document.querySelector('#active-tournament-title').scrollIntoView();
 }
 async function compare_players_from_game(id) {
 	// log('welcome to compareplayersfromgame!')
@@ -366,6 +367,7 @@ async function merge_tournaments() {
 	};
 	// log(merged_tournaments);
 	// log(`merged tournaments: ${stringify(merged_tournaments)}`);
+	document.querySelector('#player-histories').scrollIntoView();
 	await get_games_from_tournaments(merged_tournaments);
 }
 function did_i_win(game, uid) {
@@ -429,17 +431,14 @@ async function clickthing() {
 		switch (kind) {
 			case 'tournament':
 				// log('get other');
-				document.querySelector('#active-tournament-title').scrollIntoView();
 				await get_other(id);
 				break;
 			case 'game':
 				// log('compare players from game');
-				document.querySelector('#player-histories').scrollIntoView();
 				await compare_players_from_game(id);
 				break;
 			case 'user':
 				// log('compare player');
-				document.querySelector('#player-histories').scrollIntoView();
 				await compare_player(id);
 				break;
 			default:
@@ -482,7 +481,7 @@ function add_active_player(id) {
 	let playerbox = $('<div />').attr('data-player-id', id).addClass('player-history');
 	let h2 = $('<h2>').addClass('player-name').prependTo(playerbox)
 	$('<span>').addClass('vs-bars').appendTo(h2)
-	$('<span>').addClass('vs-text').appendTo(h2)
+	$('<span>').addClass('vs-text').html('0 &mdash; 0 vs ').appendTo(h2)
 	title('user', id).appendTo(h2);
 	fakefill($('<div />').addClass('boxgroup')).appendTo(playerbox);
 	$('<div />').addClass('merged-tournaments').appendTo(playerbox);
@@ -527,11 +526,13 @@ function save_data(kind, obj) {
 function spacer() {
 	return $('<div>').addClass('spacer');
 }
-function update_player_standing(uid, won, lost) {
+function update_player_standing(uid) {
+	let won = winloss[uid].won
+	let lost = winloss[uid].lost
 	let parent = document.querySelector(`#player-histories div.player-history[data-player-id="${uid}"]`)
 	let percent = won / (won+lost) * 100;
 	parent.querySelector('.vs-bars').style.cssText = `--percent: ${percent}%`;
-	parent.querySelector('.vs-text').innerHTML = `${won} &mdash; ${lost} vs`
+	parent.querySelector('.vs-text').innerHTML = `${won} &mdash; ${lost} vs `
 }
 function add_player_game(options) {
 	let box = game_element(options.game, false, true);
