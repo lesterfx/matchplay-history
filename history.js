@@ -149,9 +149,11 @@ async function get_and_populate_games_from_tournament(tid) {
 			};
 		};
 	};
-	let listnode = document.querySelector(`#player-histories div.player-history div.merged-tournaments`);
-	listnode.querySelector(`[data-kind="tournament"][data-id="${tid}"]`).remove();
-	if (listnode.innerHTML == '') listnode.remove()
+	let listnodes = document.querySelectorAll(`#player-histories div.player-history div.merged-tournaments`);
+	for (listnode of listnodes) {
+		listnode.querySelector(`[data-kind="tournament"][data-id="${tid}"]`).remove();
+		if (listnode.innerHTML == '') listnode.remove()
+	}
 }
 async function get_games_from_tournament(tournament, add_players) {
 	// log(`doing get_games_from_tournament, active players  ${stringify(active_players)}`)
@@ -497,7 +499,6 @@ function game_element(game, inc_players, inc_tournament, won) {
 		let win_rank = rankiness(game)
 		if (typeof win_rank != 'undefined') {
 			let percent = win_rank.place / win_rank.maxplace * 100
-			log(`--winmix: ${percent}%`)
 			box.style.cssText = `--winmix: ${percent}%`;
 			box.classList.add('winmix');
 			
