@@ -105,11 +105,12 @@
 			})
 		}
 		try {
-			loadcss('history.css')
-			loadjs('history.js')
+			await loadcss('history.css')
+			await loadjs('history.js')
 		} catch (err) {
 			alert('load error')
 			alert(err)
+			log(err)
 		}
 		</script>
 	</body>
