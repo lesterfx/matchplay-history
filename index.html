@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width" />
   <title>history</title>
-  <link rel="stylesheet" href="history.css" />
   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -65,7 +64,7 @@
 			if (message.slice(0, 1) == '"') message = obj
 			$('#log').prepend($('<pre>').text(message))
 		}
-		async function load(src) {
+		async function load(src, loader) {
 			try {
 				let t = Date.now()
 				let s = `${src}?t=${t}`
@@ -76,23 +75,40 @@
 				log(err.line)
 			}
 		}
-		function loader(scriptUrl){
-			return new Promise(function (res, rej) {
+		async function loadjs(src) {
+			await load(src, scriptloader)
+		}
+		async function loadcss(src) {
+			await load(src, cssloader)
+		}
+		async function cssloader(src) {
+			await new Promise(function (res, rej) {
+				let el = document.createElement('link')
+				el.addEventListener('error', rej)
+				el.addEventListener('load', res)
+				el.setAttribute('re', 'stylesheet')
+				el.setAttribute('href', src)
+				document.head.append(el)
+			})
+		}
+		async function scriptloader(scriptUrl){
+			await new Promise(function (res, rej) {
 				let script = document.createElement('script');
+				script.addEventListener('error',rej);
+				script.addEventListener('load',res);
 				script.src = scriptUrl;
 				script.type = 'text/javascript';
 				script.onerror = rej;
 				script.async = true;
 				script.onload = res;
-				script.addEventListener('error',rej);
-				script.addEventListener('load',res);
-				document.head.appendChild(script);
+				document.head.append(script);
 			})
 		}
 		try {
-			load('history.js')
+			loadcss('history.css')
+			loadjs('history.js')
 		} catch (err) {
-			alert('error loading history.js')
+			alert('load error')
 			alert(err)
 		}
 		</script>
