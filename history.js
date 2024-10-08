@@ -78,7 +78,7 @@ async function get_me() {
 async function get_all_my_tournaments() {
 	all_my_tournaments = {};
 	my_lowest_tournament = undefined
-	for (tournament of (await get_tournaments(myUserId))) {
+	for (let tournament of (await get_tournaments(myUserId))) {
 		add_tournament(tournament);
 		all_my_tournaments[tournament.tournamentId] = tournament;
 	}
@@ -87,10 +87,11 @@ async function get_all_my_tournaments() {
 async function* get_tournaments_paginated(uid) {  // paginate
 	let query = {
 		played: uid,
-		page: 1
+		page: 0 // increments before called
 	}
 	let need_more = true
 	do {
+		query['page'] ++;
 		let response = await get({
 			endpoint: 'tournaments',
 			query: query
@@ -98,14 +99,18 @@ async function* get_tournaments_paginated(uid) {  // paginate
 		let data = response.data
 		log(response.meta)
 		for (tournament of data) {
-			if (tournament < my_lowest_tournament) {
+			if (tournament.tournamentId <= my_lowest_tournament) {
+				need_more = false
+				log(`${tournament.tournamentId} already low enough!`)
+			}
+			if (query.page >= meta.last_page) {
+				log(`${query.page} is the last page! ${meta.last_page}`)
 				need_more = false
 			}
 			save_data('tournament', tournament);
 		};
 		yield data;
-		query['page'] ++;
-	} while (0)
+	} while (need_more)
 }
 async function get_tournaments(uid) {  // paginate
 	let response = await get({
