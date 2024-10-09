@@ -228,9 +228,14 @@ async function get_other(id) {
 	let active_games = await get_games_from_tournament(tournament, true);
 	active_games.reverse();
 	
+	let in_progress = []
 	for (game of active_games) {
+		if (game.status != 'completed')  in_progress.push(game.gameId)
 		add_active_game(game);
 	};
+	if (in_progress.length == 1) {
+		compare_players_from_game(in_progress[0])
+	}
 	document.querySelector('#active-tournament').scrollIntoView();
 }
 async function compare_players_from_game(id) {
@@ -284,7 +289,6 @@ function rank(game, uid) {
 
 	let result = game.resultPositions
 	if (!result || !result.length || result.includes(null)) {
-		log(result)
 		if (game.suggestions && game.suggestions.length) {
 			result = game.suggestions[0].results
 		} else {
@@ -379,7 +383,7 @@ function add_player_button(uid) {
 	insertSorted(button, active_tournament_tab('players'));
 }
 function add_active_player(id) {
-	let playerbox = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"]`)
+	let playerbox = document.querySelector(`#player-histories div.player-history[data-playerid="${id}"]`)
 	if (playerbox) {
 		document.querySelector('#player-histories').prepend(playerbox);
 		return false;
@@ -484,7 +488,6 @@ function add_active_game(game) {
 function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank = game.status
-	log(game)
 	if (typeof won == 'undefined') {
 		let win_rank = rankiness(game)
 		if (typeof win_rank != 'undefined') {
@@ -494,7 +497,6 @@ function game_element(game, inc_players, inc_tournament, won) {
 			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place];
 		} else {
 			wordrank = stringify(win_rank)
-			log(win_rank)
 		}
 	} else {
 		if (won) {
