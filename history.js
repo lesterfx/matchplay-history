@@ -594,6 +594,8 @@ function tournament_tab(tournament) {
 	let div = document.createElement('div')
 	div.classList.add('clickables', 'boxgroup', tournament.status)
 	tabs.append(div)
+
+	return div
 }
 function fakefill(element, empty) {
 	if (empty) element.innerHTML = '';
