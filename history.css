@@ -114,9 +114,12 @@ body {
 .tabs {
     padding-top: 2em;
     padding: 5px;
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     position: relative;
+}
+.tabs.ready {
+    display: flex;
 }
 .tabs>input {
     display: none;

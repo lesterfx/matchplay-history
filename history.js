@@ -76,6 +76,7 @@ async function get_me() {
 }
 
 async function get_all_my_tournaments() {
+	document.querySelector('#my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
 	my_lowest_tournament = undefined
 	for (let tournament of (await get_tournaments(myUserId))) {
@@ -239,6 +240,8 @@ async function get_other(id) {
 	let active_games = await get_games_from_tournament(tournament, true);
 	// log(`active_games: ${active_games}`)
 	active_games.reverse();
+	document.querySelector('#active-tournament').classList.add('ready')
+	
 	let tit = document.querySelector('#active-tournament-title')
 	tit.textContent = ''
 	tit.append(title('tournament', tournament.tournamentId));
