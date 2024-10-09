@@ -105,7 +105,7 @@ async function* get_tournaments_paginated(uid) {  // paginate
 				// log(`${tournament.tournamentId} already low enough!`)
 			}
 			if (query.page >= response.meta.last_page) {
-				log(`${query.page} is the last page! ${response.meta.last_page}`)
+				// log(`${query.page} is the last page! ${response.meta.last_page}`)
 				need_more = false
 			}
 			save_data('tournament', tournament);
@@ -407,7 +407,7 @@ function add_player_button(uid) {
 	let button = title('user', uid);
 	button.classList.add('box');
 	button.addEventListener('click', handler(compare_player))
-	insertSorted(button, document.querySelector('#players'));
+	insertSorted(button, tab(document.querySelector('#active-tournament'), 'players'));
 }
 function add_active_player(id) {
 	let playerbox = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"]`)
@@ -512,7 +512,7 @@ function add_player_game(options) {
 function add_active_game(game) {
 	let box = game_element(game, true, false);
 	box.addEventListener('click', handler(compare_players_from_game))
-	document.querySelector('#active-games').append(box);
+	active_tournament_tab(game.status).append(box)
 }
 function game_element(game, inc_players, inc_tournament, won) {
 	// log(game);
@@ -524,14 +524,9 @@ function game_element(game, inc_players, inc_tournament, won) {
 			let percent = win_rank.place / win_rank.maxplace * 100
 			box.style.cssText = `--winmix: ${percent}%`;
 			box.classList.add('winmix');
-			
-			if (win_rank.place == 0) {
-				wordrank = '(won)'
-			} else if (win_rank.place == win_rank.maxplace) {
-				wordrank = '(lost)'
-			} else {
-				wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place];
-			}
+			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place];
+		} else {
+
 		}
 	} else {
 		if (won) {
@@ -576,30 +571,35 @@ function add_tournament(tournament) {
 	let box = title('tournament', tid);
 	box.classList.add('box');
 	box.addEventListener('click', handler(get_other))
-	tournament_tab(tournament).append(box);
+	my_tournaments_tab(tournament).append(box);
 }
-function tournament_tab(tournament) {
-	let tabs = document.querySelector('#my-tournaments')
-	let boxgroup = tabs.querySelector('.boxgroup.' + tournament.status)
+function my_tournaments_tab(tournament) {
+	return tab(document.querySelector('#my-tournaments'), tournament.status)
+}
+function active_tournament_tab(status) {
+	return tab(document.querySelector('#active-tournament'), status)
+}
+function tab(parent, identifier) {
+	let boxgroup = parent.querySelector('.boxgroup.' + identifier)
 	if (boxgroup) {
 		return boxgroup
 	}
 
 	let input_ = document.createElement('input')
 	input_.type = 'radio'
-	input_.name = 'tournaments'
-	input_.id = tournament.status
+	input_.name = parent.dataset.tabgroup
+	input_.id = `${parent.dataset.tabgroup}-${identifier}`
 	input_.checked = true
-	tabs.append(input_)
+	parent.append(input_)
 
 	let label = document.createElement('label')
-	label.setAttribute('for', tournament.status)
-	label.textContent = tournament.status
-	tabs.append(label)
+	label.setAttribute('for', `${parent.dataset.tabgroup}-${identifier}`)
+	label.textContent = identifier
+	parent.append(label)
 
 	let div = document.createElement('div')
-	div.classList.add('clickables', 'boxgroup', tournament.status)
-	tabs.append(div)
+	div.classList.add('clickables', 'boxgroup', `${parent.dataset.tabgroup}-${identifier}`)
+	parent.append(div)
 
 	return div
 }
