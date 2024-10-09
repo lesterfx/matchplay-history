@@ -76,9 +76,20 @@ async function get_all_my_tournaments() {
 	document.querySelector('#my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
 	my_lowest_tournament = undefined
-	for (let tournament of (await get_tournaments(myUserId))) {
+	let in_progress = []
+	let tournaments = await get_tournaments(myUserId);
+	for (let tournament of tournaments) {
+		if (Math.random() > .95) {
+			tournament.status = 'something'
+		}
 		add_tournament(tournament);
 		all_my_tournaments[tournament.tournamentId] = tournament;
+		if (tournament.status != 'completed') {
+			in_progress.push(tournament.tournamentId)
+		}
+	}
+	if (in_progress.length == 1) {
+		await get_other(in_progress[0])
 	}
 }
 
