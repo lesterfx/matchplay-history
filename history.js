@@ -81,10 +81,14 @@ async function get_all_my_tournaments() {
 	for (let tournament of tournaments) {
 		let element = add_tournament(tournament);
 		all_my_tournaments[tournament.tournamentId] = tournament;
-		if (tournament.status != 'completed') in_progress.push(element)
+		if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 	}
 	if (in_progress.length == 1) {
-		in_progress[0].dispatchEvent(new Event('click'))
+		let status = in_progress[0][0]
+		let element = in_progress[0][1]
+		
+		element.dispatchEvent(new Event('click'))
+		activate_tab(my_tournaments_tab(status))
 	}
 }
 
@@ -229,12 +233,15 @@ async function get_other(id) {
 	let in_progress = []
 	for (game of active_games) {
 		let element = add_active_game(game);
-		if (game.status != 'completed')  in_progress.push(element)
+		if (game.status != 'completed')  in_progress.push([game.status, element])
 	};
-	if (in_progress.length == 1) {
-		element.dispatchEvent(new Event('click'))
-	}
 	document.querySelector('#active-tournament').scrollIntoView();
+	if (in_progress.length == 1) {
+		let status = in_progress[0][0]
+		let element = in_progress[0][1]
+		element.dispatchEvent(new Event('click'))
+		activate_tab(active_tournament_tab(status))
+	}
 }
 async function compare_players_from_game(id) {
 	active_players = {};
@@ -549,26 +556,32 @@ function my_tournaments_tab(tournament) {
 function active_tournament_tab(status) {
 	return tab(document.querySelector('#active-tournament'), status)
 }
+function activate_tab(boxgroup) {
+	document.querySelector(`#${boxgroup.dataset.inputid}`).checked = true
+
+}
 function tab(parent, identifier) {
 	let boxgroup = parent.querySelector('.boxgroup.' + `${parent.dataset.tabgroup}-${identifier}`)
 	if (boxgroup) {
 		return boxgroup
 	}
+	let id = `${parent.dataset.tabgroup}-${identifier}`
 
 	let input_ = document.createElement('input')
 	input_.type = 'radio'
 	input_.name = parent.dataset.tabgroup
-	input_.id = `${parent.dataset.tabgroup}-${identifier}`
+	input_.id = id
 	input_.checked = true
 	parent.append(input_)
 
 	let label = document.createElement('label')
-	label.setAttribute('for', `${parent.dataset.tabgroup}-${identifier}`)
+	label.setAttribute('for', id)
 	label.textContent = identifier
 	parent.append(label)
 
 	let div = document.createElement('div')
-	div.classList.add('clickables', 'boxgroup', `${parent.dataset.tabgroup}-${identifier}`)
+	div.classList.add('clickables', 'boxgroup', id)
+	div.dataset.inputid = id
 	parent.append(div)
 
 	fakefill(div)
