@@ -88,6 +88,7 @@ async function get_all_my_tournaments() {
 		let element = in_progress[0][1]
 		
 		element.dispatchEvent(new Event('click'))
+		log(`activating ${status}`)
 		activate_tab(my_tournaments_tab(status))
 	}
 }
@@ -240,6 +241,7 @@ async function get_other(id) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
 		element.dispatchEvent(new Event('click'))
+		log(`activating ${status}`)
 		activate_tab(active_tournament_tab(status))
 	}
 }
