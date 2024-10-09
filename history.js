@@ -212,6 +212,7 @@ async function get_tournament_details(tournament, add_players) {
 async function get_other(id) {
 	let tournament = all_data.tournament[id];
 	active_players = {};
+	document.querySelector('#player-histories').innerHTML = ''
 	let tabs = document.querySelector('#active-tournament');
 	tabs.innerHTML = '';
 	tabs.append(title('tournament', tournament.tournamentId, 'h2'));
@@ -272,16 +273,7 @@ function rank(game, uid) {
 			break
 		}
 	}
-	let result = game.resultPositions
-	if (!result || !result.length) {
-		result = game.suggestions[0].results
-	}
-	return result.indexOf(playerId)
-}
-function did_i_win(game, uid) {
-	return rank(game, myUserId) < rank(game, uid)
-}
-function rankiness(game) {
+
 	let result = game.resultPositions
 	if (!result || !result.length || result.includes(null)) {
 		log(result)
@@ -293,9 +285,15 @@ function rankiness(game) {
 			return
 		}
 	}
+	return result.indexOf(playerId)
+}
+function did_i_win(game, uid) {
+	return rank(game, myUserId) < rank(game, uid)
+}
+function rankiness(game) {
 	return {
 		place: rank(game, myUserId),
-		maxplace: result.length - 1
+		maxplace: game.userIds.length - 1
 	}
 }
 function token_needed(message) {
