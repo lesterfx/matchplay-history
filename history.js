@@ -213,17 +213,24 @@ async function get_tournament_details(tournament, add_players) {
 	let tournament_details = response.data;
 	let pid;
 	if (add_players) all_data.user = {};
+	log(`all_data.user: ${all_data.user.length}`)
 	for (player of tournament_details.players) {
 		let uid = player.claimedBy;
 		if (uid == myUserId) {
 			pid = player.playerId;
 			continue;
 		};
-		if (!all_data.user[uid] && add_players) {
-			all_data.user[uid] = player;
-			// log(`adding player ${uid}`)
-			add_player_button(uid);
-		};
+		if (add_players) {
+			if (!all_data.user[uid]) {
+				all_data.user[uid] = player;
+				// log(`adding player ${uid}`)
+				add_player_button(uid);
+			} else {
+				log(`${uid} already added`)
+			}
+		} else {
+			log('not adding players')
+		}
 	};
 	// log('adding arenas');
 	for (arena of tournament_details.arenas) {

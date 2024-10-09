@@ -53,6 +53,7 @@ html {
     border-bottom: none;
 }
 .box {
+    cursor: pointer;
     border: 1px solid var(--border);
     background: var(--background);
     border-radius: 10px;
