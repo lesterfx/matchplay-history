@@ -157,7 +157,7 @@ body {
     display: none;
 }
 span.vs-bars {
-    display: inline-block;
+    display: none;
     border-radius: 10px;
     width: 5em;
     height: 1em;
@@ -166,6 +166,9 @@ span.vs-bars {
     border: 1px solid var(--border);
     --percent: 50%;
     background: linear-gradient(to right, var(--won-background) var(--percent), var(--lost-background) var(--percent)) no-repeat;
+}
+span.vs-bars.ready {
+    display: inline-block;
 }
 #player-histories {
     padding-top: 1em;

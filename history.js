@@ -272,6 +272,7 @@ async function compare_players_from_game(id) {
 }
 async function compare_player(id) {
 	document.querySelector('#player-histories').innerHTML = ''
+	winloss = {}
 	active_players = {}
 	active_players[id] = true
 	if (add_active_player(id)) {
@@ -496,6 +497,7 @@ function update_player_standing(uid) {
 	let percent = won / (won+lost) * 100;
 
 	parent.querySelector('.vs-bars').style.cssText = `--percent: ${percent}%`;
+	parent.querySelector('.vs-bars').classList.add('ready')
 	parent.querySelector('.vs-text').innerHTML = `${won} &mdash; ${lost} vs `;
 }
 function add_player_game(options) {
@@ -581,9 +583,10 @@ function tournament_tab(tournament) {
 	}
 
 	let input_ = document.createElement('input')
-	input_.setAttribute('type', 'radio')
-	input_.setAttribute('name', 'tournaments')
-	input_.setAttribute('id', tournament.status)
+	input_.type = 'radio'
+	input_.name = 'tournaments'
+	input_.id = tournament.status
+	input_.checked = true
 	tabs.append(input_)
 
 	let label = document.createElement('label')
