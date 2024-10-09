@@ -79,9 +79,6 @@ async function get_all_my_tournaments() {
 	let in_progress = []
 	let tournaments = await get_tournaments(myUserId);
 	for (let tournament of tournaments) {
-		if (Math.random() > .95) {
-			tournament.status = 'something'
-		}
 		add_tournament(tournament);
 		all_my_tournaments[tournament.tournamentId] = tournament;
 		if (tournament.status != 'completed') {
