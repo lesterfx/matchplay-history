@@ -101,10 +101,10 @@ async function* get_tournaments_paginated(uid) {  // paginate
 		for (tournament of data) {
 			if (tournament.tournamentId <= my_lowest_tournament) {
 				need_more = false
-				log(`${tournament.tournamentId} already low enough!`)
+				// log(`${tournament.tournamentId} already low enough!`)
 			}
 			if (query.page >= response.meta.last_page) {
-				log(`${query.page} is the last page! ${meta.last_page}`)
+				log(`${query.page} is the last page! ${response.meta.last_page}`)
 				need_more = false
 			}
 			save_data('tournament', tournament);
@@ -571,7 +571,29 @@ function add_tournament(tournament) {
 	let box = title('tournament', tid);
 	box.classList.add('box');
 	box.addEventListener('click', handler(get_other))
-	document.querySelector('#active-tournaments').append(box);
+	tournament_tab(tournament).append(box);
+}
+function tournament_tab(tournament) {
+	let tabs = document.querySelector('#my-tournaments')
+	let boxgroup = tabs.querySelector('.boxgroup.' + tournament.status)
+	if (boxgroup) {
+		return boxgroup
+	}
+
+	let input_ = document.createElement('input')
+	input_.setAttribute('type', 'radio')
+	input_.setAttribute('name', 'tournaments')
+	input_.setAttribute('id', tournament.status)
+	tabs.append(input_)
+
+	let label = document.createElement('label')
+	label.setAttribute('for', tournament.status)
+	label.textContent = tournament.status
+	tabs.append(label)
+
+	let div = document.createElement('div')
+	div.classList.add('clickables', 'boxgroup', tournament.status)
+	tabs.append(div)
 }
 function fakefill(element, empty) {
 	if (empty) element.innerHTML = '';
