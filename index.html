@@ -55,7 +55,7 @@
 				el.textContent = message
 				let logobj = document.querySelector('#log')
 				logobj.prepend(el)
-				logobj.scrollIntoView()
+				// logobj.scrollIntoView()
 			}
 			function catcher(err) {
 				log(`${err.message}\n${err.stack}`)
