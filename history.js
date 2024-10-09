@@ -233,8 +233,9 @@ async function get_other(id) {
 	
 	let in_progress = []
 	for (game of active_games) {
+		if (Math.random() > 0.9) game.status = 'something'
 		let element = add_active_game(game);
-		if (game.status != 'completed')  in_progress.push([game.status, element])
+		if (game.status != 'completed')  in_progress.push([game.status, element]);
 	};
 	document.querySelector('#active-tournament').scrollIntoView();
 	if (in_progress.length == 1) {
