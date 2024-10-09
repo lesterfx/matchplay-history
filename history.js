@@ -203,9 +203,6 @@ async function get_tournament_details(tournament, add_players) {
 	if (!tournament) {
 		throw Error('no tournament passed into get_tournament_details')
 	}
-	if (add_players) {
-		fakefill(document.querySelector('#players'), true)
-	}
 	let response = await get({
 		endpoint: `tournaments/${tid}`,
 		query: {
@@ -234,17 +231,16 @@ async function get_tournament_details(tournament, add_players) {
 	return pid;
 }
 async function get_other(id) {
-	fakefill(document.querySelector('#active-games'), true)
 	let tournament = all_data.tournament[id];
-	active_players = {}
+	active_players = {};
+	let tabs = document.querySelector('#active-tournament');
+	tabs.innerHTML = '';
+	tabs.append(title('tournament', tournament.tournamentId, 'h2'));
+
 	let active_games = await get_games_from_tournament(tournament, true);
 	// log(`active_games: ${active_games}`)
 	active_games.reverse();
-	document.querySelector('#active-tournament').classList.add('ready')
 	
-	let tit = document.querySelector('#active-tournament-title')
-	tit.textContent = ''
-	tit.append(title('tournament', tournament.tournamentId));
 	for (game of active_games) {
 		add_active_game(game);
 	};
@@ -600,6 +596,8 @@ function tab(parent, identifier) {
 	let div = document.createElement('div')
 	div.classList.add('clickables', 'boxgroup', `${parent.dataset.tabgroup}-${identifier}`)
 	parent.append(div)
+
+	fakefill(div)
 
 	return div
 }
