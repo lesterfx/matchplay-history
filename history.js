@@ -407,7 +407,7 @@ function add_player_button(uid) {
 	let button = title('user', uid);
 	button.classList.add('box');
 	button.addEventListener('click', handler(compare_player))
-	insertSorted(button, tab(document.querySelector('#active-tournament'), 'players'));
+	insertSorted(button, active_tournament_tab('players'));
 }
 function add_active_player(id) {
 	let playerbox = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"]`)
@@ -580,7 +580,7 @@ function active_tournament_tab(status) {
 	return tab(document.querySelector('#active-tournament'), status)
 }
 function tab(parent, identifier) {
-	let boxgroup = parent.querySelector('.boxgroup.' + identifier)
+	let boxgroup = parent.querySelector('.boxgroup.' + `${parent.dataset.tabgroup}-${identifier}`)
 	if (boxgroup) {
 		return boxgroup
 	}
