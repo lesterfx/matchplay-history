@@ -52,6 +52,7 @@
 				log(err)
 				throw(err)
 			}
+			document.querySelector('#log').addEventListener('click', () => {document.querySelector('#log').prepend('tap')})
 			async function load(src, loader) {
 				try {
 					let t = Date.now()

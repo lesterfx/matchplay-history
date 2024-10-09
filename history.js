@@ -212,6 +212,7 @@ async function get_tournament_details(tournament, add_players) {
 	});
 	let tournament_details = response.data;
 	let pid;
+	if (add_players) all_data.user = {};
 	for (player of tournament_details.players) {
 		let uid = player.claimedBy;
 		if (uid == myUserId) {
@@ -233,7 +234,6 @@ async function get_tournament_details(tournament, add_players) {
 async function get_other(id) {
 	let tournament = all_data.tournament[id];
 	active_players = {};
-	all_data.users = {}
 	let tabs = document.querySelector('#active-tournament');
 	tabs.innerHTML = '';
 	tabs.append(title('tournament', tournament.tournamentId, 'h2'));
@@ -401,6 +401,7 @@ function insertSorted(element, parent) {
 }
 
 function add_player_button(uid) {
+	log('adding player')
 	let button = title('user', uid);
 	button.classList.add('box');
 	button.addEventListener('click', handler(compare_player))
