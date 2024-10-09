@@ -283,7 +283,8 @@ function did_i_win(game, uid) {
 }
 function rankiness(game) {
 	let result = game.resultPositions
-	if (!result || !result.length || result.indexOf(null)>-1) {
+	if (!result || !result.length || result.includes(null)) {
+		log(result)
 		if (game.suggestions && game.suggestions.length) {
 			result = game.suggestions[0].results
 		} else {
