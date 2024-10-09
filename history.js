@@ -233,6 +233,7 @@ async function get_tournament_details(tournament, add_players) {
 async function get_other(id) {
 	let tournament = all_data.tournament[id];
 	active_players = {};
+	data.users = {}
 	let tabs = document.querySelector('#active-tournament');
 	tabs.innerHTML = '';
 	tabs.append(title('tournament', tournament.tournamentId, 'h2'));
