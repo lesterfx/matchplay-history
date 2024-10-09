@@ -287,6 +287,8 @@ function rankiness(game) {
 		if (game.suggestions && game.suggestions.length) {
 			result = game.suggestions[0].results
 		} else {
+			log('game has no resultPositions or suggestions')
+			log(game)
 			return
 		}
 	}
@@ -483,7 +485,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 			box.classList.add('winmix');
 			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place];
 		} else {
-
+			wordrank = game.status
 		}
 	} else {
 		if (won) {
