@@ -79,14 +79,12 @@ async function get_all_my_tournaments() {
 	let in_progress = []
 	let tournaments = await get_tournaments(myUserId);
 	for (let tournament of tournaments) {
-		add_tournament(tournament);
+		let element = add_tournament(tournament);
 		all_my_tournaments[tournament.tournamentId] = tournament;
-		if (tournament.status != 'completed') {
-			in_progress.push(tournament.tournamentId)
-		}
+		if (tournament.status != 'completed') in_progress.push(element)
 	}
 	if (in_progress.length == 1) {
-		await get_other(in_progress[0])
+		in_progress[0].dispatchEvent(new Event('click'))
 	}
 }
 
@@ -230,11 +228,11 @@ async function get_other(id) {
 	
 	let in_progress = []
 	for (game of active_games) {
-		if (game.status != 'completed')  in_progress.push(game.gameId)
-		add_active_game(game);
+		let element = add_active_game(game);
+		if (game.status != 'completed')  in_progress.push(element)
 	};
 	if (in_progress.length == 1) {
-		compare_players_from_game(in_progress[0])
+		element.dispatchEvent(new Event('click'))
 	}
 	document.querySelector('#active-tournament').scrollIntoView();
 }
@@ -484,6 +482,7 @@ function add_active_game(game) {
 	let box = game_element(game, true, false);
 	box.addEventListener('click', handler(compare_players_from_game))
 	active_tournament_tab(game.status).append(box)
+	return box
 }
 function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'div');
@@ -542,6 +541,7 @@ function add_tournament(tournament) {
 	box.classList.add('box');
 	box.addEventListener('click', handler(get_other))
 	my_tournaments_tab(tournament).append(box);
+	return box
 }
 function my_tournaments_tab(tournament) {
 	return tab(document.querySelector('#my-tournaments'), tournament.status)
