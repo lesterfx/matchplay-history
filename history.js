@@ -549,11 +549,11 @@ function add_tournament(tournament) {
 	let box = title('tournament', tid);
 	box.classList.add('box');
 	box.addEventListener('click', handler(get_other))
-	my_tournaments_tab(tournament).append(box);
+	my_tournaments_tab(tournament.status).append(box);
 	return box
 }
-function my_tournaments_tab(tournament) {
-	return tab(document.querySelector('#my-tournaments'), tournament.status)
+function my_tournaments_tab(status) {
+	return tab(document.querySelector('#my-tournaments'), status)
 }
 function active_tournament_tab(status) {
 	return tab(document.querySelector('#active-tournament'), status)
