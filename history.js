@@ -477,6 +477,7 @@ function add_active_game(game) {
 function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank = game.status
+	log(game)
 	if (typeof won == 'undefined') {
 		let win_rank = rankiness(game)
 		if (typeof win_rank != 'undefined') {
