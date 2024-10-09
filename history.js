@@ -485,7 +485,8 @@ function game_element(game, inc_players, inc_tournament, won) {
 			box.classList.add('winmix');
 			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place];
 		} else {
-			wordrank = game.status
+			wordrank = stringify(win_rank)
+			log(win_rank)
 		}
 	} else {
 		if (won) {
