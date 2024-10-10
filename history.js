@@ -238,7 +238,7 @@ async function get_other(id) {
 	tabs.innerHTML = '';
 	let title_h2 = document.querySelector('#active-tournament-title');
 	title_h2.innerHTML = '';
-	title_h2.append(title('tournament', tournament.tournament_id, 'span'));
+	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
 
 	let active_games = await get_games_from_tournament(tournament, true);
 	active_games.reverse();
@@ -360,7 +360,7 @@ let ready = (callback) => {
 		callback();
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
-		document.querySelector('#refresh-active-event').addEventListener('click', handler(get_other));
+		document.querySelector('#refresh-active-tournament').addEventListener('click', handler(get_other));
 	}
 }
 ready(() => {
