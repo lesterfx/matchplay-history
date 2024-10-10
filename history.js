@@ -374,7 +374,7 @@ let ready = (callback) => {
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
-	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournaments));
+	document.querySelector('#refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments));
 	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament));
 }
 ready(() => {
