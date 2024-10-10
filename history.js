@@ -639,7 +639,7 @@ async function notifyMe() {
 			await Notification.requestPermission()
 			log(`permission ${Notification.permission}`)
 		}
-		if (permission === "granted") {
+		if (Notification.permission === "granted") {
 			log('showing notificaiton!')
 			const notification = new Notification("Hi there!");
 		} else {
