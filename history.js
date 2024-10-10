@@ -241,7 +241,7 @@ async function refresh_tournament() {
 	await get_other();
 	if (refresh_timer) clearTimeout(refresh_timer)
 	refresh_timer = setTimeout(refresh_tournament, 5000);
-	.classList.add('timed');
+	refresh_button.classList.add('timed');
 }
 async function get_other(id) {
 	log(id)
