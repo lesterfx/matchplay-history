@@ -230,11 +230,18 @@ async function get_tournament_details(tournament, add_players) {
 	return pid;
 }
 async function refresh_tournaments() {
+	log(`refresh tournaments`)
 	await get_all_my_tournaments()
 }
 async function refresh_tournament() {
-	await notifyMe()
-	await get_other()
+	log(`refresh tournament ${active_tournament_id}`);
+	// await notifyMe();
+	let refresh_button = $('#refresh-active-tournament')
+	refresh_button.classList.remove('timed')
+	await get_other();
+	if (refresh_timer) clearTimeout(refresh_timer)
+	refresh_timer = setTimeout(refresh_tournament, 5000);
+	.classList.add('timed');
 }
 async function get_other(id) {
 	log(id)

@@ -197,4 +197,11 @@ ol {
     margin-left: 1em;
     color: var(--active-color);
     cursor: pointer;
+    font-weight: normal;
+    transform: rotate(0deg);
+}
+.refresh.timed {
+    transition-property: transform;
+    transition-duration: 5s;
+    transform: rotate(360deg);
 }
