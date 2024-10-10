@@ -231,17 +231,23 @@ async function get_tournament_details(tournament, add_players) {
 	return pid;
 }
 async function refresh_tournaments() {
-	log(`refresh tournaments`)
 	await get_all_my_tournaments()
 }
 async function refresh_tournament() {
+	if (refresh_timer) {
+		clearTimeout(refresh_timer)
+		refresh_timer = null
+	} else {
+		await do_refresh_tournament()
+	}
+}
+async function do_refresh_tournament() {
 	log(`refresh tournament ${active_tournament_id}`);
 	// await notifyMe();
 	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.remove('timed')
 	await get_other();
-	if (refresh_timer) clearTimeout(refresh_timer)
-	refresh_timer = setTimeout(refresh_tournament, 5000);
+	refresh_timer = setTimeout(do_refresh_tournament, 5000);
 	refresh_button.classList.add('timed');
 }
 async function get_other(id) {
@@ -537,9 +543,9 @@ function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank = game.status
 	if (typeof won == 'undefined') {
-		log(`won was ${won}`)
+		// log(`won was ${wgon}`)
 		let win_rank = rankiness(game)
-		log(`win_rank is ${stringify(win_rank)}`)
+		// log(`win_rank is ${stringify(win_rank)}`)
 		if (typeof win_rank != 'undefined') {
 			let percent = win_rank.place / win_rank.maxplace * 100
 			box.style.cssText = `--winmix: ${percent}%`;
@@ -551,10 +557,10 @@ function game_element(game, inc_players, inc_tournament, won) {
 	} else if (won === null) {
 	} else {
 		if (won) {
-			log(`setting won because ${won}`)
+			// log(`setting won because ${won}`)
 			wordrank = '(won)'
 		} else {
-			log(`setting lost because ${won}`)
+			// log(`setting lost because ${won}`)
 			wordrank = '(lost)'
 		}
 		box.classList.toggle('won', won);
@@ -648,12 +654,9 @@ async function notifyMe() {
 		log('This browser does not support desktop notification');
 	} else {
 		if (Notification.permission != 'granted' && Notification.permission != 'denied') {
-			log('requesting permission')
 			await Notification.requestPermission()
-			log(`permission ${Notification.permission}`)
 		}
 		if (Notification.permission === "granted") {
-			log('showing notificaiton!')
 			const notification = new Notification("Hi there!");
 		} else {
 
