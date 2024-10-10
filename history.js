@@ -139,10 +139,12 @@ async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
 	let tournament_games = await get_games_from_tournament(tournament)
 	for (game of tournament_games) {
-		game.userIds = [35180,42410,27652,34922]
-		game.playerIds = [322136,390368,250886,320355]
-		game.resultPositions = [null, null, null, null]
-		game.suggestions = []
+		if (Math.random() > 0.6) {
+			game.userIds = [35180,42410,27652,34922]
+			game.playerIds = [322136,390368,250886,320355]
+			game.resultPositions = [null, null, null, null]
+			game.suggestions = []
+		}
 		for (uid of game.userIds) {
 			if (uid == myUserId) {
 				continue
@@ -231,7 +233,9 @@ async function get_other(id) {
 	document.querySelector('#player-histories').innerHTML = ''
 	let tabs = document.querySelector('#active-tournament');
 	tabs.innerHTML = '';
-	tabs.append(title('tournament', tournament.tournamentId, 'h2'));
+	let title_h2 = document.querySelector('#active-tournament-title');
+	title_h2.innerHTML = '';
+	title_h2.append(title('tournament', tournament.tournamentId, 'h2'));
 
 	let active_games = await get_games_from_tournament(tournament, true);
 	active_games.reverse();
