@@ -228,6 +228,10 @@ async function get_tournament_details(tournament, add_players) {
 	};
 	return pid;
 }
+async function refresh() {
+	notifyMe()
+	await get_other()
+}
 async function get_other(id) {
 	log(id)
 	if (id) active_tournament_id = id
@@ -361,7 +365,7 @@ let ready = (callback) => {
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
-	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(get_other));
+	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh));
 }
 ready(() => {
 	try {
@@ -621,3 +625,21 @@ function fakefill(element, empty) {
 	}
 	return element;
 }
+function notifyMe() {
+	if (!("Notification" in window)) {
+	  log("This browser does not support desktop notification");
+	} else if (Notification.permission === "granted") {
+	  const notification = new Notification("Hi there!");
+	  
+	} else if (Notification.permission !== "denied") {
+	  Notification.requestPermission().then((permission) => {
+		if (permission === "granted") {
+		  const notification = new Notification("Hi there!");
+		}
+	  });
+	}
+  
+	// At last, if the user has denied notifications, and you
+	// want to be respectful there is no need to bother them anymore.
+  }
+  
