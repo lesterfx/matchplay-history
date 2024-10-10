@@ -194,8 +194,6 @@ ol {
 }
 #refresh-active-tournament {
     display: inline-block;
-    width: 24px;
-    height: 24px;
-    outline: 4px solid var(--active-color);
-    border-radius: 100%;
+    text-decoration: none;
+    content: "↻";
 }
