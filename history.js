@@ -299,13 +299,16 @@ function rank(game, uid) {
 		} else {
 			log('game has no resultPositions or suggestions')
 			log(game)
-			return
+			return null
 		}
 	}
 	return result.indexOf(playerId)
 }
 function did_i_win(game, uid) {
-	return rank(game, myUserId) < rank(game, uid)
+	let me = rank(game, myUserId)
+	let other = rank(game, uid)
+	if (me === null || other === null) return null
+	return me < other
 }
 function rankiness(game) {
 	return {
