@@ -192,9 +192,9 @@ div.title {
 ol {
     margin-bottom: 0;
 }
-#refresh-active-tournament {
+.refresh {
     display: inline-block;
     margin-left: 1em;
-    color: #0000EE;
+    color: var(--active-color);
     cursor: pointer;
 }
