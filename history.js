@@ -78,6 +78,7 @@ async function get_all_my_tournaments() {
 	all_my_tournaments = {};
 	my_lowest_tournament = undefined
 	let in_progress = []
+	document.querySelector('#my-tournaments').innerHTML = ''
 	let tournaments = await get_tournaments(myUserId);
 	for (let tournament of tournaments) {
 		let element = add_tournament(tournament);
