@@ -336,11 +336,15 @@ function rankiness(game) {
 function token_needed(message) {
 	document.querySelector('#token-entry').style.display = 'block';
 	document.querySelector('#token-form').addEventListener('submit', async function (event) {
-		event.preventDefault();
-		token = document.querySelector('#token').val();
-		localStorage.setItem('token', token);
-		document.querySelector('#token-entry').style.display = 'none';
-		main().catch(catcher);
+		try {
+			event.preventDefault();
+			token = document.querySelector('#token').val();
+			localStorage.setItem('token', token);
+			document.querySelector('#token-entry').style.display = 'none';
+			main().catch(catcher);
+		} catch (err) {
+			log(err)
+		}
 	});
 }
 function premain() {
@@ -627,16 +631,16 @@ function fakefill(element, empty) {
 }
 function notifyMe() {
 	if (!("Notification" in window)) {
-	  log("This browser does not support desktop notification");
+		log("This browser does not support desktop notification");
 	} else if (Notification.permission === "granted") {
-	  const notification = new Notification("Hi there!");
+		const notification = new Notification("Hi there!");
 	  
 	} else if (Notification.permission !== "denied") {
-	  Notification.requestPermission().then((permission) => {
-		if (permission === "granted") {
-		  const notification = new Notification("Hi there!");
-		}
-	  });
+		Notification.requestPermission().then((permission) => {
+			if (permission === "granted") {
+				const notification = new Notification("Hi there!");
+			}
+		});
 	}
   
 	// At last, if the user has denied notifications, and you
