@@ -138,13 +138,13 @@ async function get_games_from_tournaments(tournaments) {
 async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
 	let tournament_games = await get_games_from_tournament(tournament)
-	for (game of tournament_games) {
-		if (Math.random() > 0.6) {
-			game.userIds = [35180,42410,27652,34922]
-			game.playerIds = [322136,390368,250886,320355]
-			game.resultPositions = [null, null, null, null]
-			game.suggestions = []
-		}
+	// for (game of tournament_games) {
+	// 	if (Math.random() > 0.6) {
+	// 		game.userIds = [35180,42410,27652,34922]
+	// 		game.playerIds = [322136,390368,250886,320355]
+	// 		game.resultPositions = [null, null, null, null]
+	// 		game.suggestions = []
+	// 	}
 		for (uid of game.userIds) {
 			if (uid == myUserId) {
 				continue
@@ -235,7 +235,7 @@ async function get_other(id) {
 	tabs.innerHTML = '';
 	let title_h2 = document.querySelector('#active-tournament-title');
 	title_h2.innerHTML = '';
-	title_h2.append(title('tournament', tournament.tournamentId, 'h2'));
+	title_h2.append(title('tournament', tournament.tournamentId));
 
 	let active_games = await get_games_from_tournament(tournament, true);
 	active_games.reverse();
@@ -426,7 +426,7 @@ function add_active_player(id) {
 	vsText.innerHTML = '0 &mdash; 0 vs '
 	h2.append(vsText)
 
-	h2.append(title('user', id))
+	h2.append(title('user', id, 'span'))
 
 	let merged = document.createElement('div')
 	merged.classList.add('merged-tournaments')
