@@ -351,7 +351,7 @@ function token_needed(message) {
 function premain() {
     token = localStorage.getItem('token');
 	if (!token) {
-		token_needed('API Token not provided')
+		token_needed('Log in by providing your Match Play API token')
 	} else {
 		document.querySelector('#token-entry').style.display = 'none';
 		main().catch(catcher);
