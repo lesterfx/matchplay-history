@@ -138,7 +138,7 @@ async function get_games_from_tournaments(tournaments) {
 async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
 	let tournament_games = await get_games_from_tournament(tournament)
-	// for (game of tournament_games) {
+	for (game of tournament_games) {
 	// 	if (Math.random() > 0.6) {
 	// 		game.userIds = [35180,42410,27652,34922]
 	// 		game.playerIds = [322136,390368,250886,320355]
