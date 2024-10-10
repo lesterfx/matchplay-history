@@ -339,7 +339,7 @@ function token_needed(message) {
 	document.querySelector('#token-form').addEventListener('submit', async function (event) {
 		try {
 			event.preventDefault();
-			token = document.querySelector('#token').val();
+			token = document.querySelector('#token').value;
 			localStorage.setItem('token', token);
 			document.querySelector('#token-entry').style.display = 'none';
 			main().catch(catcher);
