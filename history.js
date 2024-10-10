@@ -498,7 +498,9 @@ function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank = game.status
 	if (typeof won == 'undefined') {
+		log(`won was ${won}`)
 		let win_rank = rankiness(game)
+		log(`win_rank is ${win_rank}`)
 		if (typeof win_rank != 'undefined') {
 			let percent = win_rank.place / win_rank.maxplace * 100
 			box.style.cssText = `--winmix: ${percent}%`;
@@ -509,8 +511,10 @@ function game_element(game, inc_players, inc_tournament, won) {
 		}
 	} else {
 		if (won) {
+			log(`setting won because ${won}`)
 			wordrank = '(won)'
 		} else {
+			log(`setting lost because ${won}`)
 			wordrank = '(lost)'
 		}
 		box.classList.toggle('won', won);
