@@ -184,7 +184,7 @@ span.vs-bars.ready {
     margin-bottom: 5px;
     border-radius: 5px;
 }
-.title {
+div.title {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
