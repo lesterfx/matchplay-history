@@ -374,8 +374,11 @@ ready(() => {
 function handler(callback) {
 	let handle = async function () {
 		try {
-			for (child of this.closest('.tabs').querySelectorAll('.active')) child.classList.remove('active')
+			let tabs = this.closest('.tabs')
+			if (tabs) {
+				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
+			}
 			let id = this.dataset.id
 			await callback(id)
 		} catch (err) {
