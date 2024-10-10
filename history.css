@@ -189,3 +189,6 @@ span.vs-bars.ready {
     flex-direction: row;
     justify-content: space-between;
 }
+ol {
+    margin-bottom: 0;
+}
