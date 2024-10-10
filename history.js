@@ -1,9 +1,10 @@
-let myUserId = 0
-let all_my_tournaments = {}
-let my_lowest_tournament
-let active_players = {}
-let my_pid_by_organizer = {}
-let active_tournament_id
+let myUserId = 0;
+let all_my_tournaments = {};
+let my_lowest_tournament;
+let active_players = {};
+let my_pid_by_organizer = {};
+let active_tournament_id;
+let refresh_timer;
 let all_data = {
 	user: {},
 	arena: {},
