@@ -139,18 +139,24 @@ async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
 	let tournament_games = await get_games_from_tournament(tournament)
 	for (game of tournament_games) {
+		game.userIds = [35180,42410,27652,34922]
+		game.playerIds = [322136,390368,250886,320355]
+		game.resultPositions = [null, null, null, null]
+		game.suggestions = []
 		for (uid of game.userIds) {
 			if (uid == myUserId) {
 				continue
 			}
 			if (active_players[uid]) {
 				let won = did_i_win(game, uid)
-				if (won) {
-					winloss[uid].won ++;
-				} else {
-					winloss[uid].lost ++;
+				if (won !== null) {
+					if (won) {
+						winloss[uid].won ++;
+					} else {
+						winloss[uid].lost ++;
+					}
+					update_player_standing(uid)
 				}
-				update_player_standing(uid)
 				add_player_game({
 					uid: uid,
 					game: game,
@@ -509,6 +515,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 		} else {
 			wordrank = stringify(win_rank)
 		}
+	} else if (won === null) {
 	} else {
 		if (won) {
 			log(`setting won because ${won}`)
