@@ -527,7 +527,6 @@ function game_element(game, inc_players, inc_tournament, won) {
 	tit.append(wordspan);
 
 	box.append(tit);
-	box.append(spacer());
 	if (inc_players) {
 		let plist = document.createElement('ol');
 		plist.classList.add('players');
@@ -537,9 +536,9 @@ function game_element(game, inc_players, inc_tournament, won) {
 			li.append(title('user', uid));
 			plist.append(li);
 		}
-		if (inc_tournament) box.append(spacer());
 	}
 	if (inc_tournament) {
+		box.append(spacer());
 		box.append(title('tournament', game.tournamentId));
 	}
 	return box;
