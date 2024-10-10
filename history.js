@@ -236,7 +236,7 @@ async function refresh_tournaments() {
 async function refresh_tournament() {
 	log(`refresh tournament ${active_tournament_id}`);
 	// await notifyMe();
-	let refresh_button = $('#refresh-active-tournament')
+	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.remove('timed')
 	await get_other();
 	if (refresh_timer) clearTimeout(refresh_timer)
