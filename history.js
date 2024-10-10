@@ -335,6 +335,7 @@ function rankiness(game) {
 }
 function token_needed(message) {
 	document.querySelector('#token-entry').style.display = 'block';
+	if (message) document.querySelector('#token-message').textContent = message;
 	document.querySelector('#token-form').addEventListener('submit', async function (event) {
 		try {
 			event.preventDefault();
@@ -343,14 +344,14 @@ function token_needed(message) {
 			document.querySelector('#token-entry').style.display = 'none';
 			main().catch(catcher);
 		} catch (err) {
-			log(err)
+			catcher(err)
 		}
 	});
 }
 function premain() {
     token = localStorage.getItem('token');
 	if (!token) {
-		token_needed()
+		token_needed('API Token not provided')
 	} else {
 		document.querySelector('#token-entry').style.display = 'none';
 		main().catch(catcher);
