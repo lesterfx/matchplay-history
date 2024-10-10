@@ -500,7 +500,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 	if (typeof won == 'undefined') {
 		log(`won was ${won}`)
 		let win_rank = rankiness(game)
-		log(`win_rank is ${win_rank}`)
+		log(`win_rank is ${stringify(win_rank)}`)
 		if (typeof win_rank != 'undefined') {
 			let percent = win_rank.place / win_rank.maxplace * 100
 			box.style.cssText = `--winmix: ${percent}%`;
