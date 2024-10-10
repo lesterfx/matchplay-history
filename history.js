@@ -360,8 +360,8 @@ let ready = (callback) => {
 		callback();
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
-		document.querySelector('#refresh-active-tournament').addEventListener('click', handler(get_other));
 	}
+	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(get_other));
 }
 ready(() => {
 	try {

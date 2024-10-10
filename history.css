@@ -194,7 +194,7 @@ ol {
 }
 #refresh-active-tournament {
     display: inline-block;
-    text-decoration: none;
     margin-left: 1em;
-    font-size: 2em;
+    color: #0000EE;
+    cursor: pointer;
 }
