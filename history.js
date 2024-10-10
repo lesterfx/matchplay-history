@@ -3,6 +3,7 @@ let all_my_tournaments = {}
 let my_lowest_tournament
 let active_players = {}
 let my_pid_by_organizer = {}
+let active_tournament_id
 let all_data = {
 	user: {},
 	arena: {},
@@ -228,14 +229,15 @@ async function get_tournament_details(tournament, add_players) {
 	return pid;
 }
 async function get_other(id) {
-	let tournament = all_data.tournament[id];
+	if (id) active_tournament_id = id
+	let tournament = all_data.tournament[active_tournament_id];
 	active_players = {};
 	document.querySelector('#player-histories').innerHTML = ''
 	let tabs = document.querySelector('#active-tournament');
 	tabs.innerHTML = '';
 	let title_h2 = document.querySelector('#active-tournament-title');
 	title_h2.innerHTML = '';
-	title_h2.append(title('tournament', tournament.tournamentId));
+	title_h2.append(title('tournament', tournament.tournamentactive_tournament_id));
 
 	let active_games = await get_games_from_tournament(tournament, true);
 	active_games.reverse();
@@ -245,7 +247,7 @@ async function get_other(id) {
 		let element = add_active_game(game);
 		if (game.status != 'completed')  in_progress.push([game.status, element]);
 	};
-	document.querySelector('#active-tournament').scrollIntoView();
+	document.querySelector('#active-tournament-title').scrollIntoView();
 	if (in_progress.length == 1) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
@@ -357,6 +359,7 @@ let ready = (callback) => {
 		callback();
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
+		document.querySelector('#refresh-active-event').addEventListener('click', get_other);
 	}
 }
 ready(() => {
