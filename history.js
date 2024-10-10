@@ -228,7 +228,10 @@ async function get_tournament_details(tournament, add_players) {
 	};
 	return pid;
 }
-async function refresh() {
+async function refresh_tournaments() {
+	await get_all_my_tournaments()
+}
+async function refresh_tournament() {
 	await notifyMe()
 	await get_other()
 }
@@ -370,7 +373,8 @@ let ready = (callback) => {
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
-	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh));
+	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournaments));
+	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament));
 }
 ready(() => {
 	try {
