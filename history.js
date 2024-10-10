@@ -229,6 +229,7 @@ async function get_tournament_details(tournament, add_players) {
 	return pid;
 }
 async function get_other(id) {
+	log(id)
 	if (id) active_tournament_id = id
 	let tournament = all_data.tournament[active_tournament_id];
 	active_players = {};
@@ -359,7 +360,7 @@ let ready = (callback) => {
 		callback();
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
-		document.querySelector('#refresh-active-event').addEventListener('click', get_other);
+		document.querySelector('#refresh-active-event').addEventListener('click', handler(get_other));
 	}
 }
 ready(() => {
