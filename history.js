@@ -237,7 +237,7 @@ async function get_other(id) {
 	tabs.innerHTML = '';
 	let title_h2 = document.querySelector('#active-tournament-title');
 	title_h2.innerHTML = '';
-	title_h2.append(title('tournament', tournament.tournamentactive_tournament_id));
+	title_h2.append(title('tournament', tournament.tournament_id, 'span'));
 
 	let active_games = await get_games_from_tournament(tournament, true);
 	active_games.reverse();
