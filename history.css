@@ -106,6 +106,9 @@ body.flash {
 #token-entry {
     display: none;
 }
+#main {
+    display: none;
+}
 #log pre {
     background: var(--background);
     padding: 2px;
@@ -237,4 +240,7 @@ ol {
     transition-timing-function: linear;
     transition-duration: 5s;
     transform: rotate(720deg);
+}
+.sticky-header {
+    position: sticky;
 }

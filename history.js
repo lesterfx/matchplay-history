@@ -382,6 +382,7 @@ function premain() {
 		token_needed('Log in by providing your Match Play API token')
 	} else {
 		document.querySelector('#token-entry').style.display = 'none';
+		document.querySelector('#main').style.display = 'block';
 		main().catch(catcher);
 	};
 };
