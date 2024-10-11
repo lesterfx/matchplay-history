@@ -247,7 +247,9 @@ async function do_refresh_tournament() {
 	// await notifyMe();
 	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.remove('timed')
-	if (await get_other()) {
+	let active_game = await get_other()
+	log(active_game)
+	if (active_game) {
 		await flash_screen()
 	} else {
 		refresh_timer = setTimeout(do_refresh_tournament, 5000);
