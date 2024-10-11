@@ -18,12 +18,15 @@
 			</form>
 		</div>
 		<div id="main">
-			<h2 class="sticky-header">My Tournaments<span class="refresh" id="refresh-my-tournaments"><span class="circle">↻</span><span class="text">refresh</span></span></h2>
-			<div id="my-tournaments" class="tabs" data-tabgroup="my-tournaments">
+			<div>
+				<h2 class="sticky-header">My Tournaments<span class="refresh" id="refresh-my-tournaments"><span class="circle">↻</span><span class="text">refresh</span></span></h2>
+				<div id="my-tournaments" class="tabs" data-tabgroup="my-tournaments">
+				</div>
 			</div>
-
-			<h2 class="sticky-header"><span id="active-tournament-title"></span><span class="refresh" id="refresh-active-tournament"><span class="circle">↻</span><span class="text">refresh</span></span></h2>
-			<div id="active-tournament" class="tabs" data-tabgroup="active-tournament">
+			<div>
+				<h2 class="sticky-header"><span id="active-tournament-title"></span><span class="refresh" id="refresh-active-tournament"><span class="circle">↻</span><span class="text">refresh</span></span></h2>
+				<div id="active-tournament" class="tabs" data-tabgroup="active-tournament">
+				</div>
 			</div>
 			<div class="sticky-header" id="player-histories"></div>
 		</div>
@@ -62,15 +65,16 @@
 					let t = Date.now()
 					let s = `${src}?t=${t}`
 					await loader(s)
+					return s
 				} catch (err) {
 					catcher(err)
 				}
 			}
 			async function loadjs(src) {
-				await load(src, scriptloader)
+				return await load(src, scriptloader)
 			}
 			async function loadcss(src) {
-				await load(src, cssloader)
+				return await load(src, cssloader)
 			}
 			async function cssloader(src) {
 				await new Promise(function (res, rej) {
@@ -97,8 +101,8 @@
 				})
 			}
 			try {
-				loadcss('history.css')
-				loadjs('history.js')
+				log(loadcss('history.css'))
+				log(loadjs('history.js'))
 			} catch (err) {
 				catcher(err)
 			}
