@@ -241,14 +241,14 @@ ol {
     transition-duration: 5s;
     transform: rotate(720deg);
 }
-.sticky-header {
+h2.sticky-header {
     position: sticky;
-    top: 0;
+    top: -5em;
     z-index: 5;
     background: black;
-}
-h2 {
-    padding-top: 1em;
+    padding-top: 5em;
+    margin-top: -3em;
+    padding-bottom: .1em;
 }
 #active-tournament-block {
     display: none;

@@ -188,8 +188,9 @@ async function get_games_from_tournament(tournament, add_players) {
 		query: {player: pid}
 	});
 	let games = response.data
+	let changes = false;
 	for (game of games) {
-		save_data('game', game);
+		changes = save_data('game', game) || changes;
 	};
 	return games;
 }
@@ -239,7 +240,7 @@ async function refresh_tournament() {
 	}
 }
 async function do_refresh_tournament() {
-	log(`refresh tournament ${active_tournament_id}`);
+	// log(`refresh tournament ${active_tournament_id}`);
 	// await notifyMe();
 	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.remove('timed')
@@ -260,7 +261,7 @@ async function flash_screen() {
 	}
 }
 async function get_other(id) {
-	log(id)
+	// log(id)
 	if (id) active_tournament_id = id
 	let tournament = all_data.tournament[active_tournament_id];
 	active_players = {};
@@ -522,6 +523,9 @@ function save_data(kind, obj) {
 				obj.text(obj.name);
 			}
 		}
+		return true
+	} else {
+		return false
 	}
 }
 function spacer() {
