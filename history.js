@@ -273,6 +273,11 @@ async function get_other(id) {
 
 	active_players = {};
 
+	let result = (await get_games_from_tournament(tournament, refresh_players));
+	let active_games = result.games
+	active_games.reverse();
+	if (!result.changes) return;
+
 	document.querySelector('#player-histories').innerHTML = ''
 	document.querySelector('#active-tournament-block').style.display = 'block'
 	let tabs = document.querySelector('#active-tournament');
@@ -280,11 +285,6 @@ async function get_other(id) {
 	let title_h2 = document.querySelector('#active-tournament-title');
 	title_h2.innerHTML = '';
 	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
-
-	let result = (await get_games_from_tournament(tournament, refresh_players));
-	let active_games = result.games
-	active_games.reverse();
-	if (!result.changes) return;
 
 	let in_progress = []
 	for (game of active_games) {
