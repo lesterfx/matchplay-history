@@ -246,8 +246,7 @@ h2.sticky-header {
     top: -5em;
     z-index: 5;
     background: black;
-    padding-top: 5em;
-    margin-top: -3em;
+    padding-top: 4em;
     padding-bottom: .1em;
 }
 #active-tournament-block {

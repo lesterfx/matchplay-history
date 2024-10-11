@@ -140,7 +140,7 @@ async function get_games_from_tournaments(tournaments) {
 }
 async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
-	let tournament_games = await get_games_from_tournament(tournament)
+	let tournament_games = (await get_games_from_tournament(tournament)).games;
 	for (game of tournament_games) {
 		for (uid of game.userIds) {
 			if (uid == myUserId) {
@@ -188,11 +188,11 @@ async function get_games_from_tournament(tournament, add_players) {
 		query: {player: pid}
 	});
 	let games = response.data
-	let changes = false;
+	let changes = 0;
 	for (game of games) {
-		changes = save_data('game', game) || changes;
+		changes += save_data('game', game);
 	};
-	return games;
+	return {games: games, changes: changes};
 }
 async function get_tournament_details(tournament, add_players) {
 	let tid = tournament.tournamentId;
@@ -264,7 +264,14 @@ async function get_other(id) {
 	// log(id)
 	if (id) active_tournament_id = id
 	let tournament = all_data.tournament[active_tournament_id];
+
 	active_players = {};
+	
+	let result = (await get_games_from_tournament(tournament, true));
+	let active_games = result.games
+	active_games.reverse();
+	if (!result.changes) return;
+
 	document.querySelector('#player-histories').innerHTML = ''
 	document.querySelector('#active-tournament-block').style.display = 'block'
 	let tabs = document.querySelector('#active-tournament');
@@ -272,9 +279,6 @@ async function get_other(id) {
 	let title_h2 = document.querySelector('#active-tournament-title');
 	title_h2.innerHTML = '';
 	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
-
-	let active_games = await get_games_from_tournament(tournament, true);
-	active_games.reverse();
 
 	let in_progress = []
 	for (game of active_games) {
@@ -523,9 +527,9 @@ function save_data(kind, obj) {
 				obj.text(obj.name);
 			}
 		}
-		return true
+		return 1
 	} else {
-		return false
+		return 0
 	}
 }
 function spacer() {
