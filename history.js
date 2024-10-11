@@ -224,7 +224,8 @@ async function get_tournament_details(tournament) {
 	});
 	let tournament_details = response.data;
 	let pid;
-	for (player of tournament_details.players) {
+	let players = tournament_details.players;
+	for (player of players) {
 		if (player.claimedBy == myUserId) {
 			pid = player.playerId;
 			break;
