@@ -238,8 +238,8 @@ ol {
 .refresh.timed .circle {
     transition-property: transform;
     transition-timing-function: linear;
-    transition-duration: 5s;
-    transform: rotate(720deg);
+    transition-duration: 4s;
+    transform: rotate(360deg);
 }
 h2.sticky-header {
     position: sticky;
