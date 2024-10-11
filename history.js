@@ -247,9 +247,7 @@ async function do_refresh_tournament() {
 	// await notifyMe();
 	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.remove('timed')
-	let active_game = await get_other()
-	log(active_game)
-	if (active_game) {
+	if (await get_other()) {
 		await flash_screen()
 	} else {
 		refresh_timer = setTimeout(do_refresh_tournament, 5000);
@@ -257,11 +255,11 @@ async function do_refresh_tournament() {
 	};
 }
 async function flash_screen() {
-	for (let x=0; x<10;x++) {
+	for (let x=0; x<20;x++) {
 		document.body.classList.add('flash')
-		await new Promise(resolve => setTimeout(resolve, 100));
+		await new Promise(resolve => setTimeout(resolve, 200));
 		document.body.classList.remove('flash')
-		await new Promise(resolve => setTimeout(resolve, 100));
+		await new Promise(resolve => setTimeout(resolve, 200));
 	}
 }
 async function get_other(id) {
@@ -278,9 +276,10 @@ async function get_other(id) {
 
 	let active_games = await get_games_from_tournament(tournament, true);
 	active_games.reverse();
-	
+
 	let in_progress = []
 	for (game of active_games) {
+		if (Math.random() > 0.7) game.status = 'pasdf'
 		let element = add_active_game(game);
 		if (game.status != 'completed')  in_progress.push([game.status, element]);
 	};
@@ -291,7 +290,7 @@ async function get_other(id) {
 		element.dispatchEvent(new Event('click'))
 		activate_tab(active_tournament_tab(status))
 	}
-	return Math.random() > .85;
+	return in_progress.length;
 }
 async function compare_players_from_game(id) {
 	active_players = {};
