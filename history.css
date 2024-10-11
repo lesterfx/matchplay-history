@@ -222,12 +222,15 @@ ol {
     color: var(--active-color);
     cursor: pointer;
     font-weight: normal;
+}
+.refresh .circle {
     transform: rotate(0deg);
     font-size: 1.1em;
     transform-origin: 50% 60%;
 }
-.refresh.timed {
+.refresh.timed .circle {
     transition-property: transform;
+    transition-timing-function: linear;
     transition-duration: 5s;
-    transform: rotate(360deg);
+    transform: rotate(720deg);
 }
