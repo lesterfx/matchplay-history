@@ -223,7 +223,11 @@ ol {
     cursor: pointer;
     font-weight: normal;
 }
+.refresh .text {
+    margin-left: .2em;
+}
 .refresh .circle {
+    display: inline-block;
     transform: rotate(0deg);
     font-size: 1.1em;
     transform-origin: 50% 60%;

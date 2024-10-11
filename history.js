@@ -231,7 +231,9 @@ async function refresh_tournament() {
 	if (refresh_timer) {
 		clearTimeout(refresh_timer)
 		refresh_timer = null
-		document.querySelector('#refresh-active-tournament').classList.remove('timed')
+		let el = document.querySelector('#refresh-active-tournament')
+		el.classList.remove('timed')
+		el.querySelector('.text').textContent = 'refresh'
 	} else {
 		await do_refresh_tournament()
 	}
@@ -246,6 +248,7 @@ async function do_refresh_tournament() {
 	} else {
 		refresh_timer = setTimeout(do_refresh_tournament, 5000);
 		refresh_button.classList.add('timed');
+		refresh_button.querySelector('.text').textContent = 'refreshing'
 	};
 }
 async function flash_screen() {
