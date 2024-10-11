@@ -243,7 +243,7 @@ ol {
 }
 h2.sticky-header {
     position: sticky;
-    top: -5em;
+    top: -3em;
     z-index: 5;
     background: black;
     padding-top: 4em;
