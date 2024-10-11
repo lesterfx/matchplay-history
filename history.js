@@ -241,14 +241,12 @@ async function refresh_tournaments() {
 }
 async function refresh_tournament() {
 	if (refresh_timer) {
-		log('stop refreshing')
 		clearTimeout(refresh_timer)
 		refresh_timer = null
 		let el = document.querySelector('#refresh-active-tournament')
 		el.classList.remove('timed')
 		el.querySelector('.text').textContent = 'refresh'
 	} else {
-		log('start refreshing')
 		await do_refresh_tournament()
 	}
 }
@@ -258,11 +256,11 @@ async function do_refresh_tournament() {
 	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.remove('timed')
 	refresh_timer = null
-	log('refreshing')
-	if (await get_other()) {
+	
+	let changes = await get_other()
+	if (changes) {
 		await flash_screen()
 	} else {
-		log('no changes. refresh again in 5 seconds')
 		refresh_timer = setTimeout(do_refresh_tournament, 5000);
 		refresh_button.classList.add('timed');
 		refresh_button.querySelector('.text').textContent = 'refreshing'
@@ -428,7 +426,7 @@ let ready = (callback) => {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
 	document.querySelector('#refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments));
-	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament, -1));
+	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament));
 }
 ready(() => {
 	try {
