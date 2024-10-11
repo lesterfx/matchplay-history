@@ -142,12 +142,6 @@ async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
 	let tournament_games = await get_games_from_tournament(tournament)
 	for (game of tournament_games) {
-	// 	if (Math.random() > 0.6) {
-	// 		game.userIds = [35180,42410,27652,34922]
-	// 		game.playerIds = [322136,390368,250886,320355]
-	// 		game.resultPositions = [null, null, null, null]
-	// 		game.suggestions = []
-	// 	}
 		for (uid of game.userIds) {
 			if (uid == myUserId) {
 				continue
@@ -255,7 +249,7 @@ async function do_refresh_tournament() {
 	};
 }
 async function flash_screen() {
-	for (let x=0; x<20;x++) {
+	for (let x=0; x<10;x++) {
 		document.body.classList.add('flash')
 		await new Promise(resolve => setTimeout(resolve, 200));
 		document.body.classList.remove('flash')
@@ -279,7 +273,6 @@ async function get_other(id) {
 
 	let in_progress = []
 	for (game of active_games) {
-		if (Math.random() > 0.7) game.status = 'pasdf'
 		let element = add_active_game(game);
 		if (game.status != 'completed')  in_progress.push([game.status, element]);
 	};
