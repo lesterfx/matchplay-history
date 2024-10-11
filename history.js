@@ -412,7 +412,7 @@ let ready = (callback) => {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
 	document.querySelector('#refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments));
-	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament));
+	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament, -1));
 }
 ready(() => {
 	try {
@@ -422,15 +422,15 @@ ready(() => {
 	}
 });
 
-function handler(callback) {
+function handler(callback, id) {
 	let handle = async function () {
+		log(id)
 		try {
 			let tabs = this.closest('.tabs')
 			if (tabs) {
 				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
 			}
-			let id = this.dataset.id
 			await callback(id)
 		} catch (err) {
 			this.classList.remove('active')
@@ -455,7 +455,7 @@ function insertSorted(element, parent) {
 function add_player_button(uid) {
 	let button = title('user', uid);
 	button.classList.add('box');
-	button.addEventListener('click', handler(compare_player))
+	button.addEventListener('click', handler(compare_player, uid))
 	insertSorted(button, active_tournament_tab('players'));
 }
 function add_active_player(id) {
@@ -561,7 +561,7 @@ function add_player_game(options) {
 }
 function add_active_game(game) {
 	let box = game_element(game, true, false);
-	box.addEventListener('click', handler(compare_players_from_game))
+	box.addEventListener('click', handler(compare_players_from_game, game.gameId))
 	active_tournament_tab(game.status).append(box)
 	return box
 }
@@ -624,7 +624,7 @@ function add_tournament(tournament) {
 	}
 	let box = title('tournament', tid);
 	box.classList.add('box');
-	box.addEventListener('click', handler(get_other))
+	box.addEventListener('click', handler(get_other, tid))
 	my_tournaments_tab(tournament.status).append(box);
 	return box
 }
