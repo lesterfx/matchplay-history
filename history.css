@@ -244,3 +244,9 @@ ol {
 .sticky-header {
     position: sticky;
 }
+div.block {
+    background: #200;
+}
+h2 {
+    padding-top: 1em;
+}
