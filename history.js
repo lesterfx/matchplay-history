@@ -256,7 +256,7 @@ async function do_refresh_tournament() {
 	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.remove('timed')
 	refresh_timer = null
-	
+	log(all_data.tournament[active_tournament_id].status)
 	let changes = await get_other()
 	if (changes) {
 		await flash_screen()
