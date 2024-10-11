@@ -265,6 +265,7 @@ async function get_other(id) {
 	let tournament = all_data.tournament[active_tournament_id];
 	active_players = {};
 	document.querySelector('#player-histories').innerHTML = ''
+	document.querySelector('#active-tournament-block').style.display = 'block'
 	let tabs = document.querySelector('#active-tournament');
 	tabs.innerHTML = '';
 	let title_h2 = document.querySelector('#active-tournament-title');

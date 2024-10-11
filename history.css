@@ -244,10 +244,12 @@ ol {
 .sticky-header {
     position: sticky;
     top: 0;
-}
-div.block {
-    background: #200;
+    z-index: 5;
+    background: black;
 }
 h2 {
     padding-top: 1em;
+}
+#active-tournament-block {
+    display: none;
 }
