@@ -180,8 +180,24 @@ async function get_games_from_tournament(tournament, add_players) {
 	if (my_pid_by_organizer[tid] && !add_players) {
 		pid = my_pid_by_organizer[tid];
 	} else {
-		pid = await get_tournament_details(tournament, add_players);
+		let result = await get_tournament_details(tournament);
+		pid = result.pid
 		my_pid_by_organizer[tid] = pid;
+
+		if (add_players) {
+			all_data.user = {};
+			for (player of result.players) {
+				let uid = player.claimedBy;
+				if (uid == myUserId) {
+					continue;
+				};
+				if (!all_data.user[uid]) {
+					all_data.user[uid] = player;
+					add_player_button(uid);
+				}
+			};
+		}
+	
 	};
 	let response = await get({
 		endpoint: `tournaments/${tid}/games`,
@@ -194,7 +210,7 @@ async function get_games_from_tournament(tournament, add_players) {
 	};
 	return {games: games, changes: changes};
 }
-async function get_tournament_details(tournament, add_players) {
+async function get_tournament_details(tournament) {
 	let tid = tournament.tournamentId;
 	if (!tournament) {
 		throw Error('no tournament passed into get_tournament_details')
@@ -208,22 +224,16 @@ async function get_tournament_details(tournament, add_players) {
 	});
 	let tournament_details = response.data;
 	let pid;
-	if (add_players) all_data.user = {};
-	for (player of tournament_details.players) {
-		let uid = player.claimedBy;
-		if (uid == myUserId) {
+	for (player of result.players) {
+		if (player.claimedBy == myUserId) {
 			pid = player.playerId;
-			continue;
+			break;
 		};
-		if (add_players && !all_data.user[uid]) {
-			all_data.user[uid] = player;
-			add_player_button(uid);
-		}
-	};
+	}
 	for (arena of tournament_details.arenas) {
 		save_data('arena', arena);
 	};
-	return pid;
+	return {pid: pid, players: players};
 }
 async function refresh_tournaments() {
 	await get_all_my_tournaments()
@@ -265,6 +275,7 @@ async function get_other(id) {
 	if (id) {
 		active_tournament_id = id
 		refresh_players = true
+		document.querySelector('#active-tournament').innerHTML = '';
 	} else {
 		// refreshing
 		refresh_players = false
@@ -274,14 +285,13 @@ async function get_other(id) {
 	active_players = {};
 
 	let result = (await get_games_from_tournament(tournament, refresh_players));
+	if (!refresh_players && !result.changes) return;
+
 	let active_games = result.games
 	active_games.reverse();
-	if (!result.changes) return;
 
 	document.querySelector('#player-histories').innerHTML = ''
 	document.querySelector('#active-tournament-block').style.display = 'block'
-	let tabs = document.querySelector('#active-tournament');
-	tabs.innerHTML = '';
 	let title_h2 = document.querySelector('#active-tournament-title');
 	title_h2.innerHTML = '';
 	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
