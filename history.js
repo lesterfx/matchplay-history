@@ -248,15 +248,17 @@ async function refresh_tournaments_click() {
 function refresh_on() {
 	refresh_timer = setTimeout(refresh_tournament_timer, 5000);
 	let refresh_button = document.getElementById('refresh-active-tournament')
+	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`
 	refresh_button.classList.add('timed');
-	refresh_button.querySelector('.text').textContent = 'refreshing'
+	refresh_button.querySelector('.text').textContent = 'live'
 }
 function refresh_off(will_refresh) {
 	clearTimeout(refresh_timer)
 	refresh_timer = null
 	let refresh_button = document.getElementById('refresh-active-tournament')
+	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`
 	refresh_button.classList.remove('timed')
-	refresh_button.querySelector('.text').textContent = will_refresh ? 'loading' : 'refresh'
+	refresh_button.querySelector('.text').textContent = will_refresh ? 'wait' : 'refresh'
 }
 async function refresh_tournament_click() {
 	if (refresh_timer) {
@@ -511,7 +513,7 @@ function add_active_player(id) {
 	playerbox.classList.add('player-history')
 	playerbox.dataset.playerid = id
 
-	let h2 = document.createElement('h2')
+	let h2 = document.createElement('h3')
 	h2.classList.add('player-name')
 	playerbox.prepend(h2)
 
@@ -541,8 +543,6 @@ function add_active_player(id) {
 }
 function add_player_tournament(uid, tid) {
 	let trow = title('tournament', tid);
-	trow.prepend('Loading ');
-	trow.append('...');
 	let selector = `#player-histories div.player-history[data-playerid="${uid}"] div.merged-tournaments`
 	document.querySelector(selector).append(trow)
 }

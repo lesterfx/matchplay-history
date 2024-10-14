@@ -227,6 +227,7 @@ ol {
     color: var(--active-color);
     cursor: pointer;
     font-weight: normal;
+    white-space: nowrap;
 }
 .refresh .text {
     margin-left: .2em;
@@ -243,7 +244,7 @@ ol {
     transition-duration: 5s;
     transform: rotate(360deg);
 }
-h2.sticky-header {
+h3.sticky-header {
     display: flex;
     justify-content: space-between;
 }
