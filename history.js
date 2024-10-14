@@ -594,10 +594,10 @@ function update_player_standing(uid, parent) {
 		parent = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"]`);
 	}
 
-	let bar = parent.querySelector(`.vs-bars[data-uid=${uid}]`);
+	let bar = parent.querySelector(`.vs-bars[data-uid="${uid}"]`);
 	bar.style.cssText = `--percent: ${percent}%`;
 	bar.classList.add('ready');
-	parent.querySelector(`.vs-text[data-uid=${uid}]`).innerHTML = `${won} &mdash; ${lost} vs `;
+	parent.querySelector(`.vs-text[data-uid="${uid}"]`).innerHTML = `${won} &mdash; ${lost} vs `;
 }
 function add_player_game(options) {
 	let box = game_element(options.game, false, true, options.won);
