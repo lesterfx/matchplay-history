@@ -282,11 +282,10 @@ async function do_refresh_tournament() {
 		await flash_screen()
 		return false
 	} else {
-		if (status !== 'completed') {
-			return true
-		} else {
-			alert('No auto refresh for completed tournaments')
+		if (status == 'completed') {
 			return false
+		} else {
+			return true
 		}
 	};
 }
@@ -321,6 +320,8 @@ async function get_other(id) {
 	document.getElementById('player-histories').innerHTML = ''
 	document.getElementById('active-tournament-block').style.display = 'block'
 	let title_h2 = document.getElementById('active-tournament-title');
+	title_h2.classList.remove(...title_h2.classList);
+	title_h2.classList.add(tournament.status);
 	title_h2.innerHTML = '';
 	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
 

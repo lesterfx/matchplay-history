@@ -223,6 +223,9 @@ div.title {
 ol {
     margin-bottom: 0;
 }
+#active-tournament-title.completed+.refresh {
+    display: none;
+}
 .refresh {
     display: inline-block;
     margin-left: 1em;
