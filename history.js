@@ -343,7 +343,7 @@ async function compare_players_from_game(id) {
 	let game = all_data.game[id]
 	document.getElementById('player-histories').innerHTML = '';  // or don't?
 	let selected = document.getElementById('selected-game');
-	selected.innerHTML = '';
+	fakefill(selected, true)
 	selected.append(game_element(game, true, false));
 	winloss = {}
 	let uids = game.userIds;
