@@ -236,37 +236,49 @@ async function get_tournament_details(tournament) {
 	};
 	return {pid: pid, players: players};
 }
-async function refresh_tournaments() {
+async function refresh_tournaments_click() {
 	await get_all_my_tournaments()
 }
-async function refresh_tournament() {
+function refresh_on() {
+	refresh_timer = setTimeout(refresh_tournament_timer, 5000);
+	refresh_button.classList.add('timed');
+	refresh_button.querySelector('.text').textContent = 'refreshing'
+}
+function refresh_off() {
+	clearTimeout(refresh_timer)
+	refresh_timer = null
+	let el = document.querySelector('#refresh-active-tournament')
+	el.classList.remove('timed')
+	el.querySelector('.text').textContent = 'refresh'
+}
+async function refresh_tournament_click() {
 	if (refresh_timer) {
-		clearTimeout(refresh_timer)
-		refresh_timer = null
-		let el = document.querySelector('#refresh-active-tournament')
-		el.classList.remove('timed')
-		el.querySelector('.text').textContent = 'refresh'
+		refresh_off()
 	} else {
-		await do_refresh_tournament()
+		refresh_off()
+		if (await do_refresh_tournament()) {
+			refresh_on()
+		}
+	}
+}
+async function refresh_tournament_timer() {
+	refresh_off()
+	if (await do_refresh_tournament()) {
+		refresh_on()
 	}
 }
 async function do_refresh_tournament() {
-	// log(`refresh tournament ${active_tournament_id}`);
-	// await notifyMe();
-	let refresh_button = document.querySelector('#refresh-active-tournament')
-	refresh_button.classList.remove('timed')
-	refresh_timer = null
 	let status = all_data.tournament[active_tournament_id].status
 	let changes = await get_other()
 	if (changes) {
 		await flash_screen()
+		return false
 	} else {
 		if (status !== 'completed') {
-		refresh_timer = setTimeout(do_refresh_tournament, 5000);
-		refresh_button.classList.add('timed');
-		refresh_button.querySelector('.text').textContent = 'refreshing'
+			return true
 		} else {
 			alert('No auto refresh for completed tournaments')
+			return false
 		}
 	};
 }
@@ -429,8 +441,8 @@ let ready = (callback) => {
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
-	document.querySelector('#refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments));
-	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament));
+	document.querySelector('#refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
+	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
 }
 ready(() => {
 	try {
