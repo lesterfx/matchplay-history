@@ -162,6 +162,7 @@ body {
     font-size: 1.3em;
     margin-left: 25px;
     position: relative;
+    z-index: -1;
 }
 .tabs>input:checked+label {
     background-color: var(--group-background);

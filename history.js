@@ -75,6 +75,9 @@ async function get_me() {
 }
 
 async function get_all_my_tournaments() {
+	refresh_off()
+	document.querySelector('#active-tournament-block').style.display = 'none';
+
 	document.querySelector('#my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
 	my_lowest_tournament = undefined
