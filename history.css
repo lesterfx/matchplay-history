@@ -53,9 +53,11 @@ body.flash {
     flex-direction: row;
     flex-wrap: wrap;
     min-height: 50px;
+    justify-items: stretch;
+}
+.boxgroup:not(.singular) {
     z-index: 0;
     position: relative;
-    justify-items: stretch;
     order: 1;
     flex-grow: 1;
     border-radius: 20px;
