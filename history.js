@@ -77,6 +77,8 @@ async function get_me() {
 async function get_all_my_tournaments() {
 	refresh_off()
 	document.getElementById('active-tournament-block').style.display = 'none';
+	document.getElementById('selected-game').innerHTML = '';
+	document.getElementById('player-histories').innerHTML = '';
 
 	document.getElementById('my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
@@ -337,7 +339,9 @@ async function compare_players_from_game(id) {
 	active_players = {};
 	let game = all_data.game[id]
 	document.getElementById('player-histories').innerHTML = '';  // or don't?
-	document.getElementById('selected-game').append(game_element(game, true, false));
+	let selected = document.getElementById('selected-game');
+	selected.innerHTML = '';
+	selected.append(game_element(game, true, false));
 	winloss = {}
 	let uids = game.userIds;
 	for (const uid of uids) {
@@ -359,7 +363,7 @@ async function compare_player(id) {
 }
 async function merge_tournaments() {
 	let tournaments
-	document.getElementById('player-histories').scrollIntoView();
+	document.getElementById('selected').scrollIntoView();
 	let merged_tournaments = {};
 	for (uid in active_players) {
 		for await (tournaments of get_tournaments_paginated(uid)) {
