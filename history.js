@@ -241,15 +241,16 @@ async function refresh_tournaments_click() {
 }
 function refresh_on() {
 	refresh_timer = setTimeout(refresh_tournament_timer, 5000);
+	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.add('timed');
 	refresh_button.querySelector('.text').textContent = 'refreshing'
 }
 function refresh_off() {
 	clearTimeout(refresh_timer)
 	refresh_timer = null
-	let el = document.querySelector('#refresh-active-tournament')
-	el.classList.remove('timed')
-	el.querySelector('.text').textContent = 'refresh'
+	let refresh_button = document.querySelector('#refresh-active-tournament')
+	refresh_button.classList.remove('timed')
+	refresh_button.querySelector('.text').textContent = 'refresh'
 }
 async function refresh_tournament_click() {
 	if (refresh_timer) {
