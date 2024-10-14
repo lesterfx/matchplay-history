@@ -234,12 +234,13 @@ ol {
     transform: rotate(0deg);
     font-size: 1.1em;
     transform-origin: 50% 60%;
+    transition-duration: 1s;
 }
 .refresh.timed .circle {
     transition-property: transform;
     transition-timing-function: linear;
     transition-duration: 4s;
-    transform: rotate(360deg);
+    transform: rotate(-360deg);
 }
 h2.sticky-header {
     position: sticky;
