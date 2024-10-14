@@ -254,7 +254,7 @@ h3.sticky-header {
     position: sticky;
     top: -3em;
     z-index: 5;
-    background: var(--background);
+    background: var(--page-background);
     padding-top: 4em;
     padding-bottom: .1em;
 }

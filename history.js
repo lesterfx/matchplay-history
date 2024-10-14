@@ -343,7 +343,7 @@ async function compare_players_from_game(id) {
 	let game = all_data.game[id]
 	document.getElementById('player-histories').innerHTML = '';  // or don't?
 	let selected = document.getElementById('selected-game');
-	fakefill(selected, true)
+	fakefill(selected)
 	selected.append(game_element(game, true, false));
 	winloss = {}
 	let uids = game.userIds;
@@ -717,8 +717,8 @@ function tab(parent, identifier) {
 
 	return div
 }
-function fakefill(element, empty) {
-	if (empty) element.innerHTML = '';
+function fakefill(element) {
+	element.innerHTML = '';
 	for (i=0;i<10;i++) {
 		let new_el = document.createElement('div');
 		new_el.classList.add('fake', 'box');
