@@ -245,12 +245,12 @@ function refresh_on() {
 	refresh_button.classList.add('timed');
 	refresh_button.querySelector('.text').textContent = 'refreshing'
 }
-function refresh_off() {
+function refresh_off(will_refresh) {
 	clearTimeout(refresh_timer)
 	refresh_timer = null
 	let refresh_button = document.querySelector('#refresh-active-tournament')
 	refresh_button.classList.remove('timed')
-	refresh_button.querySelector('.text').textContent = 'refresh'
+	refresh_button.querySelector('.text').textContent = will_refresh ? 'loading' : 'refresh'
 }
 async function refresh_tournament_click() {
 	if (refresh_timer) {
