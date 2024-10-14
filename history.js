@@ -274,6 +274,7 @@ async function do_refresh_tournament() {
 		await flash_screen()
 		return false
 	} else {
+		return true
 		if (status !== 'completed') {
 			return true
 		} else {
