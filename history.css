@@ -162,11 +162,11 @@ body {
     font-size: 1.3em;
     margin-left: 25px;
     position: relative;
-    z-index: -1;
+    z-index: 0;
 }
 .tabs>input:checked+label {
     background-color: var(--group-background);
-    z-index: 1;
+    z-index: 2;
 }
 .tabs>input:checked+label::after {
     content: "";
@@ -181,6 +181,7 @@ body {
     margin-left: -1px;
 }
 .tabs>input+label+div {
+    z-index: 1;
     width: 100%;
 }
 .tabs>input:not(:checked)+label+div {
