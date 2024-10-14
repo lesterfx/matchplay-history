@@ -656,7 +656,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 			vsBar.dataset.uid = uid
 			vsBar.classList.add('vs-bars')
 			li.append(vsBar)
-			li.append(title('user', uid));
+			li.append(title('user', uid, 'span'));
 			plist.append(li);
 		}
 	}
