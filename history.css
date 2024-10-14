@@ -245,6 +245,8 @@ ol {
 }
 h2.sticky-header {
     position: sticky;
+    display: flex;
+    justify-content: space-between;
     top: -3em;
     z-index: 5;
     background: black;

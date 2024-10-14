@@ -277,7 +277,6 @@ async function do_refresh_tournament() {
 		await flash_screen()
 		return false
 	} else {
-		return true
 		if (status !== 'completed') {
 			return true
 		} else {
@@ -337,6 +336,7 @@ async function get_other(id) {
 async function compare_players_from_game(id) {
 	active_players = {};
 	document.querySelector('#player-histories').innerHTML = '';  // or don't?
+	document.querySelector('#selected-game').append(game_element(game, true, false));
 	winloss = {}
 	let uids = all_data.game[id].userIds;
 	for (uid of uids) {
