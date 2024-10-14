@@ -256,16 +256,15 @@ async function refresh_tournament_click() {
 	if (refresh_timer) {
 		refresh_off()
 	} else {
-		refresh_off()
-		if (await do_refresh_tournament()) {
-			refresh_on()
-		}
+		refresh_tournament_timer()
 	}
 }
 async function refresh_tournament_timer() {
-	refresh_off()
+	refresh_off(true)
 	if (await do_refresh_tournament()) {
 		refresh_on()
+	} else {
+		refresh_off()
 	}
 }
 async function do_refresh_tournament() {
