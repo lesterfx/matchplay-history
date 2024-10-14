@@ -160,6 +160,7 @@ async function get_and_populate_games_from_tournament(tid) {
 						winloss[uid].lost ++;
 					}
 					update_player_standing(uid)
+					update_player_standing(uid, document.getElementById('selected-game'))
 				}
 				add_player_game({
 					uid: uid,
@@ -516,10 +517,12 @@ function add_active_player(id) {
 
 	let vsBars = document.createElement('span')
 	vsBars.classList.add('vs-bars')
+	vsBars.dataset.uid = id
 	h2.append(vsBars)
 
 	let vsText = document.createElement('span')
 	vsText.classList.add('vs-text')
+	vsText.dataset.uid = id
 	vsText.innerHTML = '0 &mdash; 0 vs '
 	h2.append(vsText)
 
@@ -578,38 +581,42 @@ function save_data(kind, obj) {
 	}
 }
 function spacer() {
-	let el = document.createElement('div')
-	el.classList.add('spacer')
+	let el = document.createElement('div');
+	el.classList.add('spacer');
 	return el
 }
-function update_player_standing(uid) {
-	let won = winloss[uid].won
-	let lost = winloss[uid].lost
-	let parent = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"]`)
+function update_player_standing(uid, parent) {
+	let won = winloss[uid].won;
+	let lost = winloss[uid].lost;
 	let percent = won / (won+lost) * 100;
+	
+	if (!parent) {
+		parent = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"]`);
+	}
 
-	parent.querySelector('.vs-bars').style.cssText = `--percent: ${percent}%`;
-	parent.querySelector('.vs-bars').classList.add('ready')
-	parent.querySelector('.vs-text').innerHTML = `${won} &mdash; ${lost} vs `;
+	let bar = parent.querySelector(`.vs-bars[data-uid=${uid}]`);
+	bar.style.cssText = `--percent: ${percent}%`;
+	bar.classList.add('ready');
+	parent.querySelector(`.vs-text[data-uid=${uid}]`).innerHTML = `${won} &mdash; ${lost} vs `;
 }
 function add_player_game(options) {
 	let box = game_element(options.game, false, true, options.won);
-	box.style.order = options.order
+	box.style.order = options.order;
 	let parent = document.querySelector(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
 	parent.append(box);
 }
 function add_active_game(game) {
 	let box = game_element(game, true, false);
-	box.addEventListener('click', handler(compare_players_from_game, game.gameId))
-	active_tournament_tab(game.status).append(box)
-	return box
+	box.addEventListener('click', handler(compare_players_from_game, game.gameId));
+	active_tournament_tab(game.status).append(box);
+	return box;
 }
 function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'div');
-	let wordrank = game.status
+	let wordrank = game.status;
 	if (typeof won == 'undefined') {
 		// log(`won was ${wgon}`)
-		let win_rank = rankiness(game)
+		let win_rank = rankiness(game);
 		// log(`win_rank is ${stringify(win_rank)}`)
 		if (typeof win_rank != 'undefined') {
 			let percent = win_rank.place / win_rank.maxplace * 100
@@ -644,6 +651,10 @@ function game_element(game, inc_players, inc_tournament, won) {
 		box.append(plist);
 		for (uid of game.userIds) {
 			let li = document.createElement('li');
+			let vsBar = document.createElement('span')
+			vsBar.dataset.uid = uid
+			vsBar.classList.add('vs-bars')
+			li.append(vsBar)
 			li.append(title('user', uid));
 			plist.append(li);
 		}
