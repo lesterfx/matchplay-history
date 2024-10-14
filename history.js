@@ -466,7 +466,7 @@ ready(() => {
 
 function handler(callback, id) {
 	let handle = async function () {
-		log(id)
+		// log(id)
 		try {
 			let tabs = this.closest('.tabs')
 			if (tabs) {
