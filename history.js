@@ -76,13 +76,13 @@ async function get_me() {
 
 async function get_all_my_tournaments() {
 	refresh_off()
-	document.querySelector('#active-tournament-block').style.display = 'none';
+	document.getElementById('active-tournament-block').style.display = 'none';
 
-	document.querySelector('#my-tournaments').classList.add('ready');
+	document.getElementById('my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
 	my_lowest_tournament = undefined
 	let in_progress = []
-	document.querySelector('#my-tournaments').innerHTML = ''
+	document.getElementById('my-tournaments').innerHTML = ''
 	let tournaments = await get_tournaments(myUserId);
 	for (let tournament of tournaments) {
 		let element = add_tournament(tournament);
@@ -244,14 +244,14 @@ async function refresh_tournaments_click() {
 }
 function refresh_on() {
 	refresh_timer = setTimeout(refresh_tournament_timer, 5000);
-	let refresh_button = document.querySelector('#refresh-active-tournament')
+	let refresh_button = document.getElementById('refresh-active-tournament')
 	refresh_button.classList.add('timed');
 	refresh_button.querySelector('.text').textContent = 'refreshing'
 }
 function refresh_off(will_refresh) {
 	clearTimeout(refresh_timer)
 	refresh_timer = null
-	let refresh_button = document.querySelector('#refresh-active-tournament')
+	let refresh_button = document.getElementById('refresh-active-tournament')
 	refresh_button.classList.remove('timed')
 	refresh_button.querySelector('.text').textContent = will_refresh ? 'loading' : 'refresh'
 }
@@ -298,7 +298,7 @@ async function get_other(id) {
 	if (id) {
 		active_tournament_id = id
 		refresh_players = true
-		document.querySelector('#active-tournament').innerHTML = '';
+		document.getElementById('active-tournament').innerHTML = '';
 	} else {
 		// refreshing
 		refresh_players = false
@@ -313,9 +313,9 @@ async function get_other(id) {
 	let active_games = result.games
 	active_games.reverse();
 
-	document.querySelector('#player-histories').innerHTML = ''
-	document.querySelector('#active-tournament-block').style.display = 'block'
-	let title_h2 = document.querySelector('#active-tournament-title');
+	document.getElementById('player-histories').innerHTML = ''
+	document.getElementById('active-tournament-block').style.display = 'block'
+	let title_h2 = document.getElementById('active-tournament-title');
 	title_h2.innerHTML = '';
 	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
 
@@ -324,7 +324,7 @@ async function get_other(id) {
 		let element = add_active_game(game);
 		if (game.status != 'completed')  in_progress.push([game.status, element]);
 	};
-	document.querySelector('#active-tournament-title').scrollIntoView();
+	document.getElementById('active-tournament-title').scrollIntoView();
 	if (in_progress.length == 1) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
@@ -335,11 +335,12 @@ async function get_other(id) {
 }
 async function compare_players_from_game(id) {
 	active_players = {};
-	document.querySelector('#player-histories').innerHTML = '';  // or don't?
-	document.querySelector('#selected-game').append(game_element(game, true, false));
+	let game = all_data.game[id]
+	document.getElementById('player-histories').innerHTML = '';  // or don't?
+	document.getElementById('selected-game').append(game_element(game, true, false));
 	winloss = {}
-	let uids = all_data.game[id].userIds;
-	for (uid of uids) {
+	let uids = game.userIds;
+	for (const uid of uids) {
 		if (uid == myUserId) continue;
 		if (add_active_player(uid)) {
 			active_players[uid] = 1;
@@ -348,7 +349,7 @@ async function compare_players_from_game(id) {
 	await merge_tournaments();
 }
 async function compare_player(id) {
-	document.querySelector('#player-histories').innerHTML = ''
+	document.getElementById('player-histories').innerHTML = ''
 	winloss = {}
 	active_players = {}
 	active_players[id] = true
@@ -358,7 +359,7 @@ async function compare_player(id) {
 }
 async function merge_tournaments() {
 	let tournaments
-	document.querySelector('#player-histories').scrollIntoView();
+	document.getElementById('player-histories').scrollIntoView();
 	let merged_tournaments = {};
 	for (uid in active_players) {
 		for await (tournaments of get_tournaments_paginated(uid)) {
@@ -408,14 +409,14 @@ function rankiness(game) {
 	}
 }
 function token_needed(message) {
-	document.querySelector('#token-entry').style.display = 'block';
-	if (message) document.querySelector('#token-message').textContent = message;
-	document.querySelector('#token-form').addEventListener('submit', async function (event) {
+	document.getElementById('token-entry').style.display = 'block';
+	if (message) document.getElementById('token-message').textContent = message;
+	document.getElementById('token-form').addEventListener('submit', async function (event) {
 		try {
 			event.preventDefault();
-			token = document.querySelector('#token').value;
+			token = document.getElementById('token').value;
 			localStorage.setItem('token', token);
-			document.querySelector('#token-entry').style.display = 'none';
+			document.getElementById('token-entry').style.display = 'none';
 			main().catch(catcher);
 		} catch (err) {
 			catcher(err)
@@ -427,8 +428,8 @@ function premain() {
 	if (!token) {
 		token_needed('Log in by providing your Match Play API token')
 	} else {
-		document.querySelector('#token-entry').style.display = 'none';
-		document.querySelector('#main').style.display = 'block';
+		document.getElementById('token-entry').style.display = 'none';
+		document.getElementById('main').style.display = 'block';
 		main().catch(catcher);
 	};
 };
@@ -445,8 +446,8 @@ let ready = (callback) => {
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
-	document.querySelector('#refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
-	document.querySelector('#refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
+	document.getElementById('refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
+	document.getElementById('refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
 }
 ready(() => {
 	try {
@@ -495,7 +496,7 @@ function add_player_button(uid) {
 function add_active_player(id) {
 	let playerbox = document.querySelector(`#player-histories div.player-history[data-playerid="${id}"]`)
 	if (playerbox) {
-		document.querySelector('#player-histories').prepend(playerbox);
+		document.getElementById('player-histories').prepend(playerbox);
 		return false;
 	};
 
@@ -528,7 +529,7 @@ function add_active_player(id) {
 	boxgroup.classList.add('boxgroup')
 	playerbox.append(fakefill(boxgroup))
 
-	document.querySelector('#player-histories').prepend(playerbox);
+	document.getElementById('player-histories').prepend(playerbox);
 	return true
 }
 function add_player_tournament(uid, tid) {
@@ -663,10 +664,10 @@ function add_tournament(tournament) {
 	return box
 }
 function my_tournaments_tab(status) {
-	return tab(document.querySelector('#my-tournaments'), status)
+	return tab(document.getElementById('my-tournaments'), status)
 }
 function active_tournament_tab(status) {
-	return tab(document.querySelector('#active-tournament'), status)
+	return tab(document.getElementById('active-tournament'), status)
 }
 function activate_tab(boxgroup) {
 	document.querySelector(`#${boxgroup.dataset.inputid}`).checked = true
