@@ -357,6 +357,8 @@ async function compare_players_from_game(id) {
 }
 async function compare_player(id) {
 	document.getElementById('player-histories').innerHTML = ''
+	let selected = document.getElementById('selected-game');
+	fakefill(selected)
 	winloss = {}
 	active_players = {}
 	active_players[id] = true
@@ -595,8 +597,10 @@ function update_player_standing(uid, parent) {
 	}
 
 	let bar = parent.querySelector(`.vs-bars[data-uid="${uid}"]`);
-	bar.style.cssText = `--percent: ${percent}%`;
-	bar.classList.add('ready');
+	if (bar) {
+		bar.style.cssText = `--percent: ${percent}%`;
+		bar.classList.add('ready');
+	}
 	let text = parent.querySelector(`.vs-text[data-uid="${uid}"]`)
 	if (text) text.innerHTML = `${won} &mdash; ${lost} vs `;
 }
