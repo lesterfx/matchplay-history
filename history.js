@@ -429,7 +429,6 @@ async function token_needed(message) {
 	});
 }
 async function main() {
-	document.getElementById('token-entry').classList.remove('hide');
 	document.getElementById('main').classList.add('hide');
 
 	let message = 'Log in by providing your Match Play API token'
