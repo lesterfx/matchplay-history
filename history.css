@@ -264,3 +264,16 @@ h3.sticky-header {
 #active-tournament-block {
     display: none;
 }
+#options {
+    background: var(--group-background);
+    border-radius: 10px;
+    padding: 2px;
+}
+#options:not(.shown) div {
+    visibility: hidden;
+}
+#options span.button {
+    cursor: pointer;
+    border-radius: 8px;
+    background: var(--background);
+}

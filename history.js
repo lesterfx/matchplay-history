@@ -456,10 +456,27 @@ let ready = (callback) => {
 	} else {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
-	document.getElementById('refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
-	document.getElementById('refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
 }
 ready(() => {
+	document.getElementById('refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
+	document.getElementById('refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
+	document.querySelector('#options .button').addEventListener('click', () => {
+		try {
+			this.parent.classList.toggle('shown')
+		} catch (err) {
+			catcher(err)
+		}
+	});
+	document.getElementById('log-out').addEventListener('click', () => {
+		try {
+			token = ''
+			localStorage.removeItem('token')
+			main()
+		} catch (err) {
+			catcher(err)
+		}
+	});
+	
 	try {
 		main();
 	} catch (err) {
