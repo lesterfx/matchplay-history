@@ -462,7 +462,7 @@ ready(() => {
 	document.getElementById('refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
 	document.querySelector('#options .button').addEventListener('click', () => {
 		try {
-			this.parent.classList.toggle('shown')
+			this.parentElement.classList.toggle('shown')
 		} catch (err) {
 			catcher(err)
 		}

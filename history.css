@@ -276,4 +276,7 @@ h3.sticky-header {
     cursor: pointer;
     border-radius: 8px;
     background: var(--background);
+    width: 1em;
+    height: 1em;
+    display: inline-block;
 }
