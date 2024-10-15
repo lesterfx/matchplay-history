@@ -470,8 +470,9 @@ ready(() => {
 			catcher(err)
 		}
 	});
-	document.getElementById('log-out').addEventListener('click', () => {
+	document.getElementById('log-out').addEventListener('click', function () {
 		try {
+			this.parentElement.classList.remove('shown')
 			token = ''
 			localStorage.removeItem('token')
 			main()
@@ -504,7 +505,6 @@ ready(() => {
 
 function handler(callback, id) {
 	let handle = async function () {
-		// log(id)
 		try {
 			let tabs = this.closest('.tabs')
 			if (tabs) {
@@ -656,9 +656,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank = game.status;
 	if (typeof won == 'undefined') {
-		// log(`won was ${wgon}`)
 		let win_rank = rankiness(game);
-		// log(`win_rank is ${stringify(win_rank)}`)
 		if (typeof win_rank != 'undefined') {
 			let percent = win_rank.place / win_rank.maxplace * 100
 			box.style.cssText = `--winmix: ${percent}%`;
@@ -670,10 +668,8 @@ function game_element(game, inc_players, inc_tournament, won) {
 	} else if (won === null) {
 	} else {
 		if (won) {
-			// log(`setting won because ${won}`)
 			wordrank = '(won)'
 		} else {
-			// log(`setting lost because ${won}`)
 			wordrank = '(lost)'
 		}
 		box.classList.toggle('won', won);
