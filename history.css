@@ -143,7 +143,6 @@ body {
     min-height: 100vh;
     background: var(--page-background);
     color: var(--text);
-    padding-bottom: 50vh;
 }
 .tabs {
     padding-top: 2em;
@@ -199,7 +198,6 @@ span.vs-bars {
     width: 5em;
     height: 1em;
     margin-right: 5px;
-    margin-top: 10px;
     border: 1px solid var(--border);
     --percent: 50%;
     background: linear-gradient(to right, var(--won-background) var(--percent), var(--lost-background) var(--percent)) no-repeat;
