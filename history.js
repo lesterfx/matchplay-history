@@ -54,7 +54,7 @@ async function get(options) {
 		try {
 			const response = await fetch(req.clone());
 			if (!response.ok) {
-				if (response.status == 429) continue;
+				if (response.status == 429) continue;  // rate limit hit. keep trying after proper wait
 				log(`${response.url} error: ${response.status}\n${response.headers.toString()}\n\n${response.body.toString()}`)
 				throw new Error(`Response status: ${response.status}`);
 			}
@@ -68,10 +68,16 @@ async function get(options) {
 }
 
 async function get_me() {
-	let response = await get({
-		endpoint: 'users/profile'
-	});
-	myUserId = response.data.userId;
+	try {
+		let response = await get({
+			endpoint: 'users/profile'
+		});
+		myUserId = response.data.userId;
+		return 1;
+	} catch (err) {
+		catcher(err);
+		return 0;
+	}
 }
 
 async function get_all_my_tournaments() {
@@ -179,9 +185,6 @@ async function get_and_populate_games_from_tournament(tid) {
 }
 async function get_games_from_tournament(tournament, add_players) {
 	let tid = tournament.tournamentId;
-	if (!tid) {
-		throw Error(`no tournamentId in ${stringify(tournament)} passed into get_games_from_tournament`)
-	}
 	let pid;
 	if (my_pid_by_organizer[tid] && !add_players) {
 		pid = my_pid_by_organizer[tid];
@@ -218,9 +221,6 @@ async function get_games_from_tournament(tournament, add_players) {
 }
 async function get_tournament_details(tournament) {
 	let tid = tournament.tournamentId;
-	if (!tournament) {
-		throw Error('no tournament passed into get_tournament_details')
-	}
 	let response = await get({
 		endpoint: `tournaments/${tid}`,
 		query: {
@@ -418,33 +418,41 @@ function rankiness(game) {
 		maxplace: game.userIds.length - 1
 	}
 }
-function token_needed(message) {
+async function token_needed(message) {
 	document.getElementById('token-entry').style.display = 'block';
 	if (message) document.getElementById('token-message').textContent = message;
-	document.getElementById('token-form').addEventListener('submit', async function (event) {
-		try {
-			event.preventDefault();
-			token = document.getElementById('token').value;
-			localStorage.setItem('token', token);
-			document.getElementById('token-entry').style.display = 'none';
-			main().catch(catcher);
-		} catch (err) {
-			catcher(err)
-		}
+
+	return new Promise(function (resolve, reject) {
+		document.getElementById('token-form').addEventListener('submit', async function (event) {
+			try {
+				event.preventDefault();
+				token = document.getElementById('token').value;
+				localStorage.setItem('token', token);
+				document.getElementById('token-entry').style.display = 'none';
+				document.getElementById('main').style.display = 'block';
+				resolve()
+			} catch (err) {
+				catcher(err)
+				reject()
+			}
+		});
 	});
 }
-function premain() {
-    token = localStorage.getItem('token');
-	if (!token) {
-		token_needed('Log in by providing your Match Play API token')
-	} else {
-		document.getElementById('token-entry').style.display = 'none';
-		document.getElementById('main').style.display = 'block';
-		main().catch(catcher);
-	};
-};
 async function main() {
-	await get_me();
+	/*
+	get token
+	if valid
+		get me
+		if valid
+			break
+	zero out token and repeat
+
+	*/
+	do {
+		token = localStorage.getItem('token');
+		if (token && await get_me()) break
+	} while (await token_needed('Log in by providing your Match Play API token'))
+	
 	await get_all_my_tournaments();
 }
 
@@ -461,7 +469,7 @@ let ready = (callback) => {
 }
 ready(() => {
 	try {
-		premain();
+		main();
 	} catch (err) {
 		catcher(err)
 	}
