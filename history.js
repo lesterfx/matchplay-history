@@ -428,8 +428,6 @@ async function token_needed(message) {
 				event.preventDefault();
 				token = document.getElementById('token').value;
 				localStorage.setItem('token', token);
-				document.getElementById('token-entry').style.display = 'none';
-				document.getElementById('main').style.display = 'block';
 				resolve()
 			} catch (err) {
 				catcher(err)
@@ -439,20 +437,14 @@ async function token_needed(message) {
 	});
 }
 async function main() {
-	/*
-	get token
-	if valid
-		get me
-		if valid
-			break
-	zero out token and repeat
-
-	*/
 	do {
 		token = localStorage.getItem('token');
 		if (token && await get_me()) break
 	} while (await token_needed('Log in by providing your Match Play API token'))
-	
+
+	document.getElementById('token-entry').style.display = 'none';
+	document.getElementById('main').style.display = 'block';
+
 	await get_all_my_tournaments();
 }
 
