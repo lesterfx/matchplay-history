@@ -131,7 +131,7 @@ body {
     color: var(--text);
     font-family: sans-serif;
 }
-#main {
+.main {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
