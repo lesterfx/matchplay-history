@@ -446,17 +446,26 @@ async function main() {
 
 	let message = 'Log in by providing your Match Play API token'
 	while (async () => {
+		log('getting token')
 		token = localStorage.getItem('token');
+		log(`token is ${token}`)
 		if (token) {
+			log('getting me')
 			message = await get_me()
+			log(`get_me returned message ${message}`)
 			log(message)
-			if (!message) return false
+			if (!message) {
+				log('no message, returning false')
+				return false
+			}
 		}
+		log('returning true')
 		return true
 	}) {
+		log(`need token. message is ${message}`)
 		await token_needed(message)
 	}
-
+	log('done')
 	document.getElementById('token-entry').style.display = 'none';
 	document.getElementById('main').style.display = 'block';
 
