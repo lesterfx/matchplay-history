@@ -269,6 +269,11 @@ h3.sticky-header {
     border-radius: 10px;
     padding: 2px;
 }
+#options div {
+    background: var(--group-background);
+    cursor: pointer;
+    padding: .5em;
+}
 #options:not(.shown) div {
     visibility: hidden;
 }
@@ -276,7 +281,6 @@ h3.sticky-header {
     cursor: pointer;
     border-radius: 8px;
     background: var(--background);
-    width: 2em;
-    height: 2em;
+    padding: .2em;
     display: inline-block;
 }
