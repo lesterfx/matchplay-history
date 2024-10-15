@@ -460,7 +460,7 @@ let ready = (callback) => {
 ready(() => {
 	document.getElementById('refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
 	document.getElementById('refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
-	document.querySelector('#options .button').addEventListener('click', () => {
+	document.querySelector('#options .button').addEventListener('click', function () {
 		try {
 			this.parentElement.classList.toggle('shown')
 		} catch (err) {
