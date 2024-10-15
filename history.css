@@ -105,12 +105,6 @@ body.flash {
     background: var(--lost-background);
     border-color: var(--lost-border);
 }
-#token-entry {
-    display: none;
-}
-#main {
-    display: none;
-}
 #log pre {
     background: var(--background);
     padding: 2px;
@@ -280,6 +274,11 @@ h3.sticky-header {
     cursor: pointer;
     border-radius: 8px;
     background: var(--background);
-    padding: .2em;
     display: inline-block;
+    width: 2em;
+    height: 2em;
+    line-height: 2em;
+}
+.hide {
+    display: none;
 }
