@@ -78,7 +78,7 @@ async function get_me() {
 		log('get_me valid')
 		return;
 	} catch (err) {
-		catcher(err);
+		catcher(err, true);
 		log('get_me error')
 		return err.message;
 	}
