@@ -255,10 +255,10 @@ h3.sticky-header {
 }
 .sticky-header {
     position: sticky;
-    top: -5em;
+    top: calc( 0 - env(safe-area-inset-top, 0) );
     z-index: 5;
     background: var(--page-background);
-    padding-top: 5em;
+    padding-top: env(safe-area-inset-top, 0);
     padding-bottom: .1em;
 }
 #active-tournament-block {
