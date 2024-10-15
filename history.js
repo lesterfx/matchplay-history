@@ -75,11 +75,9 @@ async function get_me() {
 			endpoint: 'users/profile'
 		});
 		myUserId = response.data.userId;
-		log('get_me valid')
 		return;
 	} catch (err) {
 		catcher(err, true);
-		log('get_me error')
 		return err.message;
 	}
 }
