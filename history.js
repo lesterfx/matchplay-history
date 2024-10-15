@@ -73,10 +73,10 @@ async function get_me() {
 			endpoint: 'users/profile'
 		});
 		myUserId = response.data.userId;
-		return 1;
+		return;
 	} catch (err) {
 		catcher(err);
-		return 0;
+		return err.message;
 	}
 }
 
@@ -437,10 +437,14 @@ async function token_needed(message) {
 	});
 }
 async function main() {
+	let message = 'Log in by providing your Match Play API token'
 	do {
 		token = localStorage.getItem('token');
-		if (token && await get_me()) break
-	} while (await token_needed('Log in by providing your Match Play API token'))
+		if (token) {
+			message = await get_me()
+			if (!message) break
+		}
+	} while (await token_needed(message))
 
 	document.getElementById('token-entry').style.display = 'none';
 	document.getElementById('main').style.display = 'block';
