@@ -430,7 +430,9 @@ async function token_needed(message) {
 		document.getElementById('token-form').addEventListener('submit', async function (event) {
 			try {
 				event.preventDefault();
-				token = document.getElementById('token').value;
+				let tinput = document.getElementById('token')
+				token = tinput.value;
+				tinput.value = '';
 				localStorage.setItem('token', token);
 				resolve()
 			} catch (err) {
@@ -446,26 +448,17 @@ async function main() {
 
 	let message = 'Log in by providing your Match Play API token'
 	while (await (async function() {
-		log('getting token')
 		token = localStorage.getItem('token');
-		log(`token is ${token}`)
 		if (token) {
-			log('getting me')
 			message = await get_me()
-			log(`get_me returned message ${message}`)
-			log(message)
 			if (!message) {
-				log('no message, returning false')
 				return false
 			}
 		}
-		log('returning true')
 		return true
 	})()) {
-		log(`need token. message is ${message}`)
 		await token_needed(message)
 	}
-	log('done')
 	document.getElementById('token-entry').style.display = 'none';
 	document.getElementById('main').style.display = 'block';
 
