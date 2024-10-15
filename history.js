@@ -445,14 +445,17 @@ async function main() {
 	document.getElementById('main').style.display = 'none';
 
 	let message = 'Log in by providing your Match Play API token'
-	do {
+	while (async () => {
 		token = localStorage.getItem('token');
 		if (token) {
 			message = await get_me()
 			log(message)
-			if (!message) break
+			if (!message) return false
 		}
-	} while (await token_needed(message))
+		return true
+	}) {
+		await token_needed(message)
+	}
 
 	document.getElementById('token-entry').style.display = 'none';
 	document.getElementById('main').style.display = 'block';
