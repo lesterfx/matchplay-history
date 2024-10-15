@@ -278,6 +278,7 @@ h3.sticky-header {
     width: 2em;
     height: 2em;
     line-height: 2em;
+    text-align: center;
 }
 .hide {
     display: none;

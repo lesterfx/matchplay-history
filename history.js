@@ -420,24 +420,12 @@ function rankiness(game) {
 		maxplace: game.userIds.length - 1
 	}
 }
+token_promises = []
 async function token_needed(message) {
 	document.getElementById('token-entry').classList.remove('hide');
 	if (message) document.getElementById('token-message').textContent = message;
-
 	return new Promise(function (resolve, reject) {
-		document.getElementById('token-form').addEventListener('submit', async function (event) {
-			try {
-				event.preventDefault();
-				let tinput = document.getElementById('token')
-				token = tinput.value;
-				tinput.value = '';
-				localStorage.setItem('token', token);
-				resolve()
-			} catch (err) {
-				catcher(err)
-				reject()
-			}
-		});
+		token_promises.push([resolve, reject])
 	});
 }
 async function main() {
@@ -491,7 +479,22 @@ ready(() => {
 			catcher(err)
 		}
 	});
-	
+	document.getElementById('token-form').addEventListener('submit', async function (event) {
+		try {
+			event.preventDefault();
+			let tinput = document.getElementById('token')
+			token = tinput.value;
+			tinput.value = '';
+			localStorage.setItem('token', token);
+			for (promise of token_promises) promise[0]()
+			token_promises = []
+		} catch (err) {
+			catcher(err)
+			for (promise of token_promises) promise[1]()
+			token_promises = []
+		}
+	});
+
 	try {
 		main();
 	} catch (err) {
@@ -520,7 +523,7 @@ function insertSorted(element, parent) {
 	let added = false;
 	let etext = element.textContent.toLowerCase();
 	for (el of parent.children) {
-		if ((el.textContent.toLowerCase()) > etext) {  // }.localeCompare(etext, 'en', {'sensitivity': 'base'})) {
+		if ((el.textContent.toLowerCase()) > etext) {
 			parent.insertBefore(element, el);
 			added = true;
 			return false;
