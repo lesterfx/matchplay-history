@@ -31,6 +31,7 @@ async function rate_limit() {
 	await new Promise(resolve => setTimeout(resolve, wait));
     return wait
 }
+let invalid_token = 'API token invalid'
 async function get(options) {
     const headers = new Headers();
 	
@@ -55,6 +56,7 @@ async function get(options) {
 			const response = await fetch(req.clone());
 			if (!response.ok) {
 				if (response.status == 429) continue;  // rate limit hit. keep trying after proper wait
+				if (response.status == 401) throw new Error(invalid_token)
 				log(`${response.url} error: ${response.status}\n${response.headers.toString()}\n\n${response.body.toString()}`)
 				throw new Error(`Response status: ${response.status}`);
 			}
@@ -73,9 +75,11 @@ async function get_me() {
 			endpoint: 'users/profile'
 		});
 		myUserId = response.data.userId;
+		log('get_me valid')
 		return;
 	} catch (err) {
 		catcher(err);
+		log('get_me error')
 		return err.message;
 	}
 }
@@ -437,11 +441,15 @@ async function token_needed(message) {
 	});
 }
 async function main() {
+	document.getElementById('token-entry').style.display = 'block';
+	document.getElementById('main').style.display = 'none';
+
 	let message = 'Log in by providing your Match Play API token'
 	do {
 		token = localStorage.getItem('token');
 		if (token) {
 			message = await get_me()
+			log(message)
 			if (!message) break
 		}
 	} while (await token_needed(message))
