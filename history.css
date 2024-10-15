@@ -130,16 +130,20 @@ body.flash {
 }
 html {
     scroll-behavior: smooth;
+    background: var(--page-background);
 }
 body {
     background: var(--page-background);
     color: var(--text);
     font-family: sans-serif;
-    padding-bottom: 50vh;
 }
 #main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     background: var(--page-background);
     color: var(--text);
+    padding-bottom: 50vh;
 }
 .tabs {
     padding-top: 2em;
@@ -264,12 +268,9 @@ h3.sticky-header {
 #active-tournament-block {
     display: none;
 }
-#options {
-    background: var(--group-background);
-    border-radius: 10px;
-    padding: 2px;
-}
 #options div {
+    padding: 2px;
+    border-radius: 10px;
     background: var(--group-background);
     cursor: pointer;
     padding: .5em;
