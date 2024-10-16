@@ -105,12 +105,6 @@ body.flash {
     background: var(--lost-background);
     border-color: var(--lost-border);
 }
-#log {
-    background: var(--group-background);
-    padding: 2px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-}
 #log pre {
     background: var(--background);
     padding: 2px;
@@ -235,7 +229,8 @@ ol {
 }
 .refresh {
     display: inline-block;
-    margin-left: 1em;
+    margin-left: .2em;
+    margin-right: .2em;
     color: var(--active-color);
     cursor: pointer;
     font-weight: normal;

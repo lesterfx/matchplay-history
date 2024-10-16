@@ -252,17 +252,13 @@ let wakeLock = null;
 async function wakelock_on() {
 	try {
 		if (wakeLock && !wakeLock.released) {
-			log('wakeLock already on')
 			return
 		}
-		log("requesting wake lock");
 		wakeLock = await navigator.wakeLock.request("screen");
 		wakeLock.addEventListener("release", async () => {
-			log("Wake Lock has been released");
 			wakeLock = null
 			await refresh_off()
 		  });
-		log("Wake Lock is active!");
 	} catch (err) {
 		// The Wake Lock request has failed - usually system related, such as battery.
 		catcher(err);
