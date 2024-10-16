@@ -554,6 +554,7 @@ ready(() => {
 function tabhandler(callback, ...args) {
 	let handle = async function () {
 		try {
+			refresh_off()
 			let tabs = this.closest('.tabs')
 			if (tabs) {
 				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
