@@ -264,11 +264,13 @@ async function wakelock_on() {
 	}
 }
 async function wakelock_off() {
-	log('releasing wakelock...')
-	wakeLock.release().then(() => {
-		log('released')
-		wakeLock = null;
-	});
+	if (wakeLock) {
+		log('releasing wakelock...')
+		wakeLock.release().then(() => {
+			log('released')
+			wakeLock = null;
+		});
+	};
 }
 async function refresh_on() {
 	refresh_timer && clearTimeout(refresh_timer)
@@ -298,9 +300,8 @@ async function refresh_tournament_click() {
 	}
 }
 async function refresh_tournament_timer() {
-	await refresh_off(true);
 	try {
-
+		await refresh_off(true);
 		if (await do_refresh_tournament()) {
 			await refresh_on();
 		} else {
