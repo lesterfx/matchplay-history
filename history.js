@@ -83,7 +83,7 @@ async function get_me() {
 }
 
 async function get_all_my_tournaments() {
-	refresh_off()
+	await refresh_off()
 	document.getElementById('active-tournament-block').style.display = 'none';
 	document.getElementById('selected-game').innerHTML = '';
 	document.getElementById('player-histories').innerHTML = '';
@@ -251,10 +251,11 @@ async function refresh_tournaments_click() {
 let wakeLock = null;
 async function wakelock_on() {
 	try {
+		log("requesting wake lock");
 		wakeLock = await navigator.wakeLock.request("screen");
-		wakeLock.addEventListener("release", () => {
+		wakeLock.addEventListener("release", async () => {
 			log("Wake Lock has been released");
-			refresh_off()
+			await refresh_off()
 		  });
 		log("Wake Lock is active!");
 	} catch (err) {
@@ -263,7 +264,9 @@ async function wakelock_on() {
 	}
 }
 async function wakelock_off() {
+	log('releasing wakelock...')
 	wakeLock.release().then(() => {
+		log('released')
 		wakeLock = null;
 	});
 }
@@ -287,17 +290,25 @@ async function refresh_off(will_refresh) {
 }
 async function refresh_tournament_click() {
 	if (refresh_timer) {
+		log('turn off refresh')
 		await refresh_off();
 	} else {
-		refresh_tournament_timer();
+		log('turn on refresh')
+		await refresh_tournament_timer();
 	}
 }
 async function refresh_tournament_timer() {
 	await refresh_off(true);
-	if (await do_refresh_tournament()) {
-		await refresh_on();
-	} else {
-		await refresh_off();
+	try {
+
+		if (await do_refresh_tournament()) {
+			await refresh_on();
+		} else {
+			await refresh_off();
+		}
+	} catch (err) {
+		refresh_off();
+		catcher(err)
 	}
 }
 async function do_refresh_tournament() {
