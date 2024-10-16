@@ -266,13 +266,13 @@ async function wakelock_on() {
 }
 async function wakelock_off() {
 	if (wakeLock && !wakeLock.released) {
-		log('releasing wakelock...')
+		// log('releasing wakelock...')
 		wakeLock.release().then(() => {
-			log('released')
+			// log('released')
 			wakeLock = null;
 		});
 	} else {
-		log('wakeLock already off')
+		// log('wakeLock already off')
 	};
 }
 async function refresh_on() {
