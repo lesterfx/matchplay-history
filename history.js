@@ -11,7 +11,7 @@ let all_data = {
 	tournament: {},
 	game: {}
 }
-let allow_refresh_completed = true  // also change css
+let allow_refresh_completed = false  // also change css
 let limit_period = 1100;
 let limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
 let limit_phase = 0;
