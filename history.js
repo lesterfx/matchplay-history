@@ -779,6 +779,7 @@ function fakefill(element) {
 	return element;
 }
 function notifyMe() {
+	log('notifications...')
 	if (!('Notification' in window)) {
 		log('This browser does not support desktop notification');
 	} else {
@@ -789,7 +790,9 @@ function notifyMe() {
 		log(`Notification permission is ${Notification.permission}`)
 		if (Notification.permission === "granted") {
 			log(`Sending notification`)
-			new Notification("Hi there!");
+			new Notification("Hi there!", {
+                body: 'This is a test notification.'
+            });
 		} else {
 			log(`Notification permission is ${Notification.permission}`)
 		}
