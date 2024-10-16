@@ -245,49 +245,72 @@ async function get_tournament_details(tournament) {
 	return {pid: pid, players: players};
 }
 async function refresh_tournaments_click() {
-	await get_all_my_tournaments()
+	await get_all_my_tournaments();
 }
-function refresh_on() {
+
+let wakeLock = null;
+async function wakelock_on() {
+	try {
+		wakeLock = await navigator.wakeLock.request("screen");
+		wakeLock.addEventListener("release", () => {
+			log("Wake Lock has been released");
+			refresh_off()
+		  });
+		log("Wake Lock is active!");
+	} catch (err) {
+		// The Wake Lock request has failed - usually system related, such as battery.
+		catcher(err);
+	}
+}
+async function wakelock_off() {
+	wakeLock.release().then(() => {
+		wakeLock = null;
+	});
+}
+async function refresh_on() {
+	refresh_timer && clearTimeout(refresh_timer)
 	refresh_timer = setTimeout(refresh_tournament_timer, 5000);
-	let refresh_button = document.getElementById('refresh-active-tournament')
-	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`
+	let refresh_button = document.getElementById('refresh-active-tournament');
+	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`;
 	refresh_button.classList.add('timed');
-	refresh_button.querySelector('.text').textContent = 'live'
+	refresh_button.querySelector('.text').textContent = 'live';
+	await wakelock_on();
 }
-function refresh_off(will_refresh) {
-	clearTimeout(refresh_timer)
-	refresh_timer = null
-	let refresh_button = document.getElementById('refresh-active-tournament')
-	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`
-	refresh_button.classList.remove('timed')
-	refresh_button.querySelector('.text').textContent = will_refresh ? 'wait' : 'refresh'
+async function refresh_off(will_refresh) {
+	refresh_timer && clearTimeout(refresh_timer);
+	refresh_timer = null;
+	let refresh_button = document.getElementById('refresh-active-tournament');
+	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`;
+	refresh_button.classList.remove('timed');
+	refresh_button.querySelector('.text').textContent = will_refresh ? 'wait' : 'refresh';
+	await wakelock_off();
 }
 async function refresh_tournament_click() {
 	if (refresh_timer) {
-		refresh_off()
+		await refresh_off();
 	} else {
-		refresh_tournament_timer()
+		refresh_tournament_timer();
 	}
 }
 async function refresh_tournament_timer() {
-	refresh_off(true)
+	await refresh_off(true);
 	if (await do_refresh_tournament()) {
-		refresh_on()
+		await refresh_on();
 	} else {
-		refresh_off()
+		await refresh_off();
 	}
 }
 async function do_refresh_tournament() {
-	let status = all_data.tournament[active_tournament_id].status
-	let changes = await get_other()
+	let status = all_data.tournament[active_tournament_id].status;
+	let changes = await get_other();
 	if (changes) {
-		await flash_screen()
-		return false
+		await flash_screen();
+		return false;
 	} else {
 		if (status == 'completed') {
-			return false
+			return false;
 		} else {
-			return true
+			return true;
 		}
 	};
 }
