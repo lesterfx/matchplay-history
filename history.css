@@ -265,7 +265,11 @@ h3.sticky-header {
 #active-tournament-block {
     display: none;
 }
-#options div {
+#options>div {
+    float: left;
+    clear: both;
+}
+#options div.options-item {
     padding: 2px;
     border-radius: 10px;
     background: var(--group-background);
