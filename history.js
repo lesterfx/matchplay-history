@@ -469,9 +469,9 @@ ready(() => {
 			catcher(err)
 		}
 	});
-	document.getElementById('log-out').addEventListener('click', function () {
+	document.getElementById('log-out').addEventListener('click', async function () {
 		try {
-			notifyMe()
+			await notifyMe()
 		} catch (err) {
 			catcher(err)
 		}
