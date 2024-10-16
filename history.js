@@ -471,6 +471,13 @@ ready(() => {
 	});
 	document.getElementById('log-out').addEventListener('click', function () {
 		try {
+			notifyMe()
+		} catch (err) {
+			catcher(err)
+		}
+	})
+	document.getElementById('log-out').addEventListener('click', function () {
+		try {
 			this.parentElement.classList.remove('shown')
 			token = ''
 			localStorage.removeItem('token')
@@ -502,7 +509,7 @@ ready(() => {
 	}
 });
 
-function handler(callback, id) {
+function tabhandler(callback, ...args) {
 	let handle = async function () {
 		try {
 			let tabs = this.closest('.tabs')
@@ -510,9 +517,19 @@ function handler(callback, id) {
 				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
 			}
-			await callback(id)
+			await callback(...args)
 		} catch (err) {
 			this.classList.remove('active')
+			await catcher(err)
+		}
+	}
+	return handle
+}
+function handler(callback, ...args) {
+	let handle = async function () {
+		try {
+			await callback(...args)
+		} catch (err) {
 			await catcher(err)
 		}
 	}
@@ -534,7 +551,7 @@ function insertSorted(element, parent) {
 function add_player_button(uid) {
 	let button = title('user', uid);
 	button.classList.add('box');
-	button.addEventListener('click', handler(compare_player, uid))
+	button.addEventListener('click', tabhandler(compare_player, uid))
 	insertSorted(button, active_tournament_tab('players'));
 }
 function add_active_player(id) {
@@ -647,7 +664,7 @@ function add_player_game(options) {
 }
 function add_active_game(game) {
 	let box = game_element(game, true, false);
-	box.addEventListener('click', handler(compare_players_from_game, game.gameId));
+	box.addEventListener('click', tabhandler(compare_players_from_game, game.gameId));
 	active_tournament_tab(game.status).append(box);
 	return box;
 }
@@ -710,7 +727,7 @@ function add_tournament(tournament) {
 	}
 	let box = title('tournament', tid);
 	box.classList.add('box');
-	box.addEventListener('click', handler(get_other, tid))
+	box.addEventListener('click', tabhandler(get_other, tid))
 	my_tournaments_tab(tournament.status).append(box);
 	return box
 }
@@ -765,13 +782,17 @@ async function notifyMe() {
 	if (!('Notification' in window)) {
 		log('This browser does not support desktop notification');
 	} else {
-		if (Notification.permission != 'granted' && Notification.permission != 'denied') {
+		if (Notification.permission !== 'granted' && Notification.permission != 'denied') {
+			log(`Permission is ${Notification.permission}`)
 			await Notification.requestPermission()
 		}
+		log(`Notification permission is ${Notification.permission}`)
 		if (Notification.permission === "granted") {
+			log(`Sending notification`)
 			const notification = new Notification("Hi there!");
+			log(notification)
 		} else {
-
+			log(`Notification permission is ${Notification.permission}`)
 		}
 	}
   }
