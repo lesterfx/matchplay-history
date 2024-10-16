@@ -251,10 +251,15 @@ async function refresh_tournaments_click() {
 let wakeLock = null;
 async function wakelock_on() {
 	try {
+		if (wakeLock && !wakeLock.released) {
+			log('wakeLock already on')
+			return
+		}
 		log("requesting wake lock");
 		wakeLock = await navigator.wakeLock.request("screen");
 		wakeLock.addEventListener("release", async () => {
 			log("Wake Lock has been released");
+			wakeLock = null
 			await refresh_off()
 		  });
 		log("Wake Lock is active!");
@@ -264,12 +269,14 @@ async function wakelock_on() {
 	}
 }
 async function wakelock_off() {
-	if (wakeLock) {
+	if (wakeLock && !wakeLock.released) {
 		log('releasing wakelock...')
 		wakeLock.release().then(() => {
 			log('released')
 			wakeLock = null;
 		});
+	} else {
+		log('wakeLock already off')
 	};
 }
 async function refresh_on() {
@@ -287,8 +294,12 @@ async function refresh_off(will_refresh) {
 	let refresh_button = document.getElementById('refresh-active-tournament');
 	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`;
 	refresh_button.classList.remove('timed');
-	refresh_button.querySelector('.text').textContent = will_refresh ? 'wait' : 'refresh';
-	await wakelock_off();
+	if (will_refresh) {
+		refresh_button.querySelector('.text').textContent = 'wait';
+	} else {
+		refresh_button.querySelector('.text').textContent = 'refresh';
+		await wakelock_off();
+	}
 }
 async function refresh_tournament_click() {
 	if (refresh_timer) {
