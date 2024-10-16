@@ -224,8 +224,7 @@ ol {
     margin-bottom: 0;
 }
 #active-tournament-title.completed+.refresh {
-    /* display: none; */
-    text-decoration-line: line-through;
+    display: none;
 }
 .refresh {
     display: inline-block;
