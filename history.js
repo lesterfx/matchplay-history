@@ -469,9 +469,9 @@ ready(() => {
 			catcher(err)
 		}
 	});
-	document.getElementById('log-out').addEventListener('click', async function () {
+	document.getElementById('log-out').addEventListener('click', function () {
 		try {
-			await notifyMe()
+			notifyMe()
 		} catch (err) {
 			catcher(err)
 		}
@@ -778,19 +778,18 @@ function fakefill(element) {
 	}
 	return element;
 }
-async function notifyMe() {
+function notifyMe() {
 	if (!('Notification' in window)) {
 		log('This browser does not support desktop notification');
 	} else {
 		if (Notification.permission !== 'granted' && Notification.permission != 'denied') {
 			log(`Permission is ${Notification.permission}`)
-			await Notification.requestPermission()
+			Notification.requestPermission()
 		}
 		log(`Notification permission is ${Notification.permission}`)
 		if (Notification.permission === "granted") {
 			log(`Sending notification`)
-			const notification = new Notification("Hi there!");
-			log(notification)
+			new Notification("Hi there!");
 		} else {
 			log(`Notification permission is ${Notification.permission}`)
 		}
