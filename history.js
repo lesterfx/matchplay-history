@@ -389,7 +389,9 @@ async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown')
 	// div.textContent = tournament.type
 	if (tournament.type == 'frenzy') {
-		let frenzy = await get(`api/tournaments/${tournament.tournamentId}/frenzy`)
+		let frenzy = await get({
+			endpoint: `api/tournaments/${tournament.tournamentId}/frenzy`,
+		})
 		log(frenzy)
 		div.textContent(JSON.stringify(frenzy))
 	} else {
