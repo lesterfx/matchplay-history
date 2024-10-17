@@ -57,7 +57,7 @@ async function get(options) {
 			if (!response.ok) {
 				if (response.status == 429) continue;  // rate limit hit. keep trying after proper wait
 				if (response.status == 401) throw new Error(invalid_token)
-				log(`${response.url} error: ${response.status}\n${response.headers.toString()}\n\n${response.body.toString()}`)
+				log(`${response.url} error: ${response.status}\n${await response.text()}`)
 				throw new Error(`Response status: ${response.status}`);
 			}
 			const json = await response.json();
@@ -390,7 +390,7 @@ async function get_frenzy_position(tournament) {
 	// div.textContent = tournament.type
 	if (tournament.type == 'frenzy') {
 		let frenzy = await get({
-			endpoint: `api/tournaments/${tournament.tournamentId}/frenzy`,
+			endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
 		})
 		log(frenzy)
 		div.textContent(JSON.stringify(frenzy))
