@@ -369,7 +369,7 @@ async function get_other(id) {
 	title_h2.innerHTML = '';
 	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
 
-	await get_frenzy_position(tournament.tournamentId)
+	await get_frenzy_position(tournament)
 
 	let in_progress = []
 	for (game of active_games) {
@@ -388,7 +388,13 @@ async function get_other(id) {
 async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown')
 	div.textContent = tournament.type
-	// get(`api/tournaments/${tournament.tournamentId}/frenzy`)
+	if (tournament.type == 'frenzy') {
+		// let frenzy = await get(`api/tournaments/${tournament.tournamentId}/frenzy`)
+		// log(frenzy)
+		// div.textContent(JSON.stringify(frenzy))
+	} else {
+		// div.textContent = ''
+	}
 }
 async function compare_players_from_game(id) {
 	active_players = {};
