@@ -393,7 +393,7 @@ async function get_frenzy_position(tournament) {
 			endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
 		})
 		log(frenzy)
-		div.textContent(JSON.stringify(frenzy))
+		div.textContent = JSON.stringify(frenzy.queue)
 	} else {
 		div.textContent = ''
 	}
