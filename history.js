@@ -369,6 +369,8 @@ async function get_other(id) {
 	title_h2.innerHTML = '';
 	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
 
+	await get_frenzy_position(tournament.tournamentId)
+
 	let in_progress = []
 	for (game of active_games) {
 		let element = add_active_game(game);
@@ -382,6 +384,11 @@ async function get_other(id) {
 		activate_tab(active_tournament_tab(status))
 	}
 	return in_progress.length;
+}
+async function get_frenzy_position(tournament) {
+	let div = document.getElementById('frenzy-countdown')
+	div.textContent = tournament.type
+	// get(`api/tournaments/${tournament.tournamentId}/frenzy`)
 }
 async function compare_players_from_game(id) {
 	active_players = {};
