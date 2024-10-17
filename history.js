@@ -387,13 +387,13 @@ async function get_other(id) {
 }
 async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown')
-	div.textContent = tournament.type
+	// div.textContent = tournament.type
 	if (tournament.type == 'frenzy') {
-		// let frenzy = await get(`api/tournaments/${tournament.tournamentId}/frenzy`)
-		// log(frenzy)
-		// div.textContent(JSON.stringify(frenzy))
+		let frenzy = await get(`api/tournaments/${tournament.tournamentId}/frenzy`)
+		log(frenzy)
+		div.textContent(JSON.stringify(frenzy))
 	} else {
-		// div.textContent = ''
+		div.textContent = ''
 	}
 }
 async function compare_players_from_game(id) {
