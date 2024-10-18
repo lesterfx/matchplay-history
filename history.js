@@ -374,7 +374,7 @@ async function get_other(id) {
 	let in_progress = []
 	for (game of active_games) {
 		let element = add_active_game(game);
-		if (game.status != 'completed')  in_progress.push([game.status, element]);
+		if (game.status != 'completed') in_progress.push([game.status, element]);
 	};
 	document.getElementById('active-tournament-title').scrollIntoView();
 	if (in_progress.length == 1) {
@@ -395,14 +395,14 @@ function arc(factor) {
 	let bx = centerx + radius*Math.sin(a)
 	let by = centery - radius*Math.cos(a)
 	let long = (factor > .5) ? 1 : 0
-	let svg = `<svg width="60" height="60" viewBox="0 0 60 60"><path d="M ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke-width="10px" fill="none" stroke-linecap="round" /></svg>`
+	let svg = `<svg width="60" height="60" viewBox="0 0 60 60"><path d="M ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}"/></svg>`
 	return svg
 }
 async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown');
-	// div.textContent = tournament.type
+
 	if (tournament.type != 'frenzy') {
-		div.textContent = '';
+		for (el of div.querySelectorAll('span')) el.textContent = ''
 		return;
 	}
 
@@ -418,10 +418,14 @@ async function get_frenzy_position(tournament) {
 		}
 	}
 	let queue_progress;
+	if (!queue_size) {
+		queue_size = 6
+		queue_pos = Math.floor(Math.random() * queue_size)
+	}
 	if (queue_size && queue_pos !== null) {
 		queue_progress = (queue_size - queue_pos) / queue_size;
 		let svg = arc(queue_progress);
-		div.querySelector('.text').prepend(`${queue_pos} ahead of you in queue`);
+		div.querySelector('.text').prepend(`${queue_pos} ahead of you in queue of ${queue_size}`);
 		div.querySelector('.pie').innerHTML = svg;
 	} else {
 		for (el of div.querySelectorAll('span')) el.textContent = ''

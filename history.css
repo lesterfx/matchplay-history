@@ -298,3 +298,10 @@ h3.sticky-header {
     display: flex;
     align-items: center;
 }
+
+#frenzy-countdown svg path {
+    stroke: var(--active-color);
+    stroke-width: 10px;
+    fill: none;
+    stroke-linecap: round;
+}
