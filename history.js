@@ -417,7 +417,12 @@ async function get_frenzy_position(tournament) {
 			queue_pos = i
 		}
 	}
-	let queue_progress = (queue_size - queue_pos) / queue_size;
+	let queue_progress
+	if (queue_size) {
+		queue_progress = (queue_size - queue_pos) / queue_size;
+	} else {
+		queue_progress = Math.random();
+	}
 	div.querySelector('.text').textContent =`Frenzy queue progress ${queue_progress}`;
 	div.querySelector('.pie').innerHTML = arc(queue_progress)
 }
