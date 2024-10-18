@@ -389,13 +389,13 @@ function arc(factor) {
 	let a = Math.PI * 2 * factor
 	let centerx = 100
 	let centery = 100
-	let radius1 = 80
+	let radius = 80
 	let ax = centerx
-	let ay = centery - radius1
-	let bx = centerx + radius1*Math.sin(a)
-	let by = centery - radius1*Math.cos(a)
+	let ay = centery - radius
+	let bx = centerx + radius*Math.sin(a)
+	let by = centery - radius*Math.cos(a)
 	let long = (factor > .5) ? 1 : 0
-	let svg = `<svg width="200" height="200"><circle cx="${centerx}" cy="${centery}" r="${radius1}" stroke="#333333" stroke=width="10px" /><path d="M ${centerx} ${centery} L ${ax} ${ay} A 100 100 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke=width="10px" fill="none" /></svg>`
+	let svg = `<svg width="200" height="200"><circle cx="${centerx}" cy="${centery}" r="${radius}" stroke="#333333" stroke=width="10" /><path d="M ${centerx} ${centery} L ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke=width="10" fill="none" /></svg>`
 	return svg
 }
 async function get_frenzy_position(tournament) {
