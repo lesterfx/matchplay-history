@@ -386,14 +386,14 @@ async function get_other(id) {
 	return in_progress.length;
 }
 function arc(factor) {
-	let a = Math.pi * 2 * factor
-	centerx = 100
-	centery = 100
-	radius1 = 80
-	ax = centerx
-	ay = centery - radius1
-	bx = centerx + radius1*Math.sin(a)
-	by = centery - radius1*Math.cos(a)
+	let a = Math.PI * 2 * factor
+	let centerx = 100
+	let centery = 100
+	let radius1 = 80
+	let ax = centerx
+	let ay = centery - radius1
+	let bx = centerx + radius1*Math.sin(a)
+	let by = centery - radius1*Math.cos(a)
 	let long = (factor > .5) ? 1 : 0
 	let svg = `<svg width="200" height="200"><path d="M ${ax} ${ay} A 100 100 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke=width="10" fill="none" /></svg>`
 	return svg
