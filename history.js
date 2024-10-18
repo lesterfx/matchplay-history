@@ -387,15 +387,15 @@ async function get_other(id) {
 }
 function arc(factor) {
 	let a = Math.PI * 2 * factor
-	let centerx = 50
-	let centery = 50
-	let radius = 40
+	let centerx = 30
+	let centery = 30
+	let radius = 20
 	let ax = centerx
 	let ay = centery - radius
 	let bx = centerx + radius*Math.sin(a)
 	let by = centery - radius*Math.cos(a)
 	let long = (factor > .5) ? 1 : 0
-	let svg = `<svg width="100" height="100" viewBox="0 0 100 100"><path d="M ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke-width="10px" fill="none" stroke-linecap="round" /></svg>`
+	let svg = `<svg width="60" height="60" viewBox="0 0 60 60"><path d="M ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke-width="10px" fill="none" stroke-linecap="round" /></svg>`
 	return svg
 }
 async function get_frenzy_position(tournament) {
@@ -424,7 +424,6 @@ async function get_frenzy_position(tournament) {
 		queue_progress = Math.random();
 	}
 	let svg = arc(queue_progress);
-	div.querySelector('.text').textContent = svg;
 	div.querySelector('.text').prepend(`Frenzy queue progress ${queue_progress}`);
 	div.querySelector('.pie').innerHTML = svg;
 }
