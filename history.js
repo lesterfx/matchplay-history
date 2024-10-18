@@ -420,10 +420,6 @@ async function get_frenzy_position(tournament) {
 		}
 	}
 	let queue_progress;
-	if (!queue_size) {
-		queue_size = Math.floor(Math.random() * 6) + 1
-		queue_pos = Math.floor(Math.random() * queue_size)
-	}
 	if (queue_size && queue_pos !== null) {
 		queue_progress = (queue_size - queue_pos) / queue_size;
 		let svg = arc(queue_pos, queue_size);
