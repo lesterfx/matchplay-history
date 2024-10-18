@@ -386,17 +386,164 @@ async function get_other(id) {
 	return in_progress.length;
 }
 async function get_frenzy_position(tournament) {
-	let div = document.getElementById('frenzy-countdown')
+	let div = document.getElementById('frenzy-countdown');
 	// div.textContent = tournament.type
-	if (tournament.type == 'frenzy') {
-		let frenzy = await get({
-			endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
-		})
-		log(frenzy)
-		div.textContent = JSON.stringify(frenzy.queue)
-	} else {
-		div.textContent = ''
+	if (tournament.type != 'frenzy') {
+		div.textContent = '';
+		return;
 	}
+
+	let frenzy = await get({
+		endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
+	})
+	let my_pid = my_pid_by_organizer[tournament.tournamentId];
+	let queue_pos = null;
+	let queue_size = frenzy.queue.length;
+	for (const [i, queue] of frenzy.queue.entries()) {
+		if (queue.playerId == my_pid) {
+			queue_pos = i
+		}
+	}
+	let queue_progress = (queue_size - queue_pos) / queue_size;
+	div.textContent = `Frenzy queue progress ${queue_progress}`;
+}
+let frenzy_sample = {
+    "games": [
+        {
+            "gameId": 4906360,
+            "roundId": 0,
+            "tournamentId": 161993,
+            "challengeId": null,
+            "arenaId": 124997,
+            "bankId": null,
+            "index": null,
+            "set": 0,
+            "playerIdAdvantage": null,
+            "scorekeeperId": null,
+            "status": "started",
+            "startedAt": "2024-10-18T00:09:51.000000Z",
+            "duration": null,
+            "bye": false,
+            "playerIds": [
+                390582,
+                314079
+            ],
+            "userIds": [
+                16806,
+                null
+            ],
+            "resultPositions": [
+                null,
+                null
+            ],
+            "resultPoints": [
+                null,
+                null
+            ],
+            "resultScores": [
+                null,
+                null
+            ],
+            "resultCountMismatch": false
+        },
+        {
+            "gameId": 4906367,
+            "roundId": 0,
+            "tournamentId": 161993,
+            "challengeId": null,
+            "arenaId": 135312,
+            "bankId": null,
+            "index": null,
+            "set": 0,
+            "playerIdAdvantage": null,
+            "scorekeeperId": null,
+            "status": "started",
+            "startedAt": "2024-10-18T00:10:13.000000Z",
+            "duration": null,
+            "bye": false,
+            "playerIds": [
+                304783,
+                378317
+            ],
+            "userIds": [
+                8971,
+                null
+            ],
+            "resultPositions": [
+                null,
+                null
+            ],
+            "resultPoints": [
+                null,
+                null
+            ],
+            "resultScores": [
+                null,
+                null
+            ],
+            "resultCountMismatch": false
+        },
+        {
+            "gameId": 4906368,
+            "roundId": 0,
+            "tournamentId": 161993,
+            "challengeId": null,
+            "arenaId": 124996,
+            "bankId": null,
+            "index": null,
+            "set": 0,
+            "playerIdAdvantage": null,
+            "scorekeeperId": null,
+            "status": "started",
+            "startedAt": "2024-10-18T00:10:25.000000Z",
+            "duration": null,
+            "bye": false,
+            "playerIds": [
+                390583,
+                310395
+            ],
+            "userIds": [
+                22072,
+                6294
+            ],
+            "resultPositions": [
+                null,
+                null
+            ],
+            "resultPoints": [
+                null,
+                null
+            ],
+            "resultScores": [
+                null,
+                null
+            ],
+            "resultCountMismatch": false
+        }
+    ],
+    "queue": [
+        {
+            "queueId": 918015,
+            "tournamentId": 161993,
+            "arenaId": null,
+            "roundId": null,
+            "playerId": 314080,
+            "index": 14,
+            "createdAt": "2024-10-18T00:10:13.000000Z",
+            "completedAt": null
+        },
+        {
+            "queueId": 918016,
+            "tournamentId": 161993,
+            "arenaId": null,
+            "roundId": null,
+            "playerId": 333646,
+            "index": 15,
+            "createdAt": "2024-10-18T00:10:25.000000Z",
+            "completedAt": null
+        }
+    ],
+    "avgQueueDuration": 412
 }
 async function compare_players_from_game(id) {
 	active_players = {};
