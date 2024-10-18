@@ -395,7 +395,7 @@ function arc(factor) {
 	let bx = centerx + radius*Math.sin(a)
 	let by = centery - radius*Math.cos(a)
 	let long = (factor > .5) ? 1 : 0
-	let svg = `<svg width="200" height="200"><circle cx="${centerx}" cy="${centery}" r="${radius}" stroke="#333333" stroke=width="10" /><path d="M ${centerx} ${centery} L ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke=width="10" fill="none" /></svg>`
+	let svg = `<svg width="200" height="200" viewBox="0 0 200 200"><circle cx="${centerx}" cy="${centery}" r="${radius}" stroke="#333333" stroke-width="10" /><path d="M ${centerx} ${centery} L ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke-width="10px" fill="none" /></svg>`
 	return svg
 }
 async function get_frenzy_position(tournament) {
