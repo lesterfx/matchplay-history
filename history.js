@@ -389,16 +389,14 @@ function arc(factor) {
 	let a = Math.pi * 2 * factor
 	centerx = 100
 	centery = 100
-	radius1 = 100
-	radius2 = 50
-	startx = centerx + 0
-	starty = centery - radius1
-	endx = centerx + radius1*Math.sin(a)
-	endy = centery - radius1*Math.cos(a)
-	
-	
-	let d = `M ${startx} ${starty} A 100 100 0 1 0 ${endx} ${endy}`
-	
+	radius1 = 80
+	ax = centerx
+	ay = centery - radius1
+	bx = centerx + radius1*Math.sin(a)
+	by = centery - radius1*Math.cos(a)
+	let long = (factor > .5) ? 1 : 0
+	let svg = `<svg width="200" height="200"><path d="M ${ax} ${ay} A 100 100 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke=width="10" fill="none" /></svg>`
+	return svg
 }
 async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown');
@@ -420,7 +418,8 @@ async function get_frenzy_position(tournament) {
 		}
 	}
 	let queue_progress = (queue_size - queue_pos) / queue_size;
-	div.textContent = `Frenzy queue progress ${queue_progress}`;
+	div.querySelector('.text').textContent =`Frenzy queue progress ${queue_progress}`;
+	div.querySelector('.pie').innerHTML = arc(queue_progress)
 }
 let frenzy_sample = {
     "games": [
