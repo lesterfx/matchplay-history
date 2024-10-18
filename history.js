@@ -414,17 +414,19 @@ async function get_frenzy_position(tournament) {
 	let queue_size = frenzy.queue.length;
 	for (const [i, queue] of frenzy.queue.entries()) {
 		if (queue.playerId == my_pid) {
-			queue_pos = i
+			queue_pos = i;
 		}
 	}
-	let queue_progress
+	let queue_progress;
 	if (queue_size) {
 		queue_progress = (queue_size - queue_pos) / queue_size;
 	} else {
 		queue_progress = Math.random();
 	}
-	div.querySelector('.text').textContent =`Frenzy queue progress ${queue_progress}`;
-	div.querySelector('.pie').innerHTML = arc(queue_progress)
+	let svg = arc(queue_progress);
+	div.querySelector('.text').textContent = svg;
+	div.querySelector('.text').prepend(`Frenzy queue progress ${queue_progress}`);
+	div.querySelector('.pie').innerHTML = svg;
 }
 let frenzy_sample = {
     "games": [
