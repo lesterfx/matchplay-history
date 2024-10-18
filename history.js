@@ -386,7 +386,8 @@ async function get_other(id) {
 	}
 	return in_progress.length;
 }
-function arc(factor) {
+function arc(queue_pos, queue_size) {
+	let factor = (queue_pos + 0.5) / (queue_size + 1)
 	let a = Math.PI * 2 * factor
 	let centerx = 30
 	let centery = 30
@@ -425,7 +426,7 @@ async function get_frenzy_position(tournament) {
 	}
 	if (queue_size && queue_pos !== null) {
 		queue_progress = (queue_size - queue_pos) / queue_size;
-		let svg = arc(queue_progress);
+		let svg = arc(queue_pos, queue_size);
 		div.querySelector('.text').prepend(`${queue_pos} ahead of you in queue of ${queue_size}`);
 		div.querySelector('.pie').innerHTML = svg;
 	} else {
