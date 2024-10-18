@@ -387,7 +387,7 @@ async function get_other(id) {
 	return in_progress.length;
 }
 function arc(queue_pos, queue_size) {
-	let factor = (queue_pos + 0.5) / (queue_size + 1)
+	let factor = (queue_size - queue_pos - 0.5) / (queue_size + 1)
 	let a = Math.PI * 2 * factor
 	let centerx = 30
 	let centery = 30
@@ -421,7 +421,7 @@ async function get_frenzy_position(tournament) {
 	}
 	let queue_progress;
 	if (!queue_size) {
-		queue_size = 6
+		queue_size = Math.floor(Math.random() * 6) + 1
 		queue_pos = Math.floor(Math.random() * queue_size)
 	}
 	if (queue_size && queue_pos !== null) {
