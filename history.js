@@ -347,6 +347,7 @@ async function get_other(id) {
 		active_tournament_id = id
 		refresh_players = true
 		document.getElementById('active-tournament').innerHTML = '';
+		for (el of document.querySelectorAll('#frenzy-countdown span')) el.textContent = ''
 	} else {
 		// refreshing
 		refresh_players = false
@@ -400,9 +401,9 @@ function arc(factor) {
 }
 async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown');
-
+	for (el of div.querySelectorAll('span')) el.textContent = ''
+	
 	if (tournament.type != 'frenzy') {
-		for (el of div.querySelectorAll('span')) el.textContent = ''
 		return;
 	}
 
