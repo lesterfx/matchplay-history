@@ -385,6 +385,21 @@ async function get_other(id) {
 	}
 	return in_progress.length;
 }
+function arc(factor) {
+	let a = Math.pi * 2 * factor
+	centerx = 100
+	centery = 100
+	radius1 = 100
+	radius2 = 50
+	startx = centerx + 0
+	starty = centery - radius1
+	endx = centerx + radius1*Math.sin(a)
+	endy = centery - radius1*Math.cos(a)
+	
+	
+	let d = `M ${startx} ${starty} A 100 100 0 1 0 ${endx} ${endy}`
+	
+}
 async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown');
 	// div.textContent = tournament.type
