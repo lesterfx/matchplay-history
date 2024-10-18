@@ -427,7 +427,13 @@ async function get_frenzy_position(tournament) {
 	if (queue_size && queue_pos !== null) {
 		queue_progress = (queue_size - queue_pos) / queue_size;
 		let svg = arc(queue_pos, queue_size);
-		div.querySelector('.text').prepend(`${queue_pos} ahead of you in queue of ${queue_size}`);
+		let msg
+		if (queue_pos) {
+			msg = `${queue_pos} ahead of you in queue of ${queue_size}`
+		} else {
+			msg = "You're on deck!"
+		}
+		div.querySelector('.text').prepend(msg);
 		div.querySelector('.pie').innerHTML = svg;
 	} else {
 		for (el of div.querySelectorAll('span')) el.textContent = ''
