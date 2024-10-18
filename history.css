@@ -294,3 +294,7 @@ h3.sticky-header {
 .hide {
     display: none;
 }
+#frenzy-countdown {
+    display: flex;
+    align-items: center;
+}
