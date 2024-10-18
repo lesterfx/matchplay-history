@@ -387,15 +387,15 @@ async function get_other(id) {
 }
 function arc(factor) {
 	let a = Math.PI * 2 * factor
-	let centerx = 100
-	let centery = 100
-	let radius = 80
+	let centerx = 50
+	let centery = 50
+	let radius = 40
 	let ax = centerx
 	let ay = centery - radius
 	let bx = centerx + radius*Math.sin(a)
 	let by = centery - radius*Math.cos(a)
 	let long = (factor > .5) ? 1 : 0
-	let svg = `<svg width="200" height="200" viewBox="0 0 200 200"><circle cx="${centerx}" cy="${centery}" r="${radius}" stroke="#333333" stroke-width="10" /><path d="M ${centerx} ${centery} L ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke-width="10px" fill="none" /></svg>`
+	let svg = `<svg width="100" height="100" viewBox="0 0 100 100"><path d="M ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by}" stroke="#fa3838" stroke-width="10px" fill="none" stroke-linecap="round" /></svg>`
 	return svg
 }
 async function get_frenzy_position(tournament) {
