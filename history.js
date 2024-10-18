@@ -418,14 +418,14 @@ async function get_frenzy_position(tournament) {
 		}
 	}
 	let queue_progress;
-	if (queue_size) {
+	if (queue_size && queue_pos !== null) {
 		queue_progress = (queue_size - queue_pos) / queue_size;
+		let svg = arc(queue_progress);
+		div.querySelector('.text').prepend(`${queue_pos} ahead of you in queue`);
+		div.querySelector('.pie').innerHTML = svg;
 	} else {
-		queue_progress = Math.random();
+		for (el of div.querySelectorAll('span')) el.textContent = ''
 	}
-	let svg = arc(queue_progress);
-	div.querySelector('.text').prepend(`Frenzy queue progress ${queue_progress}`);
-	div.querySelector('.pie').innerHTML = svg;
 }
 let frenzy_sample = {
     "games": [
