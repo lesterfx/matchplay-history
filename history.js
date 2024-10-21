@@ -363,7 +363,7 @@ async function toggle_standing_tournament(id) {
 	let player_standings_by_tournament = {}
 	let tnames = {}
 	let pnames = {}
-	for (el of document.querySelectorAll('tabs tournaments stuff!')) {
+	for (el of document.querySelectorAll('#my-tournaments.tabs .box')) {
 		let tid = el.dataset.get('tid')
 		let tournament = all_my_tournaments[tid]
 		tnames[tid] = tournament.name
