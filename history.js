@@ -905,7 +905,7 @@ function add_tournament(tournament) {
 	}
 	let box = title('tournament', tid);
 	box.classList.add('box');
-	box.addEventListener('click', tabhandler(click_tournament), tid))
+	box.addEventListener('click', tabhandler(click_tournament, tid))
 	my_tournaments_tab(tournament.status).append(box);
 	return box
 }
