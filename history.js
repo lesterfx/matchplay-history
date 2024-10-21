@@ -363,6 +363,27 @@ async function toggle_standing_tournament(id) {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active').length
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 }
+function tnamer() {
+	let regex = RegExp(document.getElementById('standings-regex').value || "S\d+(W\d+)")
+	return function(tournament) {
+		let str = tournament.name
+		let m;
+
+		while ((m = regex.exec(str)) !== null) {
+			// This is necessary to avoid infinite loops with zero-width matches
+			if (m.index === regex.lastIndex) {
+				regex.lastIndex++;
+			}
+			
+			// The result can be accessed through the `m`-variable.
+			m.forEach((match, groupIndex) => {
+				console.log(`Found match, group ${groupIndex}: ${match}`);
+				return match
+			});
+		}
+		return str
+	}
+}
 async function load_standings() {
 	let overall_standings = {}
 	let player_standings_by_player = {}
@@ -407,13 +428,17 @@ async function load_standings() {
 
 	let headrow = document.getElementById('standings-table').querySelector('thead tr')
 	for (el of headrow.querySelectorAll('th:not(.keep)')) el.remove()
+
+	let regex = tnamer()
+	
 	for (tournament of standings_tournaments) {
-		th = document.createElement('td')
-		th.textContent = tournament.name
+		th = document.createElement('th')
+		th.textContent = tnamer(tournament)
 		headrow.append(th)
 	}
 
 	let tbody = document.getElementById('standings-table').querySelector('tbody')
+	tbody.innerHTML = ''
 	for (let pid in overall_standings) {
 		let tr = document.createElement('tr')
 		tr.classList.add('player')
@@ -441,7 +466,7 @@ async function load_standings() {
 
 		tbody.append(tr)
 		insertSorted(tr, tbody, (el) => {
-			return Number(el.querySelector('td.overall').dataset.score)
+			return -Number(el.querySelector('td.overall').dataset.score)
 		})
 	}
 
@@ -683,6 +708,9 @@ let ready = (callback) => {
 ready(() => {
 	document.getElementById('refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
 	document.getElementById('refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
+	document.querySelector('#options .items div').addEventListener('click', function () {
+		this.parentElement.parentElement.classList.remove('shown')
+	})
 	document.querySelector('#options .button').addEventListener('click', function () {
 		try {
 			this.parentElement.classList.toggle('shown')
