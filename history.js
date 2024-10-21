@@ -374,7 +374,7 @@ async function toggle_standing_tournament(id) {
 				let points = Math.floor( (1-(entry.position / standings.length)) * 35 + 5)
 				player_standings_by_tournament[tid][pid] = points
 				overall_standings[pid] += points
-				if (!(pnames contains pid) {
+				if (!(pnames.contains(pid)) {
 					need_players = true
 				}
 		}
