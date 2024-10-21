@@ -361,7 +361,7 @@ async function click_tournament(id) {
 }
 async function toggle_standing_tournament(id) {
 	let overall_standings = {}
-	let player_standings_by_tournament = {}
+	let player_standings_by_player = {}
 	let tnames = {}
 	let n = 0
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
@@ -377,7 +377,11 @@ async function toggle_standing_tournament(id) {
 		for (let entry of standings) {
 				let pid = entry['playerId']
 				let points = Math.floor( (1-(entry.position / standings.length)) * 35 + 5)
-				player_standings_by_tournament[tid][pid] = points
+				if (!player_standings_by_player.contains(tid)) {
+					player_standings_by_player[pid] = {}
+					overall_standings[pid] = 0
+				}
+				player_standings_by_player[pid][tid] = points
 				overall_standings[pid] += points
 				if (!all_data.player.contains(pid)) {
 					need_players = true
@@ -394,7 +398,7 @@ async function toggle_standing_tournament(id) {
 	}
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 	log(overall_standings)
-	log(player_standings_by_tournament)
+	log(player_standings_by_player)
 	/*
 	overall_standings = list(overall_standings.items())
 	overall_standings.sort(key=itemgetter(1), reverse=True)
