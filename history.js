@@ -383,7 +383,7 @@ async function toggle_standing_tournament(id) {
 				}
 				player_standings_by_player[pid][tid] = points
 				overall_standings[pid] += points
-				if (!all_data.player.contains(pid)) {
+				if (!all_data.player[pid]) {
 					need_players = true
 				}
 		}
