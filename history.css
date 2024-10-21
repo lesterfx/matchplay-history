@@ -288,9 +288,9 @@ h3.sticky-header {
     border-radius: 8px;
     background: var(--background);
     display: block;
-    width: 2em;
-    height: 2em;
-    line-height: 2em;
+    width: 1.5em;
+    height: 1.5em;
+    line-height: 1.5em;
     text-align: center;
     font-size: 2em;
 }

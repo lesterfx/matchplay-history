@@ -412,7 +412,6 @@ async function load_standings() {
 		th.textContent = tournament.name
 		headrow.append(th)
 	}
-	tbody.append(tr)
 
 	let tbody = document.getElementById('standings-table').querySelector('tbody')
 	for (let pid in overall_standings) {
