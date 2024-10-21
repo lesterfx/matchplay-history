@@ -433,7 +433,7 @@ async function load_standings() {
 	
 	for (tournament of standings_tournaments) {
 		th = document.createElement('th')
-		th.textContent = tnamer(tournament)
+		th.textContent = regex(tournament)
 		headrow.append(th)
 	}
 
