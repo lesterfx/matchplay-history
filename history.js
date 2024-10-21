@@ -365,10 +365,10 @@ async function toggle_standing_tournament(id) {
 }
 function tnamer() {
 	let re = document.getElementById('standings-regex').value || "S\d+(?<abbr>W\d+)"
+	let regex = RegExp(re)
 	return function(tournament) {
-		let regex = RegExp(re)
 		let str = tournament.name
-		const { abbr } = re.exec(
+		const { abbr } = regex.exec(
 			str,
 		  ).groups;
 		return abbr || str
