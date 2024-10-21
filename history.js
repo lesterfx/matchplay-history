@@ -364,24 +364,14 @@ async function toggle_standing_tournament(id) {
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 }
 function tnamer() {
-	let regex = RegExp(document.getElementById('standings-regex').value || "S\d+(W\d+)")
+	let re = document.getElementById('standings-regex').value || "S\d+(?<abbr>W\d+)"
 	return function(tournament) {
+		let regex = RegExp(re)
 		let str = tournament.name
-		let m;
-
-		while ((m = regex.exec(str)) !== null) {
-			// This is necessary to avoid infinite loops with zero-width matches
-			if (m.index === regex.lastIndex) {
-				regex.lastIndex++;
-			}
-			
-			// The result can be accessed through the `m`-variable.
-			m.forEach((match, groupIndex) => {
-				console.log(`Found match, group ${groupIndex}: ${match}`);
-				return match
-			});
-		}
-		return str
+		const { abbr } = re.exec(
+			str,
+		  ).groups;
+		return abbr || str
 	}
 }
 async function load_standings() {
