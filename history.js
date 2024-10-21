@@ -458,27 +458,18 @@ async function load_standings() {
 	}
 
 	let i = 1
+	let tie_rank = 1
+	let tie_score = null
 	for (let el of tbody.querySelectorAll('tr.player td.rank')) {
-		el.textContent = i
+		let score = el.querySelector('overall').dataset.score
+		if (score !== tie_score) {
+			tie_rank = i
+			tie_score = score
+		}
+		el.textContent = tie_rank
 		i++
 	}
-	/*
-	overall_standings = list(overall_standings.items())
-	overall_standings.sort(key=itemgetter(1), reverse=True)
 
-	print(f'#  "{"name":<15}" tot', end=' ')
-	for tid, tname in tnames.items():
-		match = next(re.finditer(r'w[\d+]', tname.lower()))
-		print(match.group(), end=' ')
-	print()
-	with self.print_to_object() as obj:
-		for i, (pid, score) in enumerate(overall_standings, 1):
-			name = pnames[pid][:15]
-			print(f'{i:>2} "{name:<15}" {score:>3}', end=' ')
-			for tid, tname in tnames.items():
-				print(f'{player_standings_by_tournament[tid].get(pid, 0):>2}', end=' ')
-			print()
-    */
 }
 async function get_other(id) {
 	let refresh_players
