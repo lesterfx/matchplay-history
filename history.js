@@ -363,8 +363,9 @@ async function toggle_standing_tournament(id) {
 	let player_standings_by_tournament = {}
 	let tnames = {}
 	let pnames = {}
-	for (el of document.querySelectorAll('#my-tournaments.tabs .box')) {
+	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
 		let tid = el.dataset.id
+		log(tid)
 		let tournament = all_my_tournaments[tid]
 		tnames[tid] = tournament.name
 		let standings = await get(`tournaments/${tid}/standings`)
@@ -387,22 +388,22 @@ async function toggle_standing_tournament(id) {
 			}
 		}
 	}
-		/*
-		overall_standings = list(overall_standings.items())
-		overall_standings.sort(key=itemgetter(1), reverse=True)
+	/*
+	overall_standings = list(overall_standings.items())
+	overall_standings.sort(key=itemgetter(1), reverse=True)
 
-		print(f'#  "{"name":<15}" tot', end=' ')
-		for tid, tname in tnames.items():
-			match = next(re.finditer(r'w[\d+]', tname.lower()))
-			print(match.group(), end=' ')
-		print()
-		with self.print_to_object() as obj:
-			for i, (pid, score) in enumerate(overall_standings, 1):
-				name = pnames[pid][:15]
-				print(f'{i:>2} "{name:<15}" {score:>3}', end=' ')
-				for tid, tname in tnames.items():
-					print(f'{player_standings_by_tournament[tid].get(pid, 0):>2}', end=' ')
-				print()
+	print(f'#  "{"name":<15}" tot', end=' ')
+	for tid, tname in tnames.items():
+		match = next(re.finditer(r'w[\d+]', tname.lower()))
+		print(match.group(), end=' ')
+	print()
+	with self.print_to_object() as obj:
+		for i, (pid, score) in enumerate(overall_standings, 1):
+			name = pnames[pid][:15]
+			print(f'{i:>2} "{name:<15}" {score:>3}', end=' ')
+			for tid, tname in tnames.items():
+				print(f'{player_standings_by_tournament[tid].get(pid, 0):>2}', end=' ')
+			print()
     */
 }
 async function get_other(id) {
