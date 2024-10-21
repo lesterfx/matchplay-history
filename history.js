@@ -416,8 +416,10 @@ async function load_standings() {
 	let tbody = document.getElementById('standings-table').querySelector('tbody')
 	for (let pid in overall_standings) {
 		let tr = document.createElement('tr')
+		tr.classList.add('player')
 
 		td = document.createElement('td')
+		td.classList.add('rank')
 		td.textContent = 'rank'
 		tr.append(td)
 
@@ -426,6 +428,8 @@ async function load_standings() {
 		tr.append(td)
 
 		td = document.createElement('td')
+		td.classList.add('overall')
+		td.dataset.score = overall_standings[pid]
 		td.textContent = overall_standings[pid]
 		tr.append(td)
 		
@@ -436,6 +440,15 @@ async function load_standings() {
 		}
 
 		tbody.append(tr)
+		insertSorted(tr, tbody, (el) => {
+			return Number(el.querySelector('td.overall').dataset.score)
+		})
+	}
+
+	let i = 1
+	for (let el of tbody.querySelectorAll('tr.player td.rank')) {
+		el.textContent = i
+		i++
 	}
 	/*
 	overall_standings = list(overall_standings.items())
@@ -766,11 +779,11 @@ function handler(callback, ...args) {
 	}
 	return handle
 }
-function insertSorted(element, parent) {
+function insertSorted(element, parent, sortvalue_function) {
 	let added = false;
-	let etext = element.textContent.toLowerCase();
+	let etext = sortvalue_function(element);
 	for (el of parent.children) {
-		if ((el.textContent.toLowerCase()) > etext) {
+		if (sortvalue_function(el) > etext) {
 			parent.insertBefore(element, el);
 			added = true;
 			return false;
@@ -783,7 +796,9 @@ function add_player_button(uid) {
 	let button = title('user', uid);
 	button.classList.add('box');
 	button.addEventListener('click', tabhandler(compare_player, uid))
-	insertSorted(button, active_tournament_tab('players'));
+	insertSorted(button, active_tournament_tab('players'), (el) => {
+		return el.textContent.toLowerCase()
+	});
 }
 function add_active_player(id) {
 	let playerbox = document.querySelector(`#player-histories div.player-history[data-playerid="${id}"]`)
