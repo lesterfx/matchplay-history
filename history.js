@@ -360,16 +360,20 @@ async function click_tournament(id) {
 	}
 }
 async function toggle_standing_tournament(id) {
+	let n = document.querySelectorAll('#my-tournaments.tabs .box.active').length
+	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
+}
+async function load_standings(id) {
 	let overall_standings = {}
 	let player_standings_by_player = {}
-	let tnames = {}
 	let n = 0
+	let standings_tournaments = []
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
 		n ++;
 		let tid = el.dataset.id
 		log(tid)
 		let tournament = all_my_tournaments[tid]
-		tnames[tid] = tournament.name
+		standings_tournaments.push(tournament)
 		let standings = await get({
 			endpoint: `tournaments/${tid}/standings`
 		})
@@ -396,9 +400,30 @@ async function toggle_standing_tournament(id) {
 			}
 		}
 	}
-	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
-	log(overall_standings)
-	log(player_standings_by_player)
+	let tbody = document.getElementById('standings-table')
+	for (let pid in overall_standings) {
+		let tr = document.createElementById('tr')
+		let td
+
+		td = document.createElementById('td')
+		td.textContent = 'rank'
+		tr.append(td)
+
+		td = document.createElementById('td')
+		td.textContent = all_data.player[pid]
+		tr.append(td)
+
+		td = document.createElementById('td')
+		td.textContent = overall_standings[pid]
+		tr.append(td)
+		
+		for (tournament of standings_tournaments) {
+			td = document.createElementById('td')
+			td.textContent = player_standings_by_player[pid][tournament.tournamentId]
+			tr.append(td)
+		}
+		tbody.append(tr)
+	}
 	/*
 	overall_standings = list(overall_standings.items())
 	overall_standings.sort(key=itemgetter(1), reverse=True)
@@ -690,6 +715,7 @@ ready(() => {
 		}
 	});
 	document.getElementById('standings').addEventListener('click', standings)
+	document.getElementById('load-standings').addEventListener('click', load_standings)
 
 	try {
 		main();
