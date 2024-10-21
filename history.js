@@ -704,10 +704,10 @@ function tabhandler(callback, ...args) {
 			refresh_off()
 			let tabs = this.closest('.tabs')
 			if (getting_standings) {
+				this.classList.toggle('active')
+			} else {
 				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
-			} else {
-				this.classList.toggle('active')
 			}
 			await callback(...args)
 		} catch (err) {
