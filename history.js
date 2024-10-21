@@ -385,6 +385,8 @@ async function toggle_standing_tournament(id) {
 			})).data.players) {
 				pnames[p['playerId']] = p['name']
 			}
+		}
+	}
 		/*
 		overall_standings = list(overall_standings.items())
 		overall_standings.sort(key=itemgetter(1), reverse=True)
