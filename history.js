@@ -461,7 +461,7 @@ async function load_standings() {
 	let tie_rank = 1
 	let tie_score = null
 	for (let el of tbody.querySelectorAll('tr.player td.rank')) {
-		let score = el.querySelector('overall').dataset.score
+		let score = el.querySelector('.overall').dataset.score
 		if (score !== tie_score) {
 			tie_rank = i
 			tie_score = score
