@@ -371,7 +371,6 @@ async function load_standings(id) {
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
 		n ++;
 		let tid = el.dataset.id
-		log(tid)
 		let tournament = all_my_tournaments[tid]
 		standings_tournaments.push(tournament)
 		let standings = await get({
@@ -400,10 +399,24 @@ async function load_standings(id) {
 			}
 		}
 	}
-	let tbody = document.getElementById('standings-table')
+
+	log(overall_standings)
+	log(player_standings_by_player)
+	
+	let td
+
+	let headrow = document.getElementById('standings-table').querySelector('thead tr')
+	for (el of headrow.querySelectorAll('th:not(.keep)')) el.remove()
+	for (tournament of standings_tournaments) {
+		th = document.createElementById('td')
+		th.textContent = tournament.name
+		headrow.append(th)
+	}
+	tbody.append(tr)
+
+	let tbody = document.getElementById('standings-table').querySelector('tbody')
 	for (let pid in overall_standings) {
 		let tr = document.createElementById('tr')
-		let td
 
 		td = document.createElementById('td')
 		td.textContent = 'rank'
@@ -422,6 +435,7 @@ async function load_standings(id) {
 			td.textContent = player_standings_by_player[pid][tournament.tournamentId]
 			tr.append(td)
 		}
+
 		tbody.append(tr)
 	}
 	/*
