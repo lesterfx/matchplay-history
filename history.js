@@ -447,7 +447,7 @@ async function load_standings() {
 		
 		for (tournament of standings_tournaments) {
 			td = document.createElement('td')
-			td.innerHTML = player_standings_by_player[pid][tournament.tournamentId] || '&emdash;'
+			td.innerHTML = player_standings_by_player[pid][tournament.tournamentId] || '&mdash;'
 			tr.append(td)
 		}
 
@@ -695,7 +695,7 @@ let ready = (callback) => {
 ready(() => {
 	document.getElementById('refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
 	document.getElementById('refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
-	document.querySelector('#options .items div').addEventListener('click', function () {
+	for (const el of document.querySelectorAll('#options .items div')) el.addEventListener('click', function () {
 		this.parentElement.parentElement.classList.remove('shown')
 	})
 	document.querySelector('#options .button').addEventListener('click', function () {
