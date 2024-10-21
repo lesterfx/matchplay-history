@@ -377,7 +377,7 @@ async function toggle_standing_tournament(id) {
 		for (let entry of standings) {
 				let pid = entry['playerId']
 				let points = Math.floor( (1-(entry.position / standings.length)) * 35 + 5)
-				if (!player_standings_by_player.contains(tid)) {
+				if (!player_standings_by_player[pid]) {
 					player_standings_by_player[pid] = {}
 					overall_standings[pid] = 0
 				}
