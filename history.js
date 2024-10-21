@@ -254,6 +254,11 @@ async function standings() {
 	getting_standings = 1-getting_standings
 	el.textContent = titles[getting_standings]
 	header.textContent = titles[1-getting_standings]
+	document.getElementById('standings-block').classList.toggle('hide', getting_standings)
+	document.getElementById('active-tournament-block').classList.toggle('hide', !getting_standings)
+	document.getElementById('selected').classList.toggle('hide', !getting_standings)
+	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) el.classList.remove('active')
+	
 }
 async function refresh_tournaments_click() {
 	await get_all_my_tournaments();
@@ -434,8 +439,9 @@ async function load_standings() {
 		td.classList.add('rank')
 		td.textContent = 'rank'
 		tr.append(td)
-
+		
 		td = document.createElement('td')
+		td.classList.add('name')
 		td.textContent = all_data.player[pid]
 		tr.append(td)
 

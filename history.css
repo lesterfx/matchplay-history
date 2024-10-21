@@ -311,9 +311,16 @@ h3.sticky-header {
 #standings-table {
     border-collapse: collapse;
 }
+#standings-table td:not(.name) {
+    text-align: right;
+}
 #standings-table th,
 #standings-table td {
     padding: 3px 6px;
+    text-align: left;
+}
+#standings-table th {
+    border-bottom: 1px solid var(--text);
 }
 #standings-table .overall {
     border-right: 1px solid var(--text);
