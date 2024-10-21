@@ -9,7 +9,8 @@ let all_data = {
 	user: {},
 	arena: {},
 	tournament: {},
-	game: {}
+	game: {},
+	player: {}
 }
 let allow_refresh_completed = false  // also change css
 let limit_period = 1100;
@@ -362,20 +363,23 @@ async function toggle_standing_tournament(id) {
 	let overall_standings = {}
 	let player_standings_by_tournament = {}
 	let tnames = {}
-	let pnames = {}
+	let n = 0
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
+		n ++;
 		let tid = el.dataset.id
 		log(tid)
 		let tournament = all_my_tournaments[tid]
 		tnames[tid] = tournament.name
-		let standings = await get(`tournaments/${tid}/standings`)
+		let standings = await get({
+			endpoint: `tournaments/${tid}/standings`
+		})
 		let need_players = false
 		for (let entry of standings) {
 				let pid = entry['playerId']
 				let points = Math.floor( (1-(entry.position / standings.length)) * 35 + 5)
 				player_standings_by_tournament[tid][pid] = points
 				overall_standings[pid] += points
-				if (!pnames.contains(pid)) {
+				if (!all_data.player.contains(pid)) {
 					need_players = true
 				}
 		}
@@ -384,10 +388,13 @@ async function toggle_standing_tournament(id) {
 				endpoint: `tournaments/${tid}`,
 				query: {'includePlayers': 1}
 			})).data.players) {
-				pnames[p['playerId']] = p['name']
+				all_data.player[p['playerId']] = p['name']
 			}
 		}
 	}
+	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
+	log(overall_standings)
+	log(player_standings_by_tournament)
 	/*
 	overall_standings = list(overall_standings.items())
 	overall_standings.sort(key=itemgetter(1), reverse=True)

@@ -134,13 +134,15 @@ body {
     background: var(--page-background);
     color: var(--text);
     font-family: sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--page-background);
+    color: var(--text);
 }
 .main {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    background: var(--page-background);
-    color: var(--text);
 }
 .tabs {
     padding-top: 2em;
