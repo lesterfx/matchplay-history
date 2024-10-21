@@ -264,9 +264,6 @@ h3.sticky-header {
     padding-top: env(safe-area-inset-top, 0);
     padding-bottom: .1em;
 }
-#active-tournament-block {
-    display: none;
-}
 #options>.items {
     float: left;
 }
