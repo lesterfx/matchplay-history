@@ -353,9 +353,9 @@ async function flash_screen() {
 }
 async function click_tournament(id) {
 	if (getting_standings) {
-		return await get_other(id)
-	} else {
 		return await toggle_standing_tournament(id)
+	} else {
+		return await get_other(id)
 	}
 }
 async function toggle_standing_tournament(id) {
