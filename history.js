@@ -245,13 +245,14 @@ async function get_tournament_details(tournament) {
 	return {pid: pid, players: players};
 }
 
+titles = ['Season Standings', 'Player Histories']
+getting_standings = 0
 async function standings() {
 	let el = document.getElementById('standings')
-	if (el.textContent == 'Season Standings') {
-		el.textContent = 'Player Histories'
-	} else {
-		el.textContent = 'Season Standings'
-	}
+	let header = document.getElementById('header')
+	getting_standings = 1-getting_standings
+	el.textContent = titles[getting_standings]
+	header.textContent = titles[1-getting_standings]
 }
 async function refresh_tournaments_click() {
 	await get_all_my_tournaments();
