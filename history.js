@@ -408,7 +408,7 @@ async function load_standings() {
 	let headrow = document.getElementById('standings-table').querySelector('thead tr')
 	for (el of headrow.querySelectorAll('th:not(.keep)')) el.remove()
 	for (tournament of standings_tournaments) {
-		th = document.createElementById('td')
+		th = document.createElement('td')
 		th.textContent = tournament.name
 		headrow.append(th)
 	}

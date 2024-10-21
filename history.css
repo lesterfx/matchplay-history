@@ -292,6 +292,7 @@ h3.sticky-header {
     height: 2em;
     line-height: 2em;
     text-align: center;
+    font-size: 2em;
 }
 .hide {
     display: none;
