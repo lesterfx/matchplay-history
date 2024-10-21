@@ -363,7 +363,7 @@ async function toggle_standing_tournament(id) {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active').length
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 }
-async function load_standings(id) {
+async function load_standings() {
 	let overall_standings = {}
 	let player_standings_by_player = {}
 	let n = 0
@@ -402,7 +402,7 @@ async function load_standings(id) {
 
 	log(overall_standings)
 	log(player_standings_by_player)
-	
+
 	let td
 
 	let headrow = document.getElementById('standings-table').querySelector('thead tr')
@@ -416,22 +416,22 @@ async function load_standings(id) {
 
 	let tbody = document.getElementById('standings-table').querySelector('tbody')
 	for (let pid in overall_standings) {
-		let tr = document.createElementById('tr')
+		let tr = document.createElement('tr')
 
-		td = document.createElementById('td')
+		td = document.createElement('td')
 		td.textContent = 'rank'
 		tr.append(td)
 
-		td = document.createElementById('td')
+		td = document.createElement('td')
 		td.textContent = all_data.player[pid]
 		tr.append(td)
 
-		td = document.createElementById('td')
+		td = document.createElement('td')
 		td.textContent = overall_standings[pid]
 		tr.append(td)
 		
 		for (tournament of standings_tournaments) {
-			td = document.createElementById('td')
+			td = document.createElement('td')
 			td.textContent = player_standings_by_player[pid][tournament.tournamentId]
 			tr.append(td)
 		}
@@ -728,8 +728,8 @@ ready(() => {
 			token_promises = []
 		}
 	});
-	document.getElementById('standings').addEventListener('click', standings)
-	document.getElementById('load-standings').addEventListener('click', load_standings)
+	document.getElementById('standings').addEventListener('click', handler(standings))
+	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
 
 	try {
 		main();
