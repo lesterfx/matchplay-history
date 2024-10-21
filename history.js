@@ -351,6 +351,58 @@ async function flash_screen() {
 		await new Promise(resolve => setTimeout(resolve, 200));
 	}
 }
+async function click_tournament(id) {
+	if (getting_standings) {
+		return await get_other(id)
+	} else {
+		return await toggle_standing_tournament(id)
+	}
+}
+async function toggle_standing_tournament(id) {
+	let overall_standings = {}
+	let player_standings_by_tournament = {}
+	let tnames = {}
+	let pnames = {}
+	for (el of document.querySelectorAll('tabs tournaments stuff!')) {
+		let tid = el.dataset.get('tid')
+		let tournament = all_my_tournaments[tid]
+		tnames[tid] = tournament.name
+		let standings = await get(`tournaments/${tid}/standings`)
+		let need_players = false
+		for (let entry of standings) {
+				let pid = entry['playerId']
+				let points = Math.floor( (1-(entry.position / standings.length)) * 35 + 5)
+				player_standings_by_tournament[tid][pid] = points
+				overall_standings[pid] += points
+				if (!(pnames contains pid) {
+					need_players = true
+				}
+		}
+		if (need_players) {
+			for (let p of (await get({
+				endpoint: `tournaments/${tid}`,
+				query: {'includePlayers': 1}
+			}).data.players) {
+				pnames[p['playerId']] = p['name']
+			}
+		/*
+		overall_standings = list(overall_standings.items())
+		overall_standings.sort(key=itemgetter(1), reverse=True)
+
+		print(f'#  "{"name":<15}" tot', end=' ')
+		for tid, tname in tnames.items():
+			match = next(re.finditer(r'w[\d+]', tname.lower()))
+			print(match.group(), end=' ')
+		print()
+		with self.print_to_object() as obj:
+			for i, (pid, score) in enumerate(overall_standings, 1):
+				name = pnames[pid][:15]
+				print(f'{i:>2} "{name:<15}" {score:>3}', end=' ')
+				for tid, tname in tnames.items():
+					print(f'{player_standings_by_tournament[tid].get(pid, 0):>2}', end=' ')
+				print()
+    */
+}
 async function get_other(id) {
 	let refresh_players
 	if (id) {
@@ -388,7 +440,7 @@ async function get_other(id) {
 		if (game.status != 'completed') in_progress.push([game.status, element]);
 	};
 	document.getElementById('active-tournament-title').scrollIntoView();
-	if (in_progress.length == 1) {
+	if (in_progress.length == 1 && !getting_standings) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
 		element.dispatchEvent(new Event('click'))
@@ -637,9 +689,11 @@ function tabhandler(callback, ...args) {
 		try {
 			refresh_off()
 			let tabs = this.closest('.tabs')
-			if (tabs) {
+			if (getting_standings) {
 				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
+			} else {
+				this.classList.toggle('active')
 			}
 			await callback(...args)
 		} catch (err) {
@@ -851,7 +905,7 @@ function add_tournament(tournament) {
 	}
 	let box = title('tournament', tid);
 	box.classList.add('box');
-	box.addEventListener('click', tabhandler(get_other, tid))
+	box.addEventListener('click', tabhandler(click_tournament), tid))
 	my_tournaments_tab(tournament.status).append(box);
 	return box
 }
