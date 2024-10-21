@@ -308,3 +308,6 @@ h3.sticky-header {
     fill: none;
     stroke-linecap: round;
 }
+#standings-table .overall {
+    border-right: 1px solid var(--text);
+}

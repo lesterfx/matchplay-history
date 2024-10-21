@@ -390,7 +390,7 @@ async function load_standings() {
 		let need_players = false
 		for (let entry of standings) {
 				let pid = entry['playerId']
-				let points = Math.floor( (1-(entry.position / standings.length)) * 35 + 5)
+				let points = Math.max(41-entry.position, 5)
 				if (!player_standings_by_player[pid]) {
 					player_standings_by_player[pid] = {}
 					overall_standings[pid] = 0
@@ -410,9 +410,6 @@ async function load_standings() {
 			}
 		}
 	}
-
-	log(overall_standings)
-	log(player_standings_by_player)
 
 	let td
 
@@ -450,7 +447,7 @@ async function load_standings() {
 		
 		for (tournament of standings_tournaments) {
 			td = document.createElement('td')
-			td.textContent = player_standings_by_player[pid][tournament.tournamentId]
+			td.innerHTML = player_standings_by_player[pid][tournament.tournamentId] || '&emdash;'
 			tr.append(td)
 		}
 
