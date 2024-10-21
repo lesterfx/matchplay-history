@@ -85,7 +85,7 @@ async function get_me() {
 
 async function get_all_my_tournaments() {
 	await refresh_off()
-	document.getElementById('active-tournament-block').style.display = 'none';
+	document.getElementById('active-tournament-block').classList.remove('hide');
 	document.getElementById('selected-game').innerHTML = '';
 	document.getElementById('player-histories').innerHTML = '';
 
@@ -501,7 +501,7 @@ async function get_other(id) {
 	active_games.reverse();
 
 	document.getElementById('player-histories').innerHTML = ''
-	document.getElementById('active-tournament-block').style.display = 'block'
+	document.getElementById('active-tournament-block').classList.remove('hide')
 	let title_h2 = document.getElementById('active-tournament-title');
 	title_h2.classList.remove(...title_h2.classList);
 	title_h2.classList.add(tournament.status);
