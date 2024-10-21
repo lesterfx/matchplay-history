@@ -382,7 +382,7 @@ async function toggle_standing_tournament(id) {
 			for (let p of (await get({
 				endpoint: `tournaments/${tid}`,
 				query: {'includePlayers': 1}
-			}).data.players) {
+			})).data.players) {
 				pnames[p['playerId']] = p['name']
 			}
 		/*
