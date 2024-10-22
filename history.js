@@ -369,6 +369,7 @@ async function click_tournament(id) {
 async function toggle_standing_tournament(id) {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active').length
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
+	document.getElementById('standings-table').classList.add('hide')
 }
 function tnamer() {
 	let re = document.getElementById('standings-regex').value || "S\d+(?<abbr>W\d+)"
@@ -418,9 +419,12 @@ async function load_standings() {
 		}
 	}
 
+	let table = document.getElementById('standings-table')
+	table.classList.remove('hide')
+
 	let td
 
-	let headrow = document.getElementById('standings-table').querySelector('thead tr')
+	let headrow = table.querySelector('thead tr')
 	for (el of headrow.querySelectorAll('th:not(.keep)')) el.remove()
 
 	let regex = tnamer()
@@ -431,7 +435,7 @@ async function load_standings() {
 		headrow.append(th)
 	}
 
-	let tbody = document.getElementById('standings-table').querySelector('tbody')
+	let tbody = table.querySelector('tbody')
 	tbody.innerHTML = ''
 	for (let pid in overall_standings) {
 		let tr = document.createElement('tr')
