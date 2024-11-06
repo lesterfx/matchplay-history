@@ -399,14 +399,7 @@ async function load_standings() {
 		})
 		let need_players = false
 		for (let entry of standings) {
-				let pid = entry['playerId']
-				let points = Math.max(maxscore+1-entry.position, minscore)
-				if (!player_standings_by_player[pid]) {
-					player_standings_by_player[pid] = {}
-					overall_standings[pid] = 0
-				}
-				player_standings_by_player[pid][tid] = points
-				overall_standings[pid] += points
+				let pid = entry.playerId
 				if (!all_data.player[pid]) {
 					need_players = true
 				}
@@ -416,8 +409,26 @@ async function load_standings() {
 				endpoint: `tournaments/${tid}`,
 				query: {'includePlayers': 1}
 			})).data.players) {
-				all_data.player[p['playerId']] = p['name']
+				all_data.player[p.playerId] = p.name
 			}
+		}
+		for (let entry of standings) {
+			let id
+			if (combine_names) {
+				id = all_data.player[entry.playerId]
+			} else {
+				id = entry.playerId
+			}
+			let points = Math.max(maxscore+1-entry.position, minscore)
+			if (!player_standings_by_player[id]) {
+				player_standings_by_player[id] = {}
+				overall_standings[id] = 0
+			}
+			if (player_standings_by_player[id][tid]) {
+				alert(`multiple entries for ${id} in ${tournament.name}`)
+			}
+			player_standings_by_player[id][tid] = points
+			overall_standings[id] += points
 		}
 	}
 
