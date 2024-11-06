@@ -85,7 +85,7 @@ async function get_me() {
 
 async function get_all_my_tournaments() {
 	await refresh_off()
-	document.getElementById('active-tournament-block').classList.remove('hide');
+	document.getElementById('active-tournament-block').classList.add('hide');
 	document.getElementById('selected-game').innerHTML = '';
 	document.getElementById('player-histories').innerHTML = '';
 
