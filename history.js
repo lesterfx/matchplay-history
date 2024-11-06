@@ -383,6 +383,7 @@ function tnamer() {
 	}
 }
 async function load_standings() {
+	document.getElementById('load-standings').classList.add('hide')
 	let overall_standings = {}
 	let player_standings_by_player = {}
 	let n = 0
@@ -499,6 +500,8 @@ async function load_standings() {
 		row.querySelector('td.rank').textContent = tie_rank
 		i++
 	}
+
+	document.getElementById('load-standings').classList.remove('hide')
 
 }
 async function get_other(id) {
