@@ -389,6 +389,7 @@ async function load_standings() {
 	let standings_tournaments = []
 	let maxscore = Number(document.getElementById('score-max').value)
 	let minscore = Number(document.getElementById('score-min').value)
+	let combine_names = document.getElementById('combine-names').checked
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
 		n ++;
 		let tid = el.dataset.id
