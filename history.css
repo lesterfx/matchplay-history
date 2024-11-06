@@ -269,6 +269,7 @@ h3.sticky-header {
 #options>.items {
     float: left;
     height: 0;
+    z-index: 10;
 }
 #options>.items>div {
     padding: 2px;
