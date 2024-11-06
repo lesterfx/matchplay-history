@@ -266,6 +266,9 @@ h3.sticky-header {
     padding-top: env(safe-area-inset-top, 0);
     padding-bottom: .1em;
 }
+#options {
+    z-index: 10;
+}
 #options>.items {
     float: left;
     height: 0;
