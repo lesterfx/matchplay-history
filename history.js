@@ -451,7 +451,7 @@ async function load_standings() {
 
 	let tbody = table.querySelector('tbody')
 	tbody.innerHTML = ''
-	for (let pid in overall_standings) {
+	for (let id in overall_standings) {
 		let tr = document.createElement('tr')
 		tr.classList.add('player')
 
@@ -462,18 +462,22 @@ async function load_standings() {
 		
 		td = document.createElement('td')
 		td.classList.add('name')
-		td.textContent = all_data.player[pid]
+		if (combine_names) {
+			td.textContent = id
+		} else {
+			td.textContent = all_data.player[id]
+		}
 		tr.append(td)
 
 		td = document.createElement('td')
 		td.classList.add('overall')
-		td.dataset.score = overall_standings[pid]
-		td.textContent = overall_standings[pid]
+		td.dataset.score = overall_standings[id]
+		td.textContent = overall_standings[id]
 		tr.append(td)
 		
 		for (tournament of standings_tournaments) {
 			td = document.createElement('td')
-			td.innerHTML = player_standings_by_player[pid][tournament.tournamentId] || '&mdash;'
+			td.innerHTML = player_standings_by_player[id][tournament.tournamentId] || '&mdash;'
 			tr.append(td)
 		}
 
