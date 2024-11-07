@@ -432,6 +432,7 @@ async function load_standings() {
 			overall_standings[id] += points
 		}
 	}
+	log(standings_tournaments)
 
 	let table = document.getElementById('standings-table')
 	table.classList.remove('hide')
