@@ -433,6 +433,15 @@ async function load_standings() {
 		}
 	}
 	log(standings_tournaments)
+	standings_tournaments.sort((a,b) => {
+		if (a.startUtc > b.startUtc) {
+			return -1
+		} else if (a.startUtc < b.startUtc) {
+			return 1
+		} else {
+			return 0
+		}
+	})
 
 	let table = document.getElementById('standings-table')
 	table.classList.remove('hide')
