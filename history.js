@@ -255,10 +255,9 @@ async function standings() {
 	el.textContent = titles[getting_standings]
 	header.textContent = titles[1-getting_standings]
 	document.getElementById('standings-block').classList.toggle('hide', !getting_standings)
-	if (getting_standings) {
-		document.getElementById('active-tournament-block').classList.add('hide')
-		document.getElementById('selected').classList.add('hide')
-	}
+	
+	document.getElementById('active-tournament-block').classList.toggle('hide', getting_standings)
+	document.getElementById('selected').classList.toggle('hide', getting_standings)
 	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) el.classList.remove('active')
 	
 }
