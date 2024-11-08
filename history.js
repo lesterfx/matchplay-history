@@ -432,9 +432,9 @@ async function load_standings() {
 			overall_standings[id] += points
 		}
 	}
-	log(standings_tournaments)
+	
 	standings_tournaments.sort((a,b) => {
-		if (a.startUtc > b.startUtc) {
+		if (a.startUtc < b.startUtc) {
 			return -1
 		} else if (a.startUtc < b.startUtc) {
 			return 1
@@ -442,6 +442,7 @@ async function load_standings() {
 			return 0
 		}
 	})
+	log(standings_tournaments)
 
 	let table = document.getElementById('standings-table')
 	table.classList.remove('hide')
