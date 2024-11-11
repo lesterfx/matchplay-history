@@ -325,16 +325,13 @@ h3.sticky-header {
 }
 #standings-table th {
     border-bottom: 1px solid var(--text);
+    vertical-align: bottom;
+    text-align: center;
 }
 #standings-table .overall {
     border-right: 1px solid var(--text);
 }
-#standings-table th:not(.keep) {
-    vertical-align: bottom;
-    text-align: center;
-}
 #standings-table th:not(.keep) span {
     writing-mode: vertical-rl;
-    transform: rotate(180deg);
     white-space: nowrap;
 }
