@@ -360,12 +360,28 @@ async function flash_screen() {
 }
 async function click_tournament(id) {
 	if (getting_standings) {
-		return await toggle_standing_tournament(id)
+		return await toggle_standing_tournament()
 	} else {
 		return await get_other(id)
 	}
 }
-async function toggle_standing_tournament(id) {
+function filter() {
+	const value = document.getElementById('filter').value
+	const regex = new RegExp(value, 'gm')
+	for (el of document.querySelectorAll('#my-tournaments.tabs .box')) {
+		log(el.dataset.value)
+		if (!value || regex.test(el.dataset.value)) {
+			el.classList.remove('hide')
+			if (value)
+				el.classList.add('active')
+		} else {
+			el.classList.add('hide')
+			el.classList.remove('active')
+		}
+	}
+	toggle_standing_tournament()
+}
+async function toggle_standing_tournament() {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active').length
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 	document.getElementById('standings-table').classList.add('hide')
@@ -789,6 +805,7 @@ ready(() => {
 	});
 	document.getElementById('standings').addEventListener('click', handler(standings))
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
+	document.getElementById('filter').addEventListener('input', handler(filter))
 
 	try {
 		main();
