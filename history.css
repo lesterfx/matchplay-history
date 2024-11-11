@@ -266,6 +266,11 @@ h3.sticky-header {
     padding-top: env(safe-area-inset-top, 0);
     padding-bottom: .1em;
 }
+thead.sticky th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
 #options {
     z-index: 10;
 }
