@@ -370,7 +370,9 @@ function filter() {
 	const regex = new RegExp(value, 'gm')
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box')) {
 		log(el.dataset.value)
-		if (!value || regex.test(el.dataset.value)) {
+		let tid = el.dataset.id
+		let tournament = all_my_tournaments[tid]
+		if (!value || regex.test(tournament.name)) {
 			el.classList.remove('hide')
 			if (value)
 				el.classList.add('active')
