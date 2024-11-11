@@ -370,17 +370,7 @@ async function toggle_standing_tournament(id) {
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 	document.getElementById('standings-table').classList.add('hide')
 }
-function tnamer() {
-	let re = document.getElementById('standings-regex').value || "S\d+(?<abbr>W\d+)"
-	let regex = RegExp(re)
-	return function(tournament) {
-		let str = tournament.name
-		const { abbr } = regex.exec(
-			str,
-		  ).groups;
-		return abbr || str
-	}
-}
+
 async function load_standings() {
 	document.getElementById('load-standings').classList.add('hide')
 	let overall_standings = {}
@@ -455,13 +445,11 @@ async function load_standings() {
 	let headrow = table.querySelector('thead tr')
 	for (el of headrow.querySelectorAll('th:not(.keep)')) el.remove()
 
-	let regex = tnamer()
-	
 	for (tournament of standings_tournaments) {
 		th = document.createElement('th')
 		let span = document.createElement('span')
 		th.appendChild(span)
-		span.textContent = tournament //regex(tournament)
+		span.textContent = tournament.name
 		headrow.append(th)
 	}
 
