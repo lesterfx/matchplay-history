@@ -384,6 +384,7 @@ function tnamer() {
 async function load_standings() {
 	document.getElementById('load-standings').classList.add('hide')
 	let overall_standings = {}
+	let games_played = {}
 	let player_standings_by_player = {}
 	let n = 0
 	let standings_tournaments = []
@@ -424,12 +425,14 @@ async function load_standings() {
 			if (!player_standings_by_player[id]) {
 				player_standings_by_player[id] = {}
 				overall_standings[id] = 0
+				games_played[id] = 0
 			}
 			if (player_standings_by_player[id][tid]) {
 				alert(`multiple entries for ${id} in ${tournament.name}`)
 			}
 			player_standings_by_player[id][tid] = points
 			overall_standings[id] += points
+			games_played[id] += 1
 		}
 	}
 	
@@ -456,7 +459,9 @@ async function load_standings() {
 	
 	for (tournament of standings_tournaments) {
 		th = document.createElement('th')
-		th.textContent = regex(tournament)
+		let span = document.createElement('span')
+		th.appendChild(span)
+		span.textContent = tournament //regex(tournament)
 		headrow.append(th)
 	}
 
@@ -485,7 +490,11 @@ async function load_standings() {
 		td.dataset.score = overall_standings[id]
 		td.textContent = overall_standings[id]
 		tr.append(td)
-		
+
+		td = document.createElement('td')
+		td.textContent = games_played[id]
+		tr.append(td)
+
 		for (tournament of standings_tournaments) {
 			td = document.createElement('td')
 			td.innerHTML = player_standings_by_player[id][tournament.tournamentId] || '&mdash;'
