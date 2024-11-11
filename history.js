@@ -480,6 +480,7 @@ async function load_standings() {
 		tr.append(td)
 
 		td = document.createElement('td')
+		td.classList.add('last-col')
 		td.textContent = games_played[id]
 		tr.append(td)
 

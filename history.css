@@ -328,7 +328,7 @@ h3.sticky-header {
     vertical-align: bottom;
     text-align: center;
 }
-#standings-table .overall {
+#standings-table .last-col {
     border-right: 1px solid var(--text);
 }
 #standings-table th:not(.keep) span {
