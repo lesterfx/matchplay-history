@@ -367,19 +367,26 @@ async function click_tournament(id) {
 }
 function filter() {
 	const value = document.getElementById('filter').value
-	const regex = new RegExp(value, 'gm')
-	for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
-		log(el.dataset.id)
-		let tid = el.dataset.id
-		let tournament = all_my_tournaments[tid]
-		log(tournament)
-		if (!value || regex.test(tournament.name)) {
+	if (!value) {
+		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
 			el.classList.remove('hide')
-			if (value)
-				el.classList.add('active')
-		} else {
-			el.classList.add('hide')
 			el.classList.remove('active')
+		}
+	} else {
+		const regex = new RegExp(value, 'gm')
+		log(regex)
+		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
+			log(el.dataset.id)
+			let tid = el.dataset.id
+			let tournament = all_my_tournaments[tid]
+			log(tournament)
+			if (regex.test(tournament.name)) {
+				el.classList.remove('hide')
+				el.classList.add('active')
+			} else {
+				el.classList.add('hide')
+				el.classList.remove('active')
+			}
 		}
 	}
 	toggle_standing_tournament()
