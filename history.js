@@ -376,14 +376,14 @@ function filter() {
 		const regex = new RegExp(value, 'gm')
 		log(regex)
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
-			log(el.dataset.id)
 			let tid = el.dataset.id
 			let tournament = all_my_tournaments[tid]
-			log(tournament)
 			if (regex.test(tournament.name)) {
+				log(tournament.name + ' true')
 				el.classList.remove('hide')
 				el.classList.add('active')
 			} else {
+				log(tournament.name + ' false')
 				el.classList.add('hide')
 				el.classList.remove('active')
 			}
