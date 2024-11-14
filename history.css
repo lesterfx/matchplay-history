@@ -299,7 +299,7 @@ h3.sticky-header {
     font-size: 2em;
 }
 .hide {
-    display: none;
+    display: none !important;
 }
 #frenzy-countdown {
     display: flex;

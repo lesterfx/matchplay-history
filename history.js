@@ -373,7 +373,7 @@ function filter() {
 			el.classList.remove('active')
 		}
 	} else {
-		const regex = new RegExp(value, 'gm')
+		const regex = new RegExp(value, 'gmi')
 		log(regex)
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
 			let tid = el.dataset.id
