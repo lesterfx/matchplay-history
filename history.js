@@ -374,19 +374,16 @@ function filter() {
 		}
 	} else {
 		const regex = new RegExp(value, 'gmi')
-		log(regex)
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
 			let tid = el.dataset.id
 			let tournament = all_my_tournaments[tid]
 			regex.lastIndex = 0;
 			if (regex.test(tournament.name)) {
-				log(tournament.name + ' true')
 				el.classList.remove('hide')
-				el.classList.add('active')
+				// el.classList.add('active')
 			} else {
-				log(tournament.name + ' false')
 				el.classList.add('hide')
-				el.classList.remove('active')
+				// el.classList.remove('active')
 			}
 		}
 	}
