@@ -391,13 +391,17 @@ function filter() {
 			if (regex.test(tournament.name)) {
 				if (getting_standings) {
 					el.classList.add('active')
+					el.classList.remove('hide')
 				} else {
+					el.classList.remove('active')
 					el.classList.remove('hide')
 				}
 			} else {
 				if (getting_standings) {
 					el.classList.remove('active')
+					el.classList.remove('hide')
 				} else {
+					el.classList.remove('active')
 					el.classList.add('hide')
 				}
 			}
