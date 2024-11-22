@@ -405,6 +405,7 @@ async function load_standings() {
 	let maxscore = Number(document.getElementById('score-max').value)
 	let minscore = Number(document.getElementById('score-min').value)
 	let combine_names = document.getElementById('combine-names').checked
+	let id_by_name = {}
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
 		n ++;
 		let tid = el.dataset.id
@@ -429,11 +430,14 @@ async function load_standings() {
 			}
 		}
 		for (let entry of standings) {
-			let id
+			let id = entry.playerId
 			if (combine_names) {
-				id = all_data.player[entry.playerId]
-			} else {
-				id = entry.playerId
+				alternate_id = id_by_name[all_data.player[entry.playerId]]
+				if (alternate_id) {
+					id = alternate_id
+				} else {
+					id_by_name[all_data.player[entry.playerId]] = id
+				}
 			}
 			let points = Math.max(maxscore+1-entry.position, minscore)
 			if (!player_standings_by_player[id]) {
@@ -490,11 +494,7 @@ async function load_standings() {
 		
 		td = document.createElement('td')
 		td.classList.add('name')
-		if (combine_names) {
-			td.textContent = id
-		} else {
-			td.textContent = all_data.player[id]
-		}
+		td.textContent = all_data.player[id]
 		tr.append(td)
 
 		td = document.createElement('td')
