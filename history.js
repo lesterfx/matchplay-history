@@ -62,7 +62,7 @@ async function get(options) {
 				throw new Error(`Response status: ${response.status}`);
 			}
 			const json = await response.json();
-			log(json)
+			// log(json)
 			return json
 		} catch (error) {
 			catcher(error)
