@@ -617,6 +617,7 @@ async function get_frenzy_position(tournament) {
 	let frenzy = await get({
 		endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
 	})
+	log(frenzy)
 	let my_pid = my_pid_by_organizer[tournament.tournamentId];
 	let queue_pos = null;
 	let queue_size = frenzy.queue.length;
