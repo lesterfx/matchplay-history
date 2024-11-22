@@ -403,6 +403,7 @@ async function tournament_clicked_standings() {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active').length
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 	document.getElementById('standings-table').classList.add('hide')
+	document.getElementById('load-standings').classList.toggle('hide', n==0)
 }
 
 async function load_standings() {
@@ -561,6 +562,8 @@ async function get_other(id) {
 
 	active_players = {};
 
+	await get_frenzy_position(tournament)
+
 	let result = (await get_games_from_tournament(tournament, refresh_players));
 	if (!refresh_players && !result.changes) return;
 
@@ -574,8 +577,6 @@ async function get_other(id) {
 	title_h2.classList.add(tournament.status);
 	title_h2.innerHTML = '';
 	title_h2.append(title('tournament', tournament.tournamentId, 'span'));
-
-	await get_frenzy_position(tournament)
 
 	let in_progress = []
 	for (game of active_games) {
