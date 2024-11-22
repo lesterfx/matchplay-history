@@ -249,9 +249,13 @@ async function get_tournament_details(tournament) {
 titles = ['Season Standings', 'Player Histories']
 getting_standings = 0
 async function standings() {
+	getting_standings = 1-getting_standings
+	show_getting_standings()
+	filter()
+}
+function show_getting_standings() {
 	let el = document.getElementById('standings')
 	let header = document.getElementById('header')
-	getting_standings = 1-getting_standings
 	el.textContent = titles[getting_standings]
 	header.textContent = titles[1-getting_standings]
 	document.getElementById('standings-block').classList.toggle('hide', !getting_standings)
@@ -360,7 +364,7 @@ async function flash_screen() {
 }
 async function click_tournament(id) {
 	if (getting_standings) {
-		return await toggle_standing_tournament()
+		return await tournament_clicked_standings()
 	} else {
 		return await get_other(id)
 	}
@@ -379,17 +383,23 @@ function filter() {
 			let tournament = all_my_tournaments[tid]
 			regex.lastIndex = 0;
 			if (regex.test(tournament.name)) {
-				el.classList.remove('hide')
-				// el.classList.add('active')
+				if (getting_standings) {
+					el.classList.add('active')
+				} else {
+					el.classList.remove('hide')
+				}
 			} else {
-				el.classList.add('hide')
-				// el.classList.remove('active')
+				if (getting_standings) {
+					el.classList.remove('active')
+				} else {
+					el.classList.add('hide')
+				}
 			}
 		}
 	}
-	toggle_standing_tournament()
+	tournament_clicked_standings()
 }
-async function toggle_standing_tournament() {
+async function tournament_clicked_standings() {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active').length
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 	document.getElementById('standings-table').classList.add('hide')
