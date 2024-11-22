@@ -95,11 +95,13 @@ async function get_all_my_tournaments() {
 	my_lowest_tournament = undefined
 	let in_progress = []
 	document.getElementById('my-tournaments').innerHTML = ''
-	let tournaments = await get_tournaments(myUserId);
-	for (let tournament of tournaments) {
-		let element = add_tournament(tournament);
-		all_my_tournaments[tournament.tournamentId] = tournament;
-		if (tournament.status != 'completed') in_progress.push([tournament.status, element])
+	// let tournaments = await get_tournaments(myUserId);
+	for await (let tournaments of get_tournaments_paginated(myUserId)) {
+		for (let tournament of tournaments) {
+			let element = add_tournament(tournament);
+			all_my_tournaments[tournament.tournamentId] = tournament;
+			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
+		}
 	}
 
 	if (in_progress.length == 1) {
@@ -130,7 +132,7 @@ async function* get_tournaments_paginated(uid) {  // paginate
 				log(`do not need more because ${tournament.tournamentId} <= ${my_lowest_tournament}`)
 			}
 			if (query.page >= response.meta.last_page) {
-				log(`do not need more because ${query.page} >= ${response.meta.last_page}`)
+				log(`do not need more because ${query.page} >= ${my_lowest_tournament}`)
 				need_more = false
 			}
 			save_data('tournament', tournament);
