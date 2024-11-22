@@ -835,6 +835,8 @@ ready(() => {
 	document.getElementById('standings').addEventListener('click', handler(standings))
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
 	document.getElementById('filter').addEventListener('input', handler(filter))
+	document.getElementById('filter').addEventListener('focus', handler(filter))
+	document.getElementById('filter').addEventListener('change', handler(filter))
 
 	try {
 		main();
