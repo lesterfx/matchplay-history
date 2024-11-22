@@ -62,6 +62,7 @@ async function get(options) {
 				throw new Error(`Response status: ${response.status}`);
 			}
 			const json = await response.json();
+			log(json)
 			return json
 		} catch (error) {
 			catcher(error)
@@ -100,6 +101,7 @@ async function get_all_my_tournaments() {
 		all_my_tournaments[tournament.tournamentId] = tournament;
 		if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 	}
+
 	if (in_progress.length == 1) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
@@ -617,7 +619,6 @@ async function get_frenzy_position(tournament) {
 	let frenzy = await get({
 		endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
 	})
-	log(frenzy)
 	let my_pid = my_pid_by_organizer[tournament.tournamentId];
 	let queue_pos = null;
 	let queue_size = frenzy.queue.length;
