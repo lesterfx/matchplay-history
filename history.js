@@ -129,10 +129,10 @@ async function* get_tournaments_paginated(uid) {  // paginate
 		for (tournament of data) {
 			if (tournament.tournamentId <= my_lowest_tournament) {
 				need_more = false
-				log(`do not need more because ${tournament.tournamentId} <= ${my_lowest_tournament}`)
+				// log(`do not need more because ${tournament.tournamentId} <= ${my_lowest_tournament}`)
 			}
 			if (query.page >= response.meta.last_page) {
-				log(`do not need more because ${query.page} >= ${my_lowest_tournament}`)
+				// log(`do not need more because ${query.page} >= ${response.meta.last_page}`)
 				need_more = false
 			}
 			save_data('tournament', tournament);
