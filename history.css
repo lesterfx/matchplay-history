@@ -338,3 +338,6 @@ h3.sticky-header {
     writing-mode: vertical-rl;
     white-space: nowrap;
 }
+#filters div {
+    cursor: pointer;
+}

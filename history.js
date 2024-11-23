@@ -375,8 +375,8 @@ async function click_tournament(id) {
 		return await get_other(id)
 	}
 }
-function filter(save) {
-	const value = document.getElementById('filter').value
+function filter(save, value) {
+	value = value || document.getElementById('filter').value
 	if (!value) {
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
 			el.classList.remove('hide')
@@ -864,7 +864,8 @@ function load_filters_history() {
 	for (let f of JSON.parse(localStorage.getItem('filters') || '[]')) {
 		let fdiv = document.createElement('div')
 		fdiv.textContent = f
-		fcontainer.appendChild(fdiv)
+		fdiv.addEventListener('click', handler(filter, false, f))
+		fcontainer.prepend(fdiv)
 	}
 }
 
