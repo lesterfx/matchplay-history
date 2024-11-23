@@ -414,7 +414,7 @@ function filter(save) {
 		if (index > -1) { // only splice array when item is found
 			filters.splice(index, 1); // 2nd parameter means remove one item only
 		}
-		filters.append(value)
+		filters.push(value)
 		localStorage.setItem('filters', JSON.stringify(filters))
 		load_filters_history()
 	}
