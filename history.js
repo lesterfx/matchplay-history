@@ -376,7 +376,11 @@ async function click_tournament(id) {
 	}
 }
 function filter(save, value) {
-	value = value || document.getElementById('filter').value
+	if (value) {
+		document.getElementById('filter').value = value
+	} else {
+		value = document.getElementById('filter').value
+	}
 	if (!value) {
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
 			el.classList.remove('hide')
@@ -864,7 +868,7 @@ function load_filters_history() {
 	for (let f of JSON.parse(localStorage.getItem('filters') || '[]')) {
 		let fdiv = document.createElement('div')
 		fdiv.textContent = f
-		fdiv.addEventListener('click', handler(filter, false, f))
+		fdiv.addEventListener('click', handler(filter, true, f))
 		fcontainer.prepend(fdiv)
 	}
 }
