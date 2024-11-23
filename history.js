@@ -409,7 +409,7 @@ function filter(save) {
 	}
 	if (save) {
 		let filters = JSON.parse(localStorage.getItem('filters') || '[]')
-		filters.slice(0, 10)
+		filters = filters.slice(0, 10)
 		const index = filters.indexOf(value);
 		if (index > -1) { // only splice array when item is found
 			filters.splice(index, 1); // 2nd parameter means remove one item only
@@ -861,7 +861,7 @@ ready(() => {
 function load_filters_history() {
 	let fcontainer = document.getElementById('filters')
 	fcontainer.textContent = ''
-	for (let f of localStorage.getItem('filters') || []) {
+	for (let f of JSON.parse(localStorage.getItem('filters') || '[]')) {
 		let fdiv = document.createElement('div')
 		fdiv.textContent = f
 		fcontainer.appendChild(fdiv)
