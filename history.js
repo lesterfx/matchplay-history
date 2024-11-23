@@ -375,7 +375,7 @@ async function click_tournament(id) {
 		return await get_other(id)
 	}
 }
-function filter() {
+function filter(save) {
 	const value = document.getElementById('filter').value
 	if (!value) {
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
@@ -406,6 +406,17 @@ function filter() {
 				}
 			}
 		}
+	}
+	if (save) {
+		let filters = JSON.parse(localStorage.getItem('filters') || '[]')
+		filters.slice(0, 10)
+		const index = filters.indexOf(value);
+		if (index > -1) { // only splice array when item is found
+			filters.splice(index, 1); // 2nd parameter means remove one item only
+		}
+		filters.append(value)
+		localStorage.setItem('filters', JSON.stringify(filters))
+		load_filters_history()
 	}
 	tournament_clicked_standings()
 }
@@ -836,7 +847,9 @@ ready(() => {
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
-	document.getElementById('filter').addEventListener('change', handler(filter))
+	document.getElementById('filter').addEventListener('change', handler(filter, true))
+
+	load_filters_history()
 
 	try {
 		main();
@@ -844,6 +857,16 @@ ready(() => {
 		catcher(err)
 	}
 });
+
+function load_filters_history() {
+	let fcontainer = document.getElementById('filters')
+	fcontainer.textContent = ''
+	for (let f of localStorage.getItem('filters') || []) {
+		let fdiv = document.createElement('div')
+		fdiv.textContent = f
+		fcontainer.appendChild(fdiv)
+	}
+}
 
 function tabhandler(callback, ...args) {
 	let handle = async function () {
