@@ -1100,7 +1100,7 @@ function add_tournament(tournament) {
 	box.addEventListener('click', tabhandler(click_tournament, tid))
 	// my_tournaments_tab(tournament.status).append(box);
 	insertSorted(box, my_tournaments_tab(tournament.status), (el) => {
-		return el.dataset.id;
+		return -el.dataset.id;
 	});
 	return box
 }
@@ -1111,7 +1111,7 @@ async function add_manual_tournament() {
 }
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
-	box.textContent = 'Add tournament by id'
+	box.textContent = 'Add Tournament by ID...'
 	box.classList.add('box')
 	box.addEventListener('click', tabhandler(add_manual_tournament))
 	my_tournaments_tab('completed').append(box)
