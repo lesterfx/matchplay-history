@@ -199,7 +199,7 @@ async function get_games_from_tournament(tournament, add_players) {
 	if (my_pid_by_organizer[tid] && !add_players) {
 		pid = my_pid_by_organizer[tid];
 	} else {
-		let result = await get_tournament_details(tournament);
+		let result = await get_tournament_details(tournament.tournamentId);
 		pid = result.pid
 		my_pid_by_organizer[tid] = pid;
 
@@ -229,8 +229,7 @@ async function get_games_from_tournament(tournament, add_players) {
 	};
 	return {games: games, changes: changes};
 }
-async function get_tournament_details(tournament) {
-	let tid = tournament.tournamentId;
+async function get_tournament_details(tid) {
 	let response = await get({
 		endpoint: `tournaments/${tid}`,
 		query: {
@@ -1100,6 +1099,11 @@ function add_tournament(tournament) {
 	box.addEventListener('click', tabhandler(click_tournament, tid))
 	my_tournaments_tab(tournament.status).append(box);
 	return box
+}
+function add_manual_tournament() {
+	let tid = Number(prompt('Tournament ID'))
+	add_tournament(get_tournament_details(tid))
+	get()
 }
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
