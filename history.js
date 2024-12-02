@@ -1127,7 +1127,7 @@ async function add_tournament_by_id(tid) {
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
 	box.textContent = 'Add Tournament by ID...'
-	box.classList.add('fake', 'box')
+	box.classList.add('fake', 'box', nostyle)
 	box.addEventListener('click', handler(add_manual_tournament))
 	my_tournaments_tab('completed').append(box)
 }

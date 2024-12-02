@@ -90,6 +90,10 @@ body.flash {
     display: inline-block;
     flex-grow: 1;
 }
+.box.nostyle {
+    background: none;
+    border: none;
+}
 .box.active {
     outline: 4px solid var(--active-color);
 }
@@ -339,5 +343,8 @@ h3.sticky-header {
     white-space: nowrap;
 }
 #filters span {
+    cursor: pointer;
+}
+#standings-settings {
     cursor: pointer;
 }
