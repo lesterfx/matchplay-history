@@ -1112,7 +1112,9 @@ function add_tournament(tournament) {
 	return box
 }
 async function add_manual_tournament() {
-	let tid = Number(prompt('Tournament ID (found in URL)'))
+	let response = prompt('Tournament ID (found in URL)')
+	if (!response) return
+	let tid = Number(response)
 	await add_tournament_by_id(tid)
 	let manuals = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
 	if (manuals.indexOf(tid) == -1) {
@@ -1127,7 +1129,7 @@ async function add_tournament_by_id(tid) {
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
 	box.textContent = 'Add Tournament by ID...'
-	box.classList.add('fake', 'box', nostyle)
+	box.classList.add('fake', 'box', 'nostyle')
 	box.addEventListener('click', handler(add_manual_tournament))
 	my_tournaments_tab('completed').append(box)
 }
