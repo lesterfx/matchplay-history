@@ -199,7 +199,7 @@ async function get_games_from_tournament(tournament, add_players) {
 	if (my_pid_by_organizer[tid] && !add_players) {
 		pid = my_pid_by_organizer[tid];
 	} else {
-		let result = await get_tournament_details(tournament.tournamentId);
+		let result = await get_tournament_details(tid);
 		pid = result.pid
 		my_pid_by_organizer[tid] = pid;
 
@@ -1102,7 +1102,9 @@ function add_tournament(tournament) {
 }
 function add_manual_tournament() {
 	let tid = Number(prompt('Tournament ID'))
-	add_tournament(get_tournament_details(tid))
+	let tournament = get_tournament_details(tid)
+	log(tournament)
+	add_tournament(tournament)
 	get()
 }
 function manual_tournament_button() {
