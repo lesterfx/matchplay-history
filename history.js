@@ -1104,8 +1104,7 @@ function add_tournament(tournament) {
 async function add_manual_tournament() {
 	let tid = Number(prompt('Tournament ID (found in URL)'))
 	let tournament = await get_tournament_details(tid)
-	log(tournament)
-	add_tournament(tournament)
+	add_tournament(data.tournament[tid])
 }
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
