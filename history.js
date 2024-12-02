@@ -1100,9 +1100,9 @@ function add_tournament(tournament) {
 	my_tournaments_tab(tournament.status).append(box);
 	return box
 }
-function add_manual_tournament() {
+async function add_manual_tournament() {
 	let tid = Number(prompt('Tournament ID'))
-	let tournament = get_tournament_details(tid)
+	let tournament = await get_tournament_details(tid)
 	log(tournament)
 	save_data('tournament', tournament);
 	add_tournament(tournament)
