@@ -67,7 +67,7 @@ body.flash {
     padding: 10px;
     background: var(--group-background);
 }
-.box.fake {
+.box.invisible {
     height: 0;
     visibility: hidden;
     order: 1000000;

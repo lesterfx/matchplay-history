@@ -391,7 +391,6 @@ function filter(save, value) {
 		const regex = new RegExp(value, 'gmi')
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
 			let tid = el.dataset.id
-			if (!tid) return
 			let tournament = all_my_tournaments[tid]
 			regex.lastIndex = 0;
 			if (regex.test(tournament.name)) {
@@ -1113,7 +1112,7 @@ async function add_manual_tournament() {
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
 	box.textContent = 'Add Tournament by ID...'
-	box.classList.add('box')
+	box.classList.add('fake', 'box')
 	box.addEventListener('click', tabhandler(add_manual_tournament))
 	my_tournaments_tab('completed').append(box)
 }
@@ -1159,7 +1158,7 @@ function fakefill(element) {
 	element.innerHTML = '';
 	for (i=0;i<10;i++) {
 		let new_el = document.createElement('div');
-		new_el.classList.add('fake', 'box');
+		new_el.classList.add('fake', 'invisible', 'box');
 		element.append(new_el);
 	}
 	return element;
