@@ -99,10 +99,11 @@ async function get_all_my_tournaments() {
 	for await (let tournaments of get_tournaments_paginated(myUserId)) {
 		for (let tournament of tournaments) {
 			let element = add_tournament(tournament);
-			all_my_tournaments[tournament.tournamentId] = tournament;
+			all_my_tournaments[tournament.tournamentId] = tournament
 			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 		}
 	}
+	manual_tournament_button();
 
 	if (in_progress.length == 1) {
 		let status = in_progress[0][0]
@@ -1099,6 +1100,12 @@ function add_tournament(tournament) {
 	box.addEventListener('click', tabhandler(click_tournament, tid))
 	my_tournaments_tab(tournament.status).append(box);
 	return box
+}
+function manual_tournament_button() {
+	let box = notitle('tournament', 0)
+	box.classList.add('box')
+	box.addEventListener('click', tabhandler(add_manual_tournament))
+	my_tournaments_tab('completed').append(box)
 }
 function my_tournaments_tab(status) {
 	return tab(document.getElementById('my-tournaments'), status)
