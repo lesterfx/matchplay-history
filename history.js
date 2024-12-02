@@ -391,6 +391,7 @@ function filter(save, value) {
 		const regex = new RegExp(value, 'gmi')
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
 			let tid = el.dataset.id
+			if (!tid) return
 			let tournament = all_my_tournaments[tid]
 			regex.lastIndex = 0;
 			if (regex.test(tournament.name)) {
