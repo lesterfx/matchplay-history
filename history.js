@@ -103,6 +103,8 @@ async function get_all_my_tournaments() {
 			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 		}
 	}
+	let manual_tournaments = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
+	manual_tournaments.forEach(add_tournament_by_id)
 	manual_tournament_button();
 
 	if (in_progress.length == 1) {
@@ -500,7 +502,7 @@ async function load_standings() {
 			return 0
 		}
 	})
-	log(standings_tournaments)
+	// log(standings_tournaments)
 
 	let table = document.getElementById('standings-table')
 	table.classList.remove('hide')
@@ -867,9 +869,11 @@ function load_filters_history() {
 	let fcontainer = document.getElementById('filters')
 	fcontainer.textContent = ''
 	for (let f of JSON.parse(localStorage.getItem('filters') || '[]')) {
+		let fspan = document.createElement('span')
+		fspan.textContent = f
+		fspan.addEventListener('click', handler(filter, true, f))
 		let fdiv = document.createElement('div')
-		fdiv.textContent = f
-		fdiv.addEventListener('click', handler(filter, true, f))
+		fdiv.prepend(fspan)
 		fcontainer.prepend(fdiv)
 	}
 }
@@ -1106,7 +1110,15 @@ function add_tournament(tournament) {
 }
 async function add_manual_tournament() {
 	let tid = Number(prompt('Tournament ID (found in URL)'))
-	let tournament = await get_tournament_details(tid)
+	await add_tournament_by_id(tid)
+	let manuals = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
+	if (manuals.indexOf(tid) == -1) {
+		manuals.push(tid)
+		localStorage.setItem('manual_tournaments', JSON.stringify(manuals))
+	}
+}
+async function add_tournament_by_id(tid) {
+	await get_tournament_details(tid)
 	add_tournament(all_data.tournament[tid])
 }
 function manual_tournament_button() {
