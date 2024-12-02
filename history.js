@@ -1104,11 +1104,12 @@ function add_manual_tournament() {
 	let tid = Number(prompt('Tournament ID'))
 	let tournament = get_tournament_details(tid)
 	log(tournament)
+	save_data('tournament', tournament);
 	add_tournament(tournament)
-	get()
 }
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
+	box.textContent = 'Add tournament by id'
 	box.classList.add('box')
 	box.addEventListener('click', tabhandler(add_manual_tournament))
 	my_tournaments_tab('completed').append(box)
