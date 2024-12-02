@@ -426,7 +426,7 @@ function filter(save, value) {
 	tournament_clicked_standings()
 }
 async function tournament_clicked_standings() {
-	let n = document.querySelectorAll('#my-tournaments.tabs .box.active').length
+	let n = document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)').length
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 	document.getElementById('standings-table').classList.add('hide')
 	document.getElementById('load-standings').classList.toggle('hide', n==0)
@@ -443,7 +443,7 @@ async function load_standings() {
 	let minscore = Number(document.getElementById('score-min').value)
 	let combine_names = document.getElementById('combine-names').checked
 	let id_by_name = {}
-	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
+	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)')) {
 		n ++;
 		let tid = el.dataset.id
 		let tournament = all_my_tournaments[tid]
@@ -1113,7 +1113,7 @@ function manual_tournament_button() {
 	let box = notitle('tournament', 0)
 	box.textContent = 'Add Tournament by ID...'
 	box.classList.add('fake', 'box')
-	box.addEventListener('click', tabhandler(add_manual_tournament))
+	box.addEventListener('click', handler(add_manual_tournament))
 	my_tournaments_tab('completed').append(box)
 }
 function my_tournaments_tab(status) {
