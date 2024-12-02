@@ -446,7 +446,7 @@ async function load_standings() {
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)')) {
 		n ++;
 		let tid = el.dataset.id
-		let tournament = all_my_tournaments[tid]
+		let tournament = all_data.tournament[tid]
 		standings_tournaments.push(tournament)
 		let standings = await get({
 			endpoint: `tournaments/${tid}/standings`
