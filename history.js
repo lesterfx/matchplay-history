@@ -238,6 +238,7 @@ async function get_tournament_details(tid) {
 		}
 	});
 	let tournament_details = response.data;
+	save_data('tournament', response.data)
 	let pid;
 	let players = tournament_details.players;
 	for (player of players) {
