@@ -855,6 +855,9 @@ ready(() => {
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
 	document.getElementById('filter').addEventListener('change', handler(filter, true))
+	document.getElementById('standings-settings').addEventListener('click', handler(function () {
+		document.getElementById('standings-settings-table').classList.toggle('hide')
+	}))
 
 	load_filters_history()
 
