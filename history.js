@@ -1101,10 +1101,9 @@ function add_tournament(tournament) {
 	return box
 }
 async function add_manual_tournament() {
-	let tid = Number(prompt('Tournament ID'))
+	let tid = Number(prompt('Tournament ID (found in URL)'))
 	let tournament = await get_tournament_details(tid)
 	log(tournament)
-	save_data('tournament', tournament);
 	add_tournament(tournament)
 }
 function manual_tournament_button() {
