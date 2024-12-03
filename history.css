@@ -348,3 +348,6 @@ h3.sticky-header {
 #standings-settings {
     cursor: pointer;
 }
+.delete-tournament {
+    cursor: pointer;
+}

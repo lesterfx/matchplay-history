@@ -1095,7 +1095,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 	}
 	return box;
 }
-function add_tournament(tournament) {
+function add_tournament(tournament, manual) {
 	let tid = tournament.tournamentId
 	if (my_lowest_tournament) {
 		my_lowest_tournament = Math.min(my_lowest_tournament, tid)
@@ -1104,12 +1104,23 @@ function add_tournament(tournament) {
 	}
 	let box = title('tournament', tid);
 	box.classList.add('box');
+	if (manual) {
+		let del = document.createElement('div')
+		del.textContent = '×'
+		box.append(del)
+		del.classList.add('delete-tournament')
+		del.addEventListener('click', handler(remove_manual_tournament, tid))
+	}
 	box.addEventListener('click', tabhandler(click_tournament, tid))
 	// my_tournaments_tab(tournament.status).append(box);
 	insertSorted(box, my_tournaments_tab(tournament.status), (el) => {
 		return -el.dataset.id;
 	});
 	return box
+}
+function remove_manual_tournament(tid) {
+	alert(tid)
+	window.event.stopPropagation()
 }
 async function add_manual_tournament() {
 	let response = prompt('Tournament ID (found in URL)')
@@ -1125,7 +1136,7 @@ async function add_manual_tournament() {
 async function add_tournament_by_id(tid) {
 	if (all_my_tournaments[tid]) return
 	await get_tournament_details(tid)
-	add_tournament(all_data.tournament[tid])
+	add_tournament(all_data.tournament[tid], true)
 }
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
