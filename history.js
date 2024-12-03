@@ -474,11 +474,11 @@ async function load_standings() {
 		for (let entry of standings) {
 			let id = entry.playerId
 			if (combine_names) {
-				alternate_id = id_by_name[all_data.player[entry.playerId]]
+				alternate_id = id_by_name[all_data.player[entry.playerId].toLowerCase()]
 				if (alternate_id) {
 					id = alternate_id
 				} else {
-					id_by_name[all_data.player[entry.playerId]] = id
+					id_by_name[all_data.player[entry.playerId].toLowerCase()] = id
 				}
 			}
 			let points = Math.max(maxscore+1-entry.position, minscore)
