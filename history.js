@@ -417,15 +417,18 @@ function filter(save, value) {
 	if (save) {
 		let filters = JSON.parse(localStorage.getItem('filters') || '[]')
 		filters = filters.slice(0, 10)
-		const index = filters.indexOf(value);
-		if (index > -1) { // only splice array when item is found
-			filters.splice(index, 1); // 2nd parameter means remove one item only
-		}
+		remove_from_array(filters, value)
 		filters.push(value)
 		localStorage.setItem('filters', JSON.stringify(filters))
 		load_filters_history()
 	}
 	tournament_clicked_standings()
+}
+function remove_from_array(array, element) {
+	const index = array.indexOf(element);
+	if (index > -1) { // only splice array when item is found
+		array.splice(index, 1); // 2nd parameter means remove one item only
+	}
 }
 async function tournament_clicked_standings() {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)').length
@@ -1121,6 +1124,10 @@ function add_tournament(tournament, manual) {
 function remove_manual_tournament(tid) {
 	alert(tid)
 	window.event.stopPropagation()
+	document.querySelector(`.box[data-kind="tournament"][data-id="${tid}"]`).remove()
+	let manuals = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
+	remove_from_array(manuals, tid)
+	localStorage.setItem('manual_tournaments', JSON.stringify(manuals))
 }
 async function add_manual_tournament() {
 	let response = prompt('Tournament ID (found in URL)')
