@@ -1123,6 +1123,7 @@ async function add_manual_tournament() {
 	}
 }
 async function add_tournament_by_id(tid) {
+	if (all_my_tournaments[tid]) return
 	await get_tournament_details(tid)
 	add_tournament(all_data.tournament[tid])
 }
