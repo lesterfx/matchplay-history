@@ -417,10 +417,11 @@ function filter(save, value) {
 	if (save) {
 		let filters = JSON.parse(localStorage.getItem('filters') || '[]')
 		filters = filters.slice(0, 10)
-		remove_from_array(filters, value)
+		if (!remove_from_array(filters, value)) {
+			prepend_filter(f)
+		}
 		filters.push(value)
 		localStorage.setItem('filters', JSON.stringify(filters))
-		load_filters_history()
 	}
 	tournament_clicked_standings()
 }
@@ -428,6 +429,7 @@ function remove_from_array(array, element) {
 	const index = array.indexOf(element);
 	if (index > -1) { // only splice array when item is found
 		array.splice(index, 1); // 2nd parameter means remove one item only
+		return true
 	}
 }
 async function tournament_clicked_standings() {
@@ -875,15 +877,17 @@ function load_filters_history() {
 	let fcontainer = document.getElementById('filters')
 	fcontainer.textContent = ''
 	for (let f of JSON.parse(localStorage.getItem('filters') || '[]')) {
-		let fspan = document.createElement('span')
-		fspan.textContent = f
-		fspan.addEventListener('click', handler(filter, true, f))
-		let fdiv = document.createElement('div')
-		fdiv.prepend(fspan)
-		fcontainer.prepend(fdiv)
+		prepend_filter(f)
 	}
 }
-
+function prepend_filter(f) {
+	let fspan = document.createElement('span')
+	fspan.textContent = f
+	fspan.addEventListener('click', handler(filter, true, f))
+	let fdiv = document.createElement('div')
+	fdiv.prepend(fspan)
+	document.getElementById('filters').prepend(fdiv)
+}
 function tabhandler(callback, ...args) {
 	let handle = async function () {
 		try {
@@ -904,8 +908,11 @@ function tabhandler(callback, ...args) {
 	return handle
 }
 function handler(callback, ...args) {
-	let handle = async function () {
+	let handle = async function (event) {
 		try {
+			if (args[0] == 'event') {
+				args[0] = event
+			}
 			await callback(...args)
 		} catch (err) {
 			await catcher(err)
@@ -1113,7 +1120,7 @@ function add_tournament(tournament, manual) {
 		del.title = 'remove manually added tournament'
 		box.append(del)
 		del.classList.add('delete-tournament')
-		del.addEventListener('click', handler(remove_manual_tournament, tid))
+		del.addEventListener('click', handler(remove_manual_tournament, 'event', tid))
 	}
 	box.addEventListener('click', tabhandler(click_tournament, tid))
 	// my_tournaments_tab(tournament.status).append(box);
@@ -1122,8 +1129,8 @@ function add_tournament(tournament, manual) {
 	});
 	return box
 }
-function remove_manual_tournament(tid) {
-	window.event.stopPropagation()
+function remove_manual_tournament(event, tid) {
+	event.stopPropagation()
 	document.querySelector(`.box[data-kind="tournament"][data-id="${tid}"]`).remove()
 	let manuals = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
 	remove_from_array(manuals, tid)
