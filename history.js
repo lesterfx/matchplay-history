@@ -1115,9 +1115,9 @@ async function add_manual_tournament() {
 	let response = prompt('Tournament ID (found in URL)')
 	if (!response) return
 	let tid = Number(response)
-	await add_tournament_by_id(tid)
 	let manuals = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
 	if (manuals.indexOf(tid) == -1) {
+		await add_tournament_by_id(tid)
 		manuals.push(tid)
 		localStorage.setItem('manual_tournaments', JSON.stringify(manuals))
 	}
