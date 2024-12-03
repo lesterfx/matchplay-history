@@ -1110,6 +1110,7 @@ function add_tournament(tournament, manual) {
 	if (manual) {
 		let del = document.createElement('div')
 		del.textContent = '×'
+		del.title = 'remove manually added tournament'
 		box.append(del)
 		del.classList.add('delete-tournament')
 		del.addEventListener('click', handler(remove_manual_tournament, tid))
@@ -1122,7 +1123,6 @@ function add_tournament(tournament, manual) {
 	return box
 }
 function remove_manual_tournament(tid) {
-	alert(tid)
 	window.event.stopPropagation()
 	document.querySelector(`.box[data-kind="tournament"][data-id="${tid}"]`).remove()
 	let manuals = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
