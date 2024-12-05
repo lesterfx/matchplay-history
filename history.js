@@ -432,9 +432,10 @@ function delete_filter(value) {
 	})
 }
 function get_storage_array(name) {
-	let x = JSON.parse(localStorage.getItem(name) || '[]')
+	let raw = localStorage.getItem(name) || '[]'
+	let x = JSON.parse(raw)
 	if (typeof x !== Array) {
-		alert(`strange data in local storage for ${name}: ${x}`)
+		alert(`strange data in local storage for ${name}: ${raw}`)
 		x = []
 	}
 	return x
