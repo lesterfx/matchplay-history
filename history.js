@@ -432,7 +432,12 @@ function delete_filter(value) {
 	})
 }
 function get_storage_array(name) {
-	return JSON.parse(localStorage.getItem(name) || '[]')
+	let x = JSON.parse(localStorage.getItem(name) || '[]')
+	if (typeof x !== Array) {
+		alert(`strange data in local storage for ${name}: ${x}`)
+		x = []
+	}
+	return x
 }
 async function update_storage_array_async(name, update_function) {
 	let array = get_storage_array(name)
@@ -815,7 +820,7 @@ let ready = (callback) => {
 		document.addEventListener('DOMCOntentLoaded', callback);
 	}
 }
-ready(() => {
+ready(async () => {
 	document.getElementById('refresh-my-tournaments').addEventListener('click', handler(refresh_tournaments_click));
 	document.getElementById('refresh-active-tournament').addEventListener('click', handler(refresh_tournament_click));
 	for (const el of document.querySelectorAll('#options .items div')) el.addEventListener('click', function () {
@@ -853,12 +858,12 @@ ready(() => {
 			catcher(err)
 		}
 	})
-	document.getElementById('log-out').addEventListener('click', function () {
+	document.getElementById('log-out').addEventListener('click', async function () {
 		try {
 			this.parentElement.classList.remove('shown')
 			token = ''
 			localStorage.removeItem('token')
-			main()
+			await main()
 		} catch (err) {
 			catcher(err)
 		}
@@ -890,7 +895,7 @@ ready(() => {
 	load_filters_history()
 
 	try {
-		main();
+		await main();
 	} catch (err) {
 		catcher(err)
 	}
