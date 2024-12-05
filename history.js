@@ -434,7 +434,7 @@ function delete_filter(value) {
 function get_storage_array(name) {
 	let raw = localStorage.getItem(name) || '[]'
 	let x = JSON.parse(raw)
-	if (Array.isArray(x)) {
+	if (!Array.isArray(x)) {
 		alert(`strange data in local storage for ${name}: ${raw}`)
 		x = []
 	}
