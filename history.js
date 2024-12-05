@@ -1160,7 +1160,7 @@ async function add_manual_tournament() {
 	let response = prompt('Tournament ID (found in URL)')
 	if (!response) return
 	let tid = Number(response)
-	update_storage_array('manual_tournaments', (manuals) => {
+	update_storage_array('manual_tournaments', async (manuals) => {
 		if (manuals.indexOf(tid) == -1) {
 			await add_tournament_by_id(tid)
 			manuals.push(tid)
