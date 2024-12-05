@@ -414,7 +414,7 @@ function filter(save, value) {
 			}
 		}
 	}
-	if (save) {
+	if (save && value) {
 		update_storage_array('filters', (filters) => {
 			filters = filters.slice(0, 10)
 			if (!remove_from_array(filters, value)) {
@@ -433,6 +433,13 @@ function delete_filter(value) {
 }
 function get_storage_array(name) {
 	return JSON.parse(localStorage.getItem(name) || '[]')
+}
+async function update_storage_array_async(name, update_function) {
+	let array = get_storage_array(name)
+	let result = await update_function(array)
+	if (result) {
+		localStorage.setItem(name, JSON.stringify(result))
+	}
 }
 function update_storage_array(name, update_function) {
 	let array = get_storage_array(name)
@@ -1160,7 +1167,7 @@ async function add_manual_tournament() {
 	let response = prompt('Tournament ID (found in URL)')
 	if (!response) return
 	let tid = Number(response)
-	update_storage_array('manual_tournaments', async (manuals) => {
+	update_storage_array_async('manual_tournaments', async (manuals) => {
 		if (manuals.indexOf(tid) == -1) {
 			await add_tournament_by_id(tid)
 			manuals.push(tid)
