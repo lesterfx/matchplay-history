@@ -256,9 +256,10 @@ async function get_tournament_details(tid) {
 }
 
 titles = ['Season Standings', 'Player Histories']
-getting_standings = 0
-async function standings() {
+getting_standings = Number(localStorage.getItem('getting_standings') || '0')
+async function switch_getting_standings() {
 	getting_standings = 1-getting_standings
+	localStorage.setItem('getting_standings', JSON.stringify(getting_standings))
 	show_getting_standings()
 	filter()
 }
@@ -885,7 +886,7 @@ ready(async () => {
 			token_promises = []
 		}
 	});
-	document.getElementById('standings').addEventListener('click', handler(standings))
+	document.getElementById('standings').addEventListener('click', handler(switch_getting_standings))
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
