@@ -103,7 +103,7 @@ async function get_all_my_tournaments() {
 			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 		}
 	}
-	let manual_tournaments = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
+	let manual_tournaments = get_storage_array('manual_tournaments')
 	manual_tournaments.forEach(add_tournament_by_id)
 	manual_tournament_button();
 
@@ -415,15 +415,31 @@ function filter(save, value) {
 		}
 	}
 	if (save) {
-		let filters = JSON.parse(localStorage.getItem('filters') || '[]')
-		filters = filters.slice(0, 10)
-		if (!remove_from_array(filters, value)) {
-			prepend_filter(f)
-		}
-		filters.push(value)
-		localStorage.setItem('filters', JSON.stringify(filters))
+		update_storage_array('filters', (filters) => {
+			filters = filters.slice(0, 10)
+			if (!remove_from_array(filters, value)) {
+				prepend_filter(value)
+			}
+			filters.push(value)
+			return filters
+		})
 	}
 	tournament_clicked_standings()
+}
+function delete_filter(value) {
+	update_storage_array('filters', (filters) => {
+		return remove_from_array(filters, value) && filters
+	})
+}
+function get_storage_array(name) {
+	return JSON.parse(localStorage.getItem(name) || '[]')
+}
+function update_storage_array(name, update_function) {
+	let array = get_storage_array(name)
+	let result = update_function(array)
+	if (result) {
+		localStorage.setItem(name, JSON.stringify(result))
+	}
 }
 function remove_from_array(array, element) {
 	const index = array.indexOf(element);
@@ -876,7 +892,7 @@ ready(() => {
 function load_filters_history() {
 	let fcontainer = document.getElementById('filters')
 	fcontainer.textContent = ''
-	for (let f of JSON.parse(localStorage.getItem('filters') || '[]')) {
+	for (let f of get_storage_array('filters')) {
 		prepend_filter(f)
 	}
 }
@@ -884,6 +900,10 @@ function prepend_filter(f) {
 	let fspan = document.createElement('span')
 	fspan.textContent = f
 	fspan.addEventListener('click', handler(filter, true, f))
+	let delete_button = document.createElement('span')
+	delete_button.textContent = '×'
+	delete_button.addEventListener('click', handler(delete_filter, f))
+	fspan.append(delete_button)
 	let fdiv = document.createElement('div')
 	fdiv.prepend(fspan)
 	document.getElementById('filters').prepend(fdiv)
@@ -1132,20 +1152,21 @@ function add_tournament(tournament, manual) {
 function remove_manual_tournament(event, tid) {
 	event.stopPropagation()
 	document.querySelector(`.box[data-kind="tournament"][data-id="${tid}"]`).remove()
-	let manuals = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
-	remove_from_array(manuals, tid)
-	localStorage.setItem('manual_tournaments', JSON.stringify(manuals))
+	update_storage_array('manual_tournaments', (manuals) => {
+		return remove_from_array(manuals, tid) && manuals
+	})
 }
 async function add_manual_tournament() {
 	let response = prompt('Tournament ID (found in URL)')
 	if (!response) return
 	let tid = Number(response)
-	let manuals = JSON.parse(localStorage.getItem('manual_tournaments') || '[]')
-	if (manuals.indexOf(tid) == -1) {
-		await add_tournament_by_id(tid)
-		manuals.push(tid)
-		localStorage.setItem('manual_tournaments', JSON.stringify(manuals))
-	}
+	update_storage_array('manual_tournaments', (manuals) => {
+		if (manuals.indexOf(tid) == -1) {
+			await add_tournament_by_id(tid)
+			manuals.push(tid)
+			return manuals
+		}
+	})
 }
 async function add_tournament_by_id(tid) {
 	if (all_my_tournaments[tid]) return
