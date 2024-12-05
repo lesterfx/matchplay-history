@@ -49,11 +49,9 @@
 					<span class="refresh" id="load-standings">
 						<span class="text">load</span>
 					</span>
+					<span id="standings-settings">⚙️</span>
 					<span class="spacer"></span>
 				</h3>
-				<div>
-					<span id="standings-settings">⚙️</span>
-				</div>
 				<table id="standings-settings-table" class="hide">
 					<tr>
 						<td>Score Max</td>
@@ -68,20 +66,20 @@
 						<td><input type="checkbox" id="combine-names" checked></td>
 					</tr>
 				</table>
+				<table class="hide" id="standings-table">
+					<thead>
+						<tr>
+							<th class="keep">Pos</th>
+							<th class="keep">Player</th>
+							<th class="keep overall" data-score="0">Points</th>
+							<th class="keep last-col">Mtgs</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
 				</div>
 			</div>
-			<table class="hide" id="standings-table">
-				<thead>
-					<tr>
-						<th class="keep">Pos</th>
-						<th class="keep">Player</th>
-						<th class="keep overall" data-score="0">Points</th>
-						<th class="keep last-col">Mtgs</th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
 		<div class="block hide" id="active-tournament-block">
 				<h3 class="sticky-header">
 					<span id="active-tournament-title"></span>
