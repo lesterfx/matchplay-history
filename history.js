@@ -263,7 +263,7 @@ async function switch_getting_standings() {
 	show_getting_standings()
 	filter()
 }
-if (getting_standing) switch_getting_standings()
+if (getting_standings) switch_getting_standings()
 function show_getting_standings() {
 	let el = document.getElementById('standings')
 	let header = document.getElementById('header')
