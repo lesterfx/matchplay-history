@@ -428,6 +428,7 @@ function filter(save, value) {
 }
 function delete_filter(value) {
 	update_storage_array('filters', (filters) => {
+		document.querySelector(`.filters div[data-value="${value}"]`).remove()
 		return remove_from_array(filters, value) && filters
 	})
 }
@@ -916,9 +917,10 @@ function prepend_filter(f) {
 	let delete_button = document.createElement('span')
 	delete_button.textContent = '×'
 	delete_button.addEventListener('click', handler(delete_filter, f))
-	fspan.append(delete_button)
 	let fdiv = document.createElement('div')
-	fdiv.prepend(fspan)
+	fdiv.dataset.filter = f
+	fdiv.append(fspan)
+	fdiv.append(delete_button)
 	document.getElementById('filters').prepend(fdiv)
 }
 function tabhandler(callback, ...args) {

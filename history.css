@@ -344,6 +344,11 @@ h3.sticky-header {
 }
 #filters span {
     cursor: pointer;
+    display: inline-block;
+    margin-left: 10px;
+}
+#filters-lefter {
+    display: inline-block;
 }
 #standings-settings {
     cursor: pointer;
