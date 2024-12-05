@@ -261,9 +261,7 @@ async function switch_getting_standings() {
 	getting_standings = 1-getting_standings
 	localStorage.setItem('getting_standings', JSON.stringify(getting_standings))
 	show_getting_standings()
-	filter()
 }
-if (getting_standings) switch_getting_standings()
 function show_getting_standings() {
 	let el = document.getElementById('standings')
 	let header = document.getElementById('header')
@@ -274,7 +272,7 @@ function show_getting_standings() {
 	document.getElementById('active-tournament-block').classList.toggle('hide', getting_standings)
 	document.getElementById('selected').classList.toggle('hide', getting_standings)
 	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) el.classList.remove('active')
-	
+	filter()
 }
 async function refresh_tournaments_click() {
 	await get_all_my_tournaments();
@@ -813,6 +811,8 @@ async function main() {
 	document.getElementById('main').classList.remove('hide')
 
 	await get_all_my_tournaments();
+
+	show_getting_standings()
 }
 
 ////////////////////////////////////////////////////////////////
