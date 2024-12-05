@@ -1181,6 +1181,7 @@ async function add_manual_tournament() {
 		if (manuals.indexOf(tid) == -1) {
 			await add_tournament_by_id(tid)
 			manuals.push(tid)
+			filter()
 			return manuals
 		}
 	})
