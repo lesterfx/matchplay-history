@@ -426,12 +426,12 @@ function filter(save, value) {
 	}
 	tournament_clicked_standings()
 }
-function delete_filter(a) {
-	console.log(a)
-	console.log(this)
-	return
+function delete_filter(x) {
+	let elem = x.parentElement
+	let value = elem.children[0].textContent
+
 	update_storage_array('filters', (filters) => {
-		let fspan = document.querySelector(`.filters div[data-filter="${n}"]`).remove()
+		elem.remove()
 		return remove_from_array(filters, value) && filters
 	})
 }
