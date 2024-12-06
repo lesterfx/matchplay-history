@@ -384,12 +384,11 @@ function filter(save, value) {
 	} else {
 		value = document.getElementById('filter').value
 	}
-	if (!value) {
-		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
-			el.classList.remove('hide')
-			el.classList.remove('active')
-		}
-	} else {
+	for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
+		el.classList.remove('hide')
+		el.classList.remove('active')
+	}
+	if (value) {
 		const regex = new RegExp(value, 'gmi')
 		for (el of document.querySelectorAll('#my-tournaments.tabs .box:not(.fake)')) {
 			let tid = el.dataset.id
