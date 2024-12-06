@@ -342,6 +342,10 @@ h3.sticky-header {
     writing-mode: vertical-rl;
     white-space: nowrap;
 }
+#filters>div {
+    display: flex;
+    justify-content: space-between;
+}
 #filters span {
     cursor: pointer;
     display: inline-block;
