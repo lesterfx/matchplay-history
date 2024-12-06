@@ -428,7 +428,7 @@ function filter(save, value) {
 }
 function delete_filter(value) {
 	update_storage_array('filters', (filters) => {
-		document.querySelector(`.filters div[data-value="${value}"]`).remove()
+		document.querySelector(`.filters div[data-filter="${value}"]`).remove()
 		return remove_from_array(filters, value) && filters
 	})
 }
