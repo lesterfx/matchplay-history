@@ -396,21 +396,12 @@ function filter(save, value) {
 			let tournament = all_data.tournament[tid]
 			regex.lastIndex = 0;
 			if (regex.test(tournament.name)) {
+				el.classList.remove('hide')
 				if (getting_standings) {
 					el.classList.add('active')
-					el.classList.remove('hide')
-				} else {
-					el.classList.remove('active')
-					el.classList.add('hide')
 				}
 			} else {
-				if (getting_standings) {
-					el.classList.remove('active')
-					el.classList.remove('hide')
-				} else {
-					el.classList.remove('active')
-					el.classList.add('hide')
-				}
+				el.classList.add('hide')
 			}
 		}
 	}
