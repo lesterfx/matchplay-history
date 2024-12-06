@@ -906,8 +906,9 @@ ready(async () => {
 });
 
 function load_filters_history() {
-	let fcontainer = document.getElementById('filters')
-	fcontainer.textContent = ''
+	for (let x of document.querySelectorAll('#filters>div')) {
+		x.remove()
+	}
 	for (let f of get_storage_array('filters')) {
 		prepend_filter(f)
 	}
@@ -923,7 +924,7 @@ function prepend_filter(f) {
 	fdiv.dataset.filter = f
 	fdiv.append(fspan)
 	fdiv.append(delete_button)
-	document.getElementById('filters').prepend(fdiv)
+	document.getElementById('filter').insertAdjacentElement('afterend', fdiv)
 }
 function tabhandler(callback, ...args) {
 	let handle = async function () {

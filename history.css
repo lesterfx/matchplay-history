@@ -342,6 +342,9 @@ h3.sticky-header {
     writing-mode: vertical-rl;
     white-space: nowrap;
 }
+#filter {
+    min-width: 100%;
+}
 #filters>div {
     display: flex;
     justify-content: space-between;
