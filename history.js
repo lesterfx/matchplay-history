@@ -401,7 +401,7 @@ function filter(save, value) {
 					el.classList.remove('hide')
 				} else {
 					el.classList.remove('active')
-					el.classList.remove('hide')
+					el.classList.add('hide')
 				}
 			} else {
 				if (getting_standings) {
