@@ -426,9 +426,9 @@ function filter(save, value) {
 	}
 	tournament_clicked_standings()
 }
-function delete_filter(value) {
+function delete_filter(n, value) {
 	update_storage_array('filters', (filters) => {
-		document.querySelector(`.filters div[data-filter="${value}"]`).remove()
+		let fspan = document.querySelector(`.filters div[data-filter="${n}"]`).remove()
 		return remove_from_array(filters, value) && filters
 	})
 }
@@ -913,15 +913,17 @@ function load_filters_history() {
 		prepend_filter(f)
 	}
 }
+let filter_number = 0  // there must be a better way
 function prepend_filter(f) {
+	filter_number ++
 	let fspan = document.createElement('span')
 	fspan.textContent = f
 	fspan.addEventListener('click', handler(filter, true, f))
 	let delete_button = document.createElement('span')
 	delete_button.textContent = '×'
-	delete_button.addEventListener('click', handler(delete_filter, f))
+	delete_button.addEventListener('click', handler(delete_filter, filter_number, f))
 	let fdiv = document.createElement('div')
-	fdiv.dataset.filter = f
+	fdiv.dataset.filter = filter_number
 	fdiv.append(fspan)
 	fdiv.append(delete_button)
 	document.getElementById('filter').insertAdjacentElement('afterend', fdiv)
