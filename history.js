@@ -913,7 +913,7 @@ function load_filters_history() {
 		prepend_filter(f)
 	}
 }
-let filter_number = 0  // there must be a better way
+filter_number = 0  // there must be a better way
 function prepend_filter(f) {
 	filter_number ++
 	let fspan = document.createElement('span')
