@@ -786,6 +786,7 @@ async function token_needed(message) {
 }
 async function main() {
 	document.getElementById('main').classList.add('hide');
+	document.getElementById('options').classList.add('hide')
 
 	let message = 'Log in by providing your Match Play API token'
 	while (await (async function() {
@@ -802,6 +803,7 @@ async function main() {
 	}
 	document.getElementById('token-entry').classList.add('hide');
 	document.getElementById('main').classList.remove('hide')
+	document.getElementById('options').classList.remove('hide')
 
 	await get_all_my_tournaments();
 
