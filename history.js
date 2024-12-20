@@ -576,7 +576,7 @@ async function load_standings() {
 
 		td = document.createElement('td')
 		td.classList.add('last-col')
-		td.textContent = (overall_standings[id] / games_played[id] / maxscore).toFixed(2)
+		td.textContent = Math.round((overall_standings[id] / games_played[id] / maxscore).toFixed(2)
 		tr.append(td)
 
 		for (tournament of standings_tournaments) {
@@ -899,6 +899,9 @@ ready(async () => {
 	document.getElementById('filter').addEventListener('change', handler(filter, true))
 	document.getElementById('standings-settings').addEventListener('click', handler(function () {
 		document.getElementById('standings-settings-table').classList.toggle('hide')
+	}))
+	document.getElementById('copy-table').addEventListener('click', handler(function () {
+		navigator.clipboard && navigator.clipboard.writeText(document.getElementById('standings-table').innerText.trim()).catch(function () { });
 	}))
 
 	load_filters_history()
