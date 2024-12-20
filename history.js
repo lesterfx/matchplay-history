@@ -576,7 +576,7 @@ async function load_standings() {
 
 		td = document.createElement('td')
 		td.classList.add('last-col')
-		td.textContent = overall_standings[id] / games_played[id] / maxscore
+		td.textContent = (overall_standings[id] / games_played[id] / maxscore).toFixed(2)
 		tr.append(td)
 
 		for (tournament of standings_tournaments) {
