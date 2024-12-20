@@ -316,7 +316,7 @@ h3.sticky-header {
     fill: none;
     stroke-linecap: round;
 }
-#standings-table {
+#standings-table table {
     border-collapse: collapse;
 }
 #standings-table td:not(.name) {
@@ -367,5 +367,7 @@ h3.sticky-header {
     cursor: pointer;
 }
 #copy-table {
-    
+    position: absolute;
+    font-size: 3em;
+    cursor: pointer;
 }

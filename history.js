@@ -901,7 +901,7 @@ ready(async () => {
 		document.getElementById('standings-settings-table').classList.toggle('hide')
 	}))
 	document.getElementById('copy-table').addEventListener('click', handler(function () {
-		navigator.clipboard && navigator.clipboard.writeText(document.getElementById('standings-table').innerText.trim()).catch(function () { });
+		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>table').innerText.trim()).catch(function () { });
 	}))
 
 	load_filters_history()
