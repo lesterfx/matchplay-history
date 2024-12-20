@@ -585,7 +585,7 @@ async function load_standings() {
 			if (val) {
 				td.innerHTML = val
 			} else {
-				td.innerHTML = '&mdash;'
+				// td.innerHTML = '&mdash;'
 				td.classList.add('emtpy')
 			}
 			tr.append(td)
