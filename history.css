@@ -368,6 +368,6 @@ h3.sticky-header {
 }
 #copy-table {
     position: absolute;
-    font-size: 3em;
+    font-size: 1em;
     cursor: pointer;
 }
