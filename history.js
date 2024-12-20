@@ -581,7 +581,9 @@ async function load_standings() {
 
 		for (tournament of standings_tournaments) {
 			td = document.createElement('td')
-			td.innerHTML = player_standings_by_player[id][tournament.tournamentId] || '&mdash;'
+			let val = player_standings_by_player[id][tournament.tournamentId]
+			td.innerHTML = val // || '&mdash;'
+			if (!val) td.classList.add('emtpy')
 			tr.append(td)
 		}
 

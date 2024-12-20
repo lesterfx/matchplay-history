@@ -342,6 +342,9 @@ h3.sticky-header {
     writing-mode: vertical-rl;
     white-space: nowrap;
 }
+#standings-table td.empty::before {
+    content: "—";
+}
 #filter {
     min-width: 100%;
 }
