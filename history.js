@@ -571,8 +571,12 @@ async function load_standings() {
 		tr.append(td)
 
 		td = document.createElement('td')
-		td.classList.add('last-col')
 		td.textContent = games_played[id]
+		tr.append(td)
+
+		td = document.createElement('td')
+		td.classList.add('last-col')
+		td.textContent = overall_standings[id] / games_played[id] / maxscore
 		tr.append(td)
 
 		for (tournament of standings_tournaments) {
