@@ -105,6 +105,9 @@ async function get_all_my_tournaments() {
 	}
 	let manual_tournaments = get_storage_array('manual_tournaments')
 	manual_tournaments.forEach(add_tournament_by_id)
+	await Promise.all(manual_tournaments.map(async (t) => {
+            await add_tournament_by_id(t)
+        }));
 	manual_tournament_button();
 
 	if (in_progress.length == 1) {
