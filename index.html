@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<meta name = "viewport" content = "initial-scale = 1, user-scalable = no, viewport-fit=cover" />
+	<title>Match Tools</title>
+	</head>
+	<body>
+		<div id="token-entry" class="hide">
+			<h3 id="token-message">API Token Required</h3>
+			<form id="token-form">
+				<input type="password" placeholder="api token" name="token" id="token">
+				<input type="submit">
+			</form>
+		</div>
+		<div id="options" class="hide">
+			<div class="button">☰</div>
+			<div class="items">
+				<div id="log-out">Log out</div>
+				<div id="custom">Enable custom API query</div>
+				<div id="standings">Season Standings</div>
+				<div id="notify">Test notification</div>
+			</div>
+		</div>
+		<h1 id="header">&nbsp;</h1>
+		<div id="main" class="main hide">
+			<div class="block">
+				<h3 class="sticky-header">
+					<span>My Tournaments</span>
+					<span class="refresh" id="refresh-my-tournaments">
+						<span class="circle">↻</span>
+						<span class="text">refresh</span>
+					</span>
+				</h3>
+				<div id="filters-lefter">
+					<div id="filters">
+						<input id="filter" placeholder="filter">
+					</div>
+				</div>
+				<div id="my-tournaments" class="tabs" data-tabgroup="my-tournaments">
+				</div>
+			</div>
+			<div class="block hide" id="standings-block">
+				<h3 class="sticky-header">
+					<span id="standings-title">Standings</span>
+					
+					<span class="refresh" id="load-standings">
+						<span class="text">load</span>
+					</span>
+					<span id="standings-settings">⚙️</span>
+					<span class="spacer"></span>
+				</h3>
+				<table id="standings-settings-table" class="hide">
+					<tr>
+						<td>Score Max</td>
+						<td><input id="score-max" type="number" pattern="[0-9]*" value="40"></td>
+					</tr>
+					<tr>
+						<td>Score Min</td>
+						<td><input id="score-min" type="number" pattern="[0-9]*" value="5"></td>
+					</tr>
+					<tr>
+						<td>Combine same name</td>
+						<td><input type="checkbox" id="combine-names" checked></td>
+					</tr>
+				</table>
+				<div id="standings-table" class="hide">
+					<span id="copy-table">copy table to clipboard</span>
+					<table>
+						<thead>
+							<tr>
+								<th class="keep">Pos</th>
+								<th class="keep">Player</th>
+								<th class="keep overall" data-score="0">Points</th>
+								<th class="keep">Mtgs</th>
+								<th class="keep last-col">Win %</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+				</div>
+			</div>
+		<div class="block hide" id="active-tournament-block">
+				<h3 class="sticky-header">
+					<span id="active-tournament-title"></span>
+					<span class="refresh" id="refresh-active-tournament">
+						<span class="circle">↻</span>
+						<span class="text">refresh</span>
+					</span>
+				</h3>
+				<div id="frenzy-countdown"><span class="pie"></span><span class="text"></span></div>
+				<div id="active-tournament" class="tabs" data-tabgroup="active-tournament">
+				</div>
+			</div>
+			<div id="selected">
+				<div class="sticky-header boxgroup singular" id="selected-game"></div>
+				<div id="player-histories" class="block"></div>
+			</div>
+			<div class="spacer"></div>
+			<div id="custom-section" class="hide">
+				<input id="custom-endpoint" placeholder="users/profile">
+				<input type="button" id="run-custom" value="Run">
+			</div>
+
+		</div>
+		<div id="log"></div>
+		<script>
+			window.onerror = function(message, source, lineno, colno, error) {
+				let e = `window.onerror\n${source}\nline ${lineno}:${colno}\n\n${message}`
+				if (error) e += `\n\n${error.message}\n${error.stack}`
+				alert(e)
+				log(e)
+			};
+			function stringify(value) {
+				switch (typeof value) {
+					case 'string': case 'object': return JSON.stringify(value, null, 4);
+					default: return String(value);
+				}
+			};
+			function log (obj) {
+				let message = stringify(obj)
+				if (message.slice(0, 1) == '"') message = obj
+				let el = document.createElement('pre')
+				el.textContent = message
+				let logobj = document.querySelector('#log')
+				logobj.prepend(el)
+				// logobj.scrollIntoView()
+			}
+			function catcher(err, supress) {
+				log(`${err.message}\n${err.stack}`)
+				log(err)
+				if (!supress) throw(err)
+			}
+			document.querySelector('#log').addEventListener('click', () => {document.querySelector('#log').prepend('tap')})
+			async function load(src, loader) {
+				try {
+					let t = Date.now()
+					let s = `${src}?t=${t}`
+					await loader(s)
+					return s
+				} catch (err) {
+					catcher(err)
+				}
+			}
+			async function loadjs(src) {
+				return await load(src, scriptloader)
+			}
+			async function loadcss(src) {
+				return await load(src, cssloader)
+			}
+			async function cssloader(src) {
+				await new Promise(function (res, rej) {
+					let el = document.createElement('link')
+					el.addEventListener('error', rej)
+					el.addEventListener('load', res)
+					el.async = true
+					el.setAttribute('rel', 'stylesheet')
+					el.setAttribute('href', src)
+					document.head.append(el)
+				})
+			}
+			async function scriptloader(scriptUrl){
+				await new Promise(function (res, rej) {
+					let script = document.createElement('script');
+					script.addEventListener('error',rej);
+					script.addEventListener('load',res);
+					script.src = scriptUrl;
+					script.type = 'text/javascript';
+					script.onerror = rej;
+					script.async = true;
+					script.onload = res;
+					document.head.append(script);
+				})
+			}
+			try {
+				loadcss('history.css')
+				loadjs('history.js')
+			} catch (err) {
+				catcher(err)
+			}
+		</script>
+	</body>
+</html>
