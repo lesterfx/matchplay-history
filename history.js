@@ -627,7 +627,7 @@ async function load_standings() {
 		if (games_played[id] >= settings.b_attendance && !restricted) {
 			finals.push('B')
 		}
-		td.textContent(finals.join('/'))
+		td.textContent = finals.join('/')
 		let bonus = bonus_met(games_played[id])
 		if (bonus) {
 			td.textContent += (' +' + bonus_met(games_played[id]))
