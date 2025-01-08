@@ -55,12 +55,11 @@
 				</h3>
 				<table id="standings-settings-table" class="hide">
 					<tr>
-						<td>Score Max</td>
-						<td><input id="score-max" type="number" pattern="[0-9]*" value="40"></td>
-					</tr>
-					<tr>
-						<td>Score Min</td>
-						<td><input id="score-min" type="number" pattern="[0-9]*" value="5"></td>
+						<td>Score Range</td>
+						<td>
+							<input id="score-min" type="number" pattern="[0-9]*" value="5" size="3">
+							<input id="score-max" type="number" pattern="[0-9]*" value="40" size="3">
+						</td>
 					</tr>
 					<tr>
 						<td>Combine same name</td>
@@ -68,26 +67,26 @@
 					</tr>
 					<tr>
 						<td>A Division size</td>
-						<td><input id="a-size" type="number" pattern="[0-9]*" value="16"></td>
+						<td><input id="a-size" type="number" pattern="[0-9]*" value="16" size="3"></td>
 					</tr>
 					<tr>
-						<td>A Division attendance</td>
-						<td><input id="a-attendance" type="number" pattern="[0-9]*" value="5"></td>
+						<td>A Division min attendance</td>
+						<td><input id="a-attendance" type="number" pattern="[0-9]*" value="5" size="2"></td>
 					</tr>
 					<tr>
 						<td>A Division restricted players</td>
 						<td><input id="a-restricted" pattern="^\d+(\d*(,| ))*\d*$" value="" placeholder="comma-separated list of IDs"></td>
 					</tr>
 					<tr>
-						<td>B Division attendance</td>
-						<td><input id="b-attendance" type="number" pattern="[0-9]*" value="3"></td>
+						<td>B Division min attendance</td>
+						<td><input id="b-attendance" type="number" pattern="[0-9]*" value="3" size="2"></td>
 					</tr>
 					<tr>
 						<td>Attendance bonus thresholds</td>
 						<td>
-							<input id="bonus-1" type="number" pattern="[0-9]*" value="5">
-							<input id="bonus-2" type="number" pattern="[0-9]*" value="7">
-							<input id="bonus-3" type="number" pattern="[0-9]*" value="9">
+							<input id="bonus-1" type="number" pattern="[0-9]*" value="5" size="2">
+							<input id="bonus-2" type="number" pattern="[0-9]*" value="7" size="2">
+							<input id="bonus-3" type="number" pattern="[0-9]*" value="9" size="2">
 						</td>
 					</tr>
 				</table>

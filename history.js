@@ -464,6 +464,35 @@ async function tournament_clicked_standings() {
 	document.getElementById('load-standings').classList.toggle('hide', n==0)
 }
 
+function load_standings_settings() {
+	let settings = JSON.parse(localStorage.getItem('standings-settings') || '{}')
+	document.getElementById('score-min').value = settings.minscore
+	document.getElementById('score-max').value = settings.maxscore
+	document.getElementById('combine-names').checked = settings.combine_names
+	document.getElementById('a-size').value = settings.a_size
+	document.getElementById('a-attendance').value = settings.a_attendance
+	document.getElementById('a-restricted').value = settings.a_restricted.join(',')
+	document.getElementById('b-attendance').value = settings.b_attendance
+	document.getElementById('bonus-1').value = settings.bonus_1
+	document.getElementById('bonus-2').value = settings.bonus_2
+	document.getElementById('bonus-3').value = settings.bonus_3
+	return settings
+}
+function get_standings_settings() {
+	let settings = {}
+	settings.minscore = Number(document.getElementById('score-min').value)
+	settings.maxscore = Number(document.getElementById('score-max').value)
+	settings.combine_names = document.getElementById('combine-names').checked
+	settings.a_size = Number(document.getElementById('a-size').value)
+	settings.a_attendance = Number(document.getElementById('a-attendance').value)
+	settings.a_restricted = (document.getElementById('a-restricted').value).replaceAll(',', ' ').split(' ')
+	settings.b_attendance = Number(document.getElementById('b-attendance').value)
+	settings.bonus_1 = Number(document.getElementById('bonus-1').value)
+	settings.bonus_2 = Number(document.getElementById('bonus-2').value)
+	settings.bonus_3 = Number(document.getElementById('bonus-3').value)
+	localStorage.setItem('standings-settings', JSON.stringify(settings))
+	return settings
+}
 async function load_standings() {
 	document.getElementById('load-standings').classList.add('hide')
 	let overall_standings = {}
@@ -471,27 +500,18 @@ async function load_standings() {
 	let player_standings_by_player = {}
 	let n = 0
 	let standings_tournaments = []
-
-	let maxscore = Number(document.getElementById('score-max').value)
-	let minscore = Number(document.getElementById('score-min').value)
-	let combine_names = document.getElementById('combine-names').checked
-	let a_size = Number(document.getElementById('a-size').value)
-	let a_attendance = Number(document.getElementById('a-attendance').value)
-	let a_restricted = (document.getElementById('a-restricted').value).replaceAll(',', ' ').split(' ')
-	let b_attendance = Number(document.getElementById('b-attendance').value)
-	let bonus_1 = Number(document.getElementById('bonus-1').value)
-	let bonus_2 = Number(document.getElementById('bonus-2').value)
-	let bonus_3 = Number(document.getElementById('bonus-3').value)
+	
+	let settings = get_standings_settings()
 
 	let bonus_met = function(i) {
 		return (
-			Number(i >= bonus_1) +
-			Number(i >= bonus_2) +
-			Number(i >= bonus_3)
+			Number(i >= settings.bonus_1) +
+			Number(i >= settings.bonus_2) +
+			Number(i >= settings.bonus_3)
 		)
 	}
 	let is_restricted = function(i) {
-		for (let x of a_restricted) {
+		for (let x of settings.a_restricted) {
 			if (x == i) return true
 		}
 	}
@@ -521,7 +541,7 @@ async function load_standings() {
 		}
 		for (let entry of standings) {
 			let id = entry.playerId
-			if (combine_names) {
+			if (settings.combine_names) {
 				alternate_id = id_by_name[all_data.player[entry.playerId].toLowerCase()]
 				if (alternate_id) {
 					id = alternate_id
@@ -529,7 +549,7 @@ async function load_standings() {
 					id_by_name[all_data.player[entry.playerId].toLowerCase()] = id
 				}
 			}
-			let points = Math.max(maxscore+1-entry.position, minscore)
+			let points = Math.max(settings.maxscore+1-entry.position, settings.minscore)
 			if (!player_standings_by_player[id]) {
 				player_standings_by_player[id] = {}
 				overall_standings[id] = 0
@@ -599,22 +619,24 @@ async function load_standings() {
 		tr.append(td)
 		
 		td = document.createElement('td')
+		let finals = []
 		let restricted = is_restricted(id)
-		if (games_played[id] >= a_attendance || restricted) {
-			td.textContent += 'A'
+		if (games_played[id] >= settings.a_attendance || restricted) {
+			finals.push('A')
 		}
-		if (games_played[id] >= b_attendance && !restricted) {
-			td.textContent += 'B'
+		if (games_played[id] >= settings.b_attendance && !restricted) {
+			finals.push('B')
 		}
+		td.textContent(finals.join('/'))
 		let bonus = bonus_met(games_played[id])
 		if (bonus) {
-			td.textContent += ('+' + bonus_met(games_played[id]))
+			td.textContent += (' +' + bonus_met(games_played[id]))
 		}
 		tr.append(td)
 
 		td = document.createElement('td')
 		td.classList.add('last-col')
-		td.textContent = (overall_standings[id] / games_played[id] / maxscore).toFixed(2)
+		td.textContent = (overall_standings[id] / games_played[id] / settings.maxscore).toFixed(2)
 		tr.append(td)
 
 		for (tournament of standings_tournaments) {
@@ -645,7 +667,7 @@ async function load_standings() {
 			tie_score = score
 		}
 		row.querySelector('td.rank').textContent = tie_rank
-		// if (tie_rank <= a_size) {
+		// if (tie_rank <= settings.a_size) {
 		// 	row.add('a-division')
 		// }
 		i++
@@ -944,6 +966,7 @@ ready(async () => {
 	}))
 
 	load_filters_history()
+	load_standings_settings()
 
 	try {
 		await main();
