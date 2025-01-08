@@ -66,6 +66,30 @@
 						<td>Combine same name</td>
 						<td><input type="checkbox" id="combine-names" checked></td>
 					</tr>
+					<tr>
+						<td>A Division size</td>
+						<td><input id="a-size" type="number" pattern="[0-9]*" value="16"></td>
+					</tr>
+					<tr>
+						<td>A Division attendance</td>
+						<td><input id="a-attendance" type="number" pattern="[0-9]*" value="5"></td>
+					</tr>
+					<tr>
+						<td>A Division restricted players</td>
+						<td><input id="a-restricted" pattern="^\d+(\d*(,| ))*\d*$" value="" placeholder="comma-separated list of IDs"></td>
+					</tr>
+					<tr>
+						<td>B Division attendance</td>
+						<td><input id="b-attendance" type="number" pattern="[0-9]*" value="3"></td>
+					</tr>
+					<tr>
+						<td>Attendance bonus thresholds</td>
+						<td>
+							<input id="bonus-1" type="number" pattern="[0-9]*" value="5">
+							<input id="bonus-2" type="number" pattern="[0-9]*" value="7">
+							<input id="bonus-3" type="number" pattern="[0-9]*" value="9">
+						</td>
+					</tr>
 				</table>
 				<div id="standings-table" class="hide">
 					<span id="copy-table">copy table to clipboard</span>
@@ -76,6 +100,7 @@
 								<th class="keep">Player</th>
 								<th class="keep overall" data-score="0">Points</th>
 								<th class="keep">Mtgs</th>
+								<th class="keep">Finals</th>
 								<th class="keep last-col">Win %</th>
 							</tr>
 						</thead>

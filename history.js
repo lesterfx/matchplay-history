@@ -471,9 +471,30 @@ async function load_standings() {
 	let player_standings_by_player = {}
 	let n = 0
 	let standings_tournaments = []
+
 	let maxscore = Number(document.getElementById('score-max').value)
 	let minscore = Number(document.getElementById('score-min').value)
 	let combine_names = document.getElementById('combine-names').checked
+	let a_size = Number(document.getElementById('a-size').value)
+	let a_attendance = Number(document.getElementById('a-attendance').value)
+	let a_restricted = (document.getElementById('a-restricted').value).replaceAll(',', ' ').split(' ')
+	let b_attendance = Number(document.getElementById('b-attendance').value)
+	let bonus_1 = Number(document.getElementById('bonus-1').value)
+	let bonus_2 = Number(document.getElementById('bonus-2').value)
+	let bonus_3 = Number(document.getElementById('bonus-3').value)
+
+	let bonus_met = function(i) {
+		return (
+			Number(i >= bonus_1) +
+			Number(i >= bonus_2) +
+			Number(i >= bonus_3)
+		)
+	}
+	let is_restricted = function(i) {
+		for (let x of a_restricted) {
+			if (x == i) return true
+		}
+	}
 	let id_by_name = {}
 	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)')) {
 		n ++;
@@ -575,6 +596,19 @@ async function load_standings() {
 		td = document.createElement('td')
 		td.textContent = games_played[id]
 		tr.append(td)
+		
+		td = document.createElement('td')
+		let restricted = is_restricted(id)
+		if (games_played[id] >= a_attendance || restricted) {
+			td.textContent += 'A'
+		}
+		if (games_played[id] >= b_attendance && !restricted) {
+			td.textContent += 'B'
+		}
+		let bonus = bonus_met(games_played[id])
+		if (bonus) {
+			td.textContent += ('+' + bonus_met(games_played[id]))
+		}
 
 		td = document.createElement('td')
 		td.classList.add('last-col')
@@ -609,10 +643,11 @@ async function load_standings() {
 			tie_score = score
 		}
 		row.querySelector('td.rank').textContent = tie_rank
+		if (tie_rank <= a_size) {
+			row.add('a-division')
+		}
 		i++
 	}
-
-	document.getElementById('load-standings').classList.remove('hide')
 
 }
 async function get_other(id) {
