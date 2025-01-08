@@ -585,6 +585,7 @@ async function load_standings() {
 		td = document.createElement('td')
 		td.classList.add('name')
 		td.textContent = all_data.player[id]
+		td.title = id
 		tr.append(td)
 
 		td = document.createElement('td')
@@ -643,9 +644,9 @@ async function load_standings() {
 			tie_score = score
 		}
 		row.querySelector('td.rank').textContent = tie_rank
-		if (tie_rank <= a_size) {
-			row.add('a-division')
-		}
+		// if (tie_rank <= a_size) {
+		// 	row.add('a-division')
+		// }
 		i++
 	}
 
