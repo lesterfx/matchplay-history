@@ -466,16 +466,16 @@ async function tournament_clicked_standings() {
 
 function load_standings_settings() {
 	let settings = JSON.parse(localStorage.getItem('standings-settings') || '{}')
-	document.getElementById('score-min').value = settings.minscore
-	document.getElementById('score-max').value = settings.maxscore
-	document.getElementById('combine-names').checked = settings.combine_names
-	document.getElementById('a-size').value = settings.a_size
-	document.getElementById('a-attendance').value = settings.a_attendance
-	document.getElementById('a-restricted').value = settings.a_restricted.join(',')
-	document.getElementById('b-attendance').value = settings.b_attendance
-	document.getElementById('bonus-1').value = settings.bonus_1
-	document.getElementById('bonus-2').value = settings.bonus_2
-	document.getElementById('bonus-3').value = settings.bonus_3
+	if (settings.minscore) document.getElementById('score-min').value = settings.minscore
+	if (settings.maxscore) document.getElementById('score-max').value = settings.maxscore
+	if (settings.combine_names) document.getElementById('combine-names').checked = settings.combine_names
+	if (settings.a_size) document.getElementById('a-size').value = settings.a_size
+	if (settings.a_attendance) document.getElementById('a-attendance').value = settings.a_attendance
+	if (settings.a_restricted) document.getElementById('a-restricted').value = settings.a_restricted.join(',')
+	if (settings.b_attendance) document.getElementById('b-attendance').value = settings.b_attendance
+	if (settings.bonus_1) document.getElementById('bonus-1').value = settings.bonus_1
+	if (settings.bonus_2) document.getElementById('bonus-2').value = settings.bonus_2
+	if (settings.bonus_3) document.getElementById('bonus-3').value = settings.bonus_3
 	return settings
 }
 function get_standings_settings() {
