@@ -610,6 +610,7 @@ async function load_standings() {
 		if (bonus) {
 			td.textContent += ('+' + bonus_met(games_played[id]))
 		}
+		tr.append(td)
 
 		td = document.createElement('td')
 		td.classList.add('last-col')
