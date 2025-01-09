@@ -380,4 +380,6 @@ h3.sticky-header {
     position: absolute;
     font-size: 1em;
     cursor: pointer;
+    text-decoration: underline;
+    margin-top: 1em;
 }
