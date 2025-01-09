@@ -66,20 +66,16 @@
 						<td><input type="checkbox" id="combine-names" checked></td>
 					</tr>
 					<tr>
-						<td>A Division size</td>
-						<td><input id="a-size" type="number" pattern="[0-9]*" value="16" size="3"></td>
+						<td>B Division min attendance</td>
+						<td><input id="b-attendance" type="number" pattern="[0-9]*" value="3" size="2"></td>
 					</tr>
 					<tr>
 						<td>A Division min attendance</td>
 						<td><input id="a-attendance" type="number" pattern="[0-9]*" value="5" size="2"></td>
 					</tr>
 					<tr>
-						<td>A Division restricted players</td>
-						<td><input id="a-restricted" pattern="^\d+(\d*(,| ))*\d*$" value="" placeholder="comma-separated list of IDs"></td>
-					</tr>
-					<tr>
-						<td>B Division min attendance</td>
-						<td><input id="b-attendance" type="number" pattern="[0-9]*" value="3" size="2"></td>
+						<td>A Division size</td>
+						<td><input id="a-size" type="number" pattern="[0-9]*" value="16" size="3"></td>
 					</tr>
 					<tr>
 						<td>Attendance bonus thresholds</td>
@@ -88,6 +84,10 @@
 							<input id="bonus-2" type="number" pattern="[0-9]*" value="7" size="2">
 							<input id="bonus-3" type="number" pattern="[0-9]*" value="9" size="2">
 						</td>
+					</tr>
+					<tr>
+						<td>A Division restricted players</td>
+						<td><input id="a-restricted" pattern="^\d+(\d*(,| ))*\d*$" value="" placeholder="comma-separated list of IDs"></td>
 					</tr>
 				</table>
 				<div id="standings-table" class="hide">
