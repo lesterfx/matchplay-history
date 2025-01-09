@@ -593,13 +593,23 @@ async function load_standings() {
 
 	let tbody = table.querySelector('tbody')
 	tbody.innerHTML = ''
-	for (let id in overall_standings) {
+
+	const overall_standings_entries = Object.entries(overall_standings);
+	overall_standings_entries.sort((a, b) => b[1] - a[1]);
+	let i = 0
+	let tie_rank = 1
+	let tie_score = null
+	for (let [id, score] of overall_standings_entries) {
 		let tr = document.createElement('tr')
 		tr.classList.add('player')
 
 		td = document.createElement('td')
 		td.classList.add('rank')
-		td.textContent = 'rank'
+		if (score !== score) {
+			tie_rank = i
+			tie_score = score
+		}
+		td.textContent = tie_score
 		tr.append(td)
 		
 		td = document.createElement('td')
@@ -610,8 +620,8 @@ async function load_standings() {
 
 		td = document.createElement('td')
 		td.classList.add('overall')
-		td.dataset.score = overall_standings[id]
-		td.textContent = overall_standings[id]
+		td.dataset.score = score
+		td.textContent = score
 		tr.append(td)
 
 		td = document.createElement('td')
@@ -636,7 +646,7 @@ async function load_standings() {
 
 		td = document.createElement('td')
 		td.classList.add('last-col')
-		td.textContent = (overall_standings[id] / games_played[id] / settings.maxscore).toFixed(2)
+		td.textContent = (score / games_played[id] / settings.maxscore).toFixed(2)
 		tr.append(td)
 
 		for (tournament of standings_tournaments) {
@@ -652,24 +662,9 @@ async function load_standings() {
 		}
 
 		tbody.append(tr)
-		insertSorted(tr, tbody, (el) => {
-			return -Number(el.querySelector('td.overall').dataset.score)
-		})
-	}
-
-	let i = 1
-	let tie_rank = 1
-	let tie_score = null
-	for (let row of tbody.querySelectorAll('tr.player')) {
-		let score = row.querySelector('.overall').dataset.score
-		if (score !== tie_score) {
-			tie_rank = i
-			tie_score = score
-		}
-		row.querySelector('td.rank').textContent = tie_rank
-		// if (tie_rank <= settings.a_size) {
-		// 	row.add('a-division')
-		// }
+		// insertSorted(tr, tbody, (el) => {
+		// 	return -Number(el.querySelector('td.overall').dataset.score)
+		// })
 		i++
 	}
 
