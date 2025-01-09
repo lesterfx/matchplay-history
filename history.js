@@ -579,10 +579,10 @@ function show_standings_table() {
 		return Math.max(standings_settings.maxscore+1-position, standings_settings.minscore)
 	}
 	let overall_standings = {}
-	for (let id of Object.keys(loaded_standings.games_played)) {
+	for (let id of Object.keys(loaded_standings.player_standings_by_player)) {
 		overall_standings[id] = 0
-		for (let tournament of loaded_standings.standings_tournaments) {
-			overall_standings[id] += calculate_points(loaded_standings.player_standings_by_player[id][tournament.tournamentId])
+		for (let position of loaded_standings.player_standings_by_player[id]) {
+			overall_standings[id] += calculate_points(position)
 		}
 	}
 
