@@ -497,8 +497,7 @@ let loaded_standings = {}
 let standings_settings
 async function load_standings() {
 	document.getElementById('load-standings').classList.add('hide')
-	let table = document.getElementById('standings-table')
-	table.classList.add('hide')
+	document.getElementById('standings-table').classList.add('hide')
 
 	loaded_standings.overall_standings = {}
 	loaded_standings.games_played = {}
@@ -579,6 +578,7 @@ function show_standings_table() {
 			if (x == i) return true
 		}
 	}
+	let table = document.getElementById('standings-table')
 	table.classList.remove('hide')
 
 	let td
