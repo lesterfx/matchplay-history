@@ -628,7 +628,7 @@ function show_standings_table(settings_already_loaded) {
 		tr.append(td)
 		
 		td = document.createElement('td')
-		td.classList.add('name')
+		td.classList.add('text')
 		let name = all_data.player[id]
 		td.textContent = name
 		td.title = id
@@ -646,6 +646,7 @@ function show_standings_table(settings_already_loaded) {
 		
 		td = document.createElement('td')
 		td.classList.add('division')
+		td.classList.add('text')
 		let restricted = is_restricted(id)
 		if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
 			if (restricted) {

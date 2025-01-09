@@ -319,7 +319,7 @@ h3.sticky-header {
 #standings-table table {
     border-collapse: collapse;
 }
-#standings-table td:not(.name) {
+#standings-table td:not(.text) {
     text-align: right;
 }
 #standings-table th,
