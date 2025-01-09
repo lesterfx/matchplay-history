@@ -630,6 +630,7 @@ async function load_standings() {
 		tr.append(td)
 		
 		td = document.createElement('td')
+		td.classList.add('division')
 		let restricted = is_restricted(id)
 		if (tie_rank <= settings.a_size && games_played[id] >= settings.a_attendance) {
 			td.textContent = 'A'
@@ -637,6 +638,8 @@ async function load_standings() {
 		} else if (games_played[id] >= settings.b_attendance && !restricted) {
 			td.textContent = 'B'
 			tr.classList.add('b-division')
+		} else {
+			td.innerHTML = '&mdash'
 		}
 		td.addEventListener(click_tournament, handler(toggle_restricted, id, name))
 		tr.append(td)
@@ -679,11 +682,13 @@ function toggle_restricted(id, name) {
 		if (confirm(`Remove A Division restriction for ${name}?`)) {
 			vals.splice(index, 1)
 			el.value = vals.join(',')
+			load_standings()
 		}
 	} else {
 		if (confirm(`Restrict ${name} to A Division?`)) {
 			vals.push(id)
 			el.value = vals.join(',')
+			load_standings()
 		}
 	}
 }

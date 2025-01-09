@@ -345,6 +345,10 @@ h3.sticky-header {
 #standings-table td.empty::before {
     content: "—";
 }
+#standings-table td.division {
+    text-decoration: underline;
+    cursor: pointer;
+}
 #standings-table .a-division {
     font-weight: bold;
 }
