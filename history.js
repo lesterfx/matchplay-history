@@ -532,7 +532,7 @@ async function load_standings() {
 		}
 		for (let entry of standings) {
 			let id = entry.playerId
-			if (standings_setings.combine_names) {
+			if (standings_settings.combine_names) {
 				alternate_id = loaded_standings.id_by_name[all_data.player[entry.playerId].toLowerCase()]
 				if (alternate_id) {
 					id = alternate_id
@@ -540,7 +540,7 @@ async function load_standings() {
 					loaded_standings.id_by_name[all_data.player[entry.playerId].toLowerCase()] = id
 				}
 			}
-			let points = Math.max(standings_setings.maxscore+1-entry.position, standings_setings.minscore)
+			let points = Math.max(standings_settings.maxscore+1-entry.position, standings_settings.minscore)
 			if (!loaded_standings.player_standings_by_player[id]) {
 				loaded_standings.player_standings_by_player[id] = {}
 				loaded_standings.overall_standings[id] = 0
@@ -569,13 +569,13 @@ async function load_standings() {
 function show_standings_table() {
 	let bonus_met = function(i) {
 		return (
-			Number(i >= standings_setings.bonus_1) +
-			Number(i >= standings_setings.bonus_2) +
-			Number(i >= standings_setings.bonus_3)
+			Number(i >= standings_settings.bonus_1) +
+			Number(i >= standings_settings.bonus_2) +
+			Number(i >= standings_settings.bonus_3)
 		)
 	}
 	let is_restricted = function(i) {
-		for (let x of standings_setings.a_restricted) {
+		for (let x of standings_settings.a_restricted) {
 			if (x == i) return true
 		}
 	}
@@ -635,7 +635,7 @@ function show_standings_table() {
 		td = document.createElement('td')
 		td.classList.add('division')
 		let restricted = is_restricted(id)
-		if (tie_rank <= standings_setings.a_size && loaded_standings.games_played[id] >= standings_setings.a_attendance) {
+		if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
 			if (restricted) {
 				td.textContent = 'A*'
 			} else {
@@ -644,7 +644,7 @@ function show_standings_table() {
 			tr.classList.add('a-division')
 		} else if (restricted) {
 			td.textContent = '*'
-		} else if (loaded_standings.games_played[id] >= standings_setings.b_attendance) {
+		} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
 			td.textContent = 'B'
 			tr.classList.add('b-division')
 		} else {
@@ -664,7 +664,7 @@ function show_standings_table() {
 
 		td = document.createElement('td')
 		td.classList.add('last-col')
-		td.textContent = (score / loaded_standings.games_played[id] / standings_setings.maxscore).toFixed(2)
+		td.textContent = (score / loaded_standings.games_played[id] / standings_settings.maxscore).toFixed(2)
 		tr.append(td)
 
 		for (tournament of loaded_standings.standings_tournaments) {
