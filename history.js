@@ -565,10 +565,7 @@ async function load_standings() {
 	})
 	show_standings_table()
 }
-function show_standings_table(get_settings_again) {
-	if (get_settings_again) {
-		standings_settings = get_standings_settings()
-	}
+function show_standings_table() {
 	let bonus_met = function(i) {
 		return (
 			Number(i >= standings_settings.bonus_1) +
@@ -694,13 +691,15 @@ function toggle_restricted(id, name) {
 		if (confirm(`Remove A Division restriction for ${name}?`)) {
 			vals.splice(index, 1)
 			el.value = vals.join(',')
-			show_standings_table(true)
+			standings_settings = get_standings_settings()
+			show_standings_table()
 		}
 	} else {
 		if (confirm(`Restrict ${name} to A Division?`)) {
 			vals.push(id)
 			el.value = vals.join(',')
-			show_standings_table(true)
+			standings_settings = get_standings_settings()
+			show_standings_table()
 		}
 	}
 }
