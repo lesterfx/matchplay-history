@@ -614,7 +614,8 @@ async function load_standings() {
 		
 		td = document.createElement('td')
 		td.classList.add('name')
-		td.textContent = all_data.player[id]
+		let name = all_data.player[id]
+		td.textContent = name
 		td.title = id
 		tr.append(td)
 
@@ -630,13 +631,14 @@ async function load_standings() {
 		
 		td = document.createElement('td')
 		let restricted = is_restricted(id)
-		if (tie_rank <= 16 && games_played[id] >= settings.a_attendance) {
+		if (tie_rank <= settings.a_size && games_played[id] >= settings.a_attendance) {
 			td.textContent = 'A'
 			tr.classList.add('a-division')
 		} else if (games_played[id] >= settings.b_attendance && !restricted) {
 			td.textContent = 'B'
 			tr.classList.add('b-division')
 		}
+		td.addEventListener(click_tournament, handler(toggle_restricted, id, name))
 		tr.append(td)
 
 		td = document.createElement('td')
@@ -666,12 +668,24 @@ async function load_standings() {
 		}
 
 		tbody.append(tr)
-		// insertSorted(tr, tbody, (el) => {
-		// 	return -Number(el.querySelector('td.overall').dataset.score)
-		// })
 		i++
 	}
-
+}
+function toggle_restricted(id, name) {
+	let el = document.getElementById('a-restricted')
+	let vals = el.value.replaceAll(',', ' ').split(' ')
+	let index = vals.index(id)
+	if (index) {
+		if (confirm(`Remove A Division restriction for ${name}?`)) {
+			vals.splice(index, 1)
+			el.value = vals.join(',')
+		}
+	} else {
+		if (confirm(`Restrict ${name} to A Division?`)) {
+			vals.push(id)
+			el.value = vals.join(',')
+		}
+	}
 }
 async function get_other(id) {
 	let refresh_players
