@@ -674,7 +674,7 @@ async function load_standings() {
 		i++
 	}
 }
-function toggle_restricted(id, name) {
+async function toggle_restricted(id, name) {
 	let el = document.getElementById('a-restricted')
 	let vals = el.value.replaceAll(',', ' ').split(' ')
 	let index = vals.indexOf(id)
@@ -682,13 +682,13 @@ function toggle_restricted(id, name) {
 		if (confirm(`Remove A Division restriction for ${name}?`)) {
 			vals.splice(index, 1)
 			el.value = vals.join(',')
-			load_standings()
+			await load_standings()
 		}
 	} else {
 		if (confirm(`Restrict ${name} to A Division?`)) {
 			vals.push(id)
 			el.value = vals.join(',')
-			load_standings()
+			await load_standings()
 		}
 	}
 }
