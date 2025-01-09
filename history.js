@@ -539,17 +539,14 @@ async function load_standings() {
 					loaded_standings.id_by_name[all_data.player[entry.playerId].toLowerCase()] = id
 				}
 			}
-			let points = Math.max(standings_settings.maxscore+1-entry.position, standings_settings.minscore)
 			if (!loaded_standings.player_standings_by_player[id]) {
 				loaded_standings.player_standings_by_player[id] = {}
-				loaded_standings.overall_standings[id] = 0
 				loaded_standings.games_played[id] = 0
 			}
 			if (loaded_standings.player_standings_by_player[id][tid]) {
 				alert(`multiple entries for ${id} in ${tournament.name}`)
 			}
-			loaded_standings.player_standings_by_player[id][tid] = points
-			loaded_standings.overall_standings[id] += points
+			loaded_standings.player_standings_by_player[id][tid] = entry.position
 			loaded_standings.games_played[id] += 1
 		}
 	}
@@ -578,6 +575,17 @@ function show_standings_table() {
 			if (x == i) return true
 		}
 	}
+	let calculate_points = function(position) {
+		return Math.max(standings_settings.maxscore+1-position, standings_settings.minscore)
+	}
+	let overall_standings = {}
+	for (let id of loaded_standings.games_played) {
+		overall_standings[id] = 0
+		for (let tournament of loaded_standings.standings_tournaments) {
+			overall_standings[id] += calculate_points(loaded_standings.player_standings_by_player[id][tournament.tournamentId])
+		}
+	}
+
 	let table = document.getElementById('standings-table')
 	table.classList.remove('hide')
 
@@ -597,7 +605,7 @@ function show_standings_table() {
 	let tbody = table.querySelector('tbody')
 	tbody.innerHTML = ''
 
-	const overall_standings_entries = Object.entries(loaded_standings.overall_standings);
+	const overall_standings_entries = Object.entries(overall_standings);
 	overall_standings_entries.sort((a, b) => b[1] - a[1]);
 	let i = 1
 	let tie_rank = 1
@@ -667,9 +675,9 @@ function show_standings_table() {
 		td.textContent = (score / loaded_standings.games_played[id] / standings_settings.maxscore).toFixed(2)
 		tr.append(td)
 
-		for (tournament of loaded_standings.standings_tournaments) {
+		for (let tournament of loaded_standings.standings_tournaments) {
 			td = document.createElement('td')
-			let val = loaded_standings.player_standings_by_player[id][tournament.tournamentId]
+			let val = calculate_points(loaded_standings.player_standings_by_player[id][tournament.tournamentId])
 			if (val) {
 				td.innerHTML = val
 			} else {
