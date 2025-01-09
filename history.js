@@ -629,19 +629,17 @@ async function load_standings() {
 		tr.append(td)
 		
 		td = document.createElement('td')
-		let finals = []
 		let restricted = is_restricted(id)
 		if (tie_rank <= 16 && games_played[id] >= settings.a_attendance) {
-			let s = document.createElement('span')
-			s.textContent = 'A'
-			td.append(s)
+			td.textContent = 'A'
 			tr.classList.add('a-division')
 		} else if (games_played[id] >= settings.b_attendance && !restricted) {
-			let s = document.createElement('span')
-			s.textContent = 'B'
+			td.textContent = 'B'
 			tr.classList.add('b-division')
-			td.append(s)
 		}
+		tr.append(td)
+
+		td = document.createElement('td')
 		let bonus = bonus_met(games_played[id])
 		if (bonus) {
 			let s = document.createElement('span')
