@@ -639,9 +639,9 @@ async function load_standings() {
 			td.textContent = 'B'
 			tr.classList.add('b-division')
 		} else {
-			td.innerHTML = '&mdash'
+			td.innerHTML = '&mdash;'
 		}
-		td.addEventListener(click_tournament, handler(toggle_restricted, id, name))
+		td.addEventListener('click', handler(toggle_restricted, id, name))
 		tr.append(td)
 
 		td = document.createElement('td')
