@@ -678,7 +678,7 @@ function toggle_restricted(id, name) {
 	let el = document.getElementById('a-restricted')
 	let vals = el.value.replaceAll(',', ' ').split(' ')
 	let index = vals.indexOf(id)
-	if (index) {
+	if (index > -1) {
 		if (confirm(`Remove A Division restriction for ${name}?`)) {
 			vals.splice(index, 1)
 			el.value = vals.join(',')
