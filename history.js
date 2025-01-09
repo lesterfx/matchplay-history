@@ -581,7 +581,7 @@ function show_standings_table() {
 	let overall_standings = {}
 	for (let id of Object.keys(loaded_standings.player_standings_by_player)) {
 		overall_standings[id] = 0
-		for (let position of Object.keys(loaded_standings.player_standings_by_player[id])) {
+		for (let position of Object.values(loaded_standings.player_standings_by_player[id])) {
 			overall_standings[id] += calculate_points(position)
 		}
 	}
