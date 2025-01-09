@@ -605,11 +605,11 @@ async function load_standings() {
 
 		td = document.createElement('td')
 		td.classList.add('rank')
-		if (score !== score) {
+		if (score !== tie_score) {
 			tie_rank = i
 			tie_score = score
 		}
-		td.textContent = tie_score
+		td.textContent = tie_rank
 		tr.append(td)
 		
 		td = document.createElement('td')
@@ -631,16 +631,20 @@ async function load_standings() {
 		td = document.createElement('td')
 		let finals = []
 		let restricted = is_restricted(id)
-		if (games_played[id] >= settings.a_attendance || restricted) {
-			finals.push('A')
+		if (tie_rank <= 16 && games_played[id] >= settings.a_attendance) {
+			let s = document.createElement('span')
+			s.textContent = 'A'
+			td.append(s)
+		} else if (games_played[id] >= settings.b_attendance && !restricted) {
+			let s = document.createElement('span')
+			s.textContent = 'B'
+			td.append(s)
 		}
-		if (games_played[id] >= settings.b_attendance && !restricted) {
-			finals.push('B')
-		}
-		td.textContent = finals.join('/')
 		let bonus = bonus_met(games_played[id])
 		if (bonus) {
-			td.textContent += (' +' + bonus_met(games_played[id]))
+			let s = document.createElement('span')
+			s.textContent = (' +' + bonus_met(games_played[id]))
+			td.append(s)
 		}
 		tr.append(td)
 
