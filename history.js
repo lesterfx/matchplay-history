@@ -596,7 +596,7 @@ async function load_standings() {
 
 	const overall_standings_entries = Object.entries(overall_standings);
 	overall_standings_entries.sort((a, b) => b[1] - a[1]);
-	let i = 0
+	let i = 1
 	let tie_rank = 1
 	let tie_score = null
 	for (let [id, score] of overall_standings_entries) {
@@ -635,9 +635,11 @@ async function load_standings() {
 			let s = document.createElement('span')
 			s.textContent = 'A'
 			td.append(s)
+			tr.classList.add('a-division')
 		} else if (games_played[id] >= settings.b_attendance && !restricted) {
 			let s = document.createElement('span')
 			s.textContent = 'B'
+			tr.classList.add('b-division')
 			td.append(s)
 		}
 		let bonus = bonus_met(games_played[id])
