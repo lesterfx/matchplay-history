@@ -495,6 +495,8 @@ function get_standings_settings() {
 }
 async function load_standings() {
 	document.getElementById('load-standings').classList.add('hide')
+	let table = document.getElementById('standings-table')
+	table.classList.add('hide')
 	let overall_standings = {}
 	let games_played = {}
 	let player_standings_by_player = {}
@@ -575,7 +577,6 @@ async function load_standings() {
 	})
 	// log(standings_tournaments)
 
-	let table = document.getElementById('standings-table')
 	table.classList.remove('hide')
 
 	let td
@@ -633,9 +634,15 @@ async function load_standings() {
 		td.classList.add('division')
 		let restricted = is_restricted(id)
 		if (tie_rank <= settings.a_size && games_played[id] >= settings.a_attendance) {
-			td.textContent = 'A'
+			if (restricted) {
+				td.textContent = 'A*'
+			} else {
+				td.textContent = 'A'
+			}
 			tr.classList.add('a-division')
-		} else if (games_played[id] >= settings.b_attendance && !restricted) {
+		} else if (restricted) {
+			td.innerHTML = '&mdash;*'
+		} else if (games_played[id] >= settings.b_attendance) {
 			td.textContent = 'B'
 			tr.classList.add('b-division')
 		} else {
