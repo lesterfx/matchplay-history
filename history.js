@@ -620,6 +620,61 @@ function show_standings_table(settings_already_loaded) {
 	let headrow = table.querySelector('thead tr')
 	for (el of headrow.querySelectorAll('th:not(.keep)')) el.remove()
 
+	th = document.createElement('th')
+	th.classList.add('keep')
+	th.textContent = 'Pos'
+	headrow.append(th)
+	
+	th = document.createElement('th')
+	th.classList.add('keep')
+	th.textContent = 'Player'
+	headrow.append(th)
+	
+	if (standings_settings.show_points) {
+		th = document.createElement('th')
+		th.classList.add('keep')
+		th.textContent = 'Points'
+		headrow.append(th)
+	}
+
+	if (standings_settings.show_mtgs) {
+		th = document.createElement('th')
+		th.classList.add('keep')
+		th.textContent = 'Mtgs'
+		headrow.append(th)
+	}
+	
+	if (standings_settings.show_finals) {
+		th = document.createElement('th')
+		th.classList.add('keep')
+		th.textContent = 'Div'
+		headrow.append(th)
+		
+		th = document.createElement('th')
+		th.classList.add('keep')
+		th.textContent = 'Bonus'
+		headrow.append(th)
+	}
+
+	if (standings_settings.show_win) {}
+		th = document.createElement('th')
+		th.classList.add('keep')
+		th.textContent = 'Win %'
+		headrow.append(th)
+	}
+	if (standings_settings.show_avg_pts) {}
+		th = document.createElement('th')
+		th.classList.add('keep')
+		th.textContent = 'Avg Pts'
+		headrow.append(th)
+	}
+	if (standings_settings.show_avg_place) {}
+		th = document.createElement('th')
+		th.classList.add('keep')
+		th.textContent = 'Avg Place'
+		headrow.append(th)
+	}
+	
 	for (tournament of loaded_standings.standings_tournaments) {
 		th = document.createElement('th')
 		th.classList.add('week-col')
@@ -638,13 +693,6 @@ function show_standings_table(settings_already_loaded) {
 	let tie_rank = 1
 	let tie_score = null
 	for (let [id, score] of overall_standings_entries) {
-		// standings_settings.show_points
-		// standings_settings.show_mtgs
-		// standings_settings.show_win
-		// standings_settings.show_avg_pts
-		// standings_settings.show_avg_place
-		// standings_settings.show_finals
-
 		let tr = document.createElement('tr')
 		tr.classList.add('player')
 
@@ -692,11 +740,13 @@ function show_standings_table(settings_already_loaded) {
 				tr.classList.add('a-division')
 			} else if (restricted) {
 				td.textContent = '*'
+				tr.classList.add('no-finals')
 			} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
 				td.textContent = 'B'
 				tr.classList.add('b-division')
 			} else {
 				td.innerHTML = '&mdash;'
+				tr.classList.add('no-finals')
 			}
 			td.addEventListener('click', handler(toggle_restricted, id, name))
 			tr.append(td)
@@ -718,7 +768,7 @@ function show_standings_table(settings_already_loaded) {
 		}
 		if (standings_settings.show_avg_pts) {
 			td = document.createElement('td')
-			td.textContent = (score / loaded_standings.games_played[id]).toFixed(2)
+			td.textContent = (score / loaded_standings.games_played[id]).toFixed(0)
 			tr.append(td)
 		}
 		if (standings_settings.show_avg_place) {
