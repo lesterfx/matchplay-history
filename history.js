@@ -466,30 +466,49 @@ async function tournament_clicked_standings() {
 
 function load_standings_settings() {
 	let settings = JSON.parse(localStorage.getItem('standings-settings') || '{}')
+
 	if (settings.minscore) document.getElementById('score-min').value = settings.minscore
 	if (settings.maxscore) document.getElementById('score-max').value = settings.maxscore
-	if (settings.combine_names) document.getElementById('combine-names').checked = settings.combine_names
-	if (settings.a_size) document.getElementById('a-size').value = settings.a_size
-	if (settings.a_attendance) document.getElementById('a-attendance').value = settings.a_attendance
-	if (settings.a_restricted) document.getElementById('a-restricted').value = settings.a_restricted.join(',')
+	if (settings.combine_names !== undefined) document.getElementById('combine-names').checked = settings.combine_names
+
+	if (settings.show_points !== undefined) document.getElementById('show-points').checked = settings.show_points
+	if (settings.show_mtgs !== undefined) document.getElementById('show-mtgs').checked = settings.show_mtgs
+	if (settings.show_win !== undefined) document.getElementById('show-win').checked = settings.show_win
+	if (settings.show_avg_pts !== undefined) document.getElementById('show-avg-pts').checked = settings.show_avg_pts
+	if (settings.show_avg_place !== undefined) document.getElementById('show-avg-place').checked = settings.show_avg_place
+	if (settings.show_finals !== undefined) document.getElementById('show-finals').checked = settings.show_finals
+
 	if (settings.b_attendance) document.getElementById('b-attendance').value = settings.b_attendance
+	if (settings.a_attendance) document.getElementById('a-attendance').value = settings.a_attendance
+	if (settings.a_size) document.getElementById('a-size').value = settings.a_size
 	if (settings.bonus_1) document.getElementById('bonus-1').value = settings.bonus_1
 	if (settings.bonus_2) document.getElementById('bonus-2').value = settings.bonus_2
 	if (settings.bonus_3) document.getElementById('bonus-3').value = settings.bonus_3
+	if (settings.a_restricted) document.getElementById('a-restricted').value = settings.a_restricted.join(',')
 	return settings
 }
 function get_standings_settings() {
 	let settings = {}
+	
 	settings.minscore = Number(document.getElementById('score-min').value)
 	settings.maxscore = Number(document.getElementById('score-max').value)
 	settings.combine_names = document.getElementById('combine-names').checked
-	settings.a_size = Number(document.getElementById('a-size').value)
-	settings.a_attendance = Number(document.getElementById('a-attendance').value)
-	settings.a_restricted = (document.getElementById('a-restricted').value).replaceAll(',', ' ').split(' ')
+
+	settings.show_points = document.getElementById('show-points').checked
+	settings.show_mtgs = document.getElementById('show-mtgs').checked
+	settings.show_win = document.getElementById('show-win').checked
+	settings.show_avg_pts = document.getElementById('show-avg-pts').checked
+	settings.show_avg_place = document.getElementById('show-avg-place').checked
+	settings.show_finals = document.getElementById('show-finals').checked
+
 	settings.b_attendance = Number(document.getElementById('b-attendance').value)
+	settings.a_attendance = Number(document.getElementById('a-attendance').value)
+	settings.a_size = Number(document.getElementById('a-size').value)
 	settings.bonus_1 = Number(document.getElementById('bonus-1').value)
 	settings.bonus_2 = Number(document.getElementById('bonus-2').value)
 	settings.bonus_3 = Number(document.getElementById('bonus-3').value)
+	settings.a_restricted = (document.getElementById('a-restricted').value).replaceAll(',', ' ').split(' ')
+	
 	localStorage.setItem('standings-settings', JSON.stringify(settings))
 	return settings
 }
@@ -583,10 +602,13 @@ function show_standings_table(settings_already_loaded) {
 		return Math.max(standings_settings.maxscore+1-position, standings_settings.minscore)
 	}
 	let overall_standings = {}
+	let overall_place = {}
 	for (let id of Object.keys(loaded_standings.player_standings_by_player)) {
 		overall_standings[id] = 0
+		overall_place[id] = 0
 		for (let position of Object.values(loaded_standings.player_standings_by_player[id])) {
 			overall_standings[id] += calculate_points(position)
+			overall_place[id] += position
 		}
 	}
 
@@ -600,6 +622,7 @@ function show_standings_table(settings_already_loaded) {
 
 	for (tournament of loaded_standings.standings_tournaments) {
 		th = document.createElement('th')
+		th.classList.add('week-col')
 		let span = document.createElement('span')
 		th.appendChild(span)
 		span.textContent = tournament.name
@@ -615,17 +638,26 @@ function show_standings_table(settings_already_loaded) {
 	let tie_rank = 1
 	let tie_score = null
 	for (let [id, score] of overall_standings_entries) {
+		// settings.show_points
+		// settings.show_mtgs
+		// settings.show_win
+		// settings.show_avg_pts
+		// settings.show_avg_place
+		// settings.show_finals
+
 		let tr = document.createElement('tr')
 		tr.classList.add('player')
 
-		td = document.createElement('td')
-		td.classList.add('rank')
 		if (score !== tie_score) {
 			tie_rank = i
 			tie_score = score
 		}
-		td.textContent = tie_rank
-		tr.append(td)
+		if (settings.show_points) {
+			td = document.createElement('td')
+			td.classList.add('rank')
+			td.textContent = tie_rank
+			tr.append(td)
+		}
 		
 		td = document.createElement('td')
 		td.classList.add('text')
@@ -640,48 +672,64 @@ function show_standings_table(settings_already_loaded) {
 		td.textContent = score
 		tr.append(td)
 
-		td = document.createElement('td')
-		td.textContent = loaded_standings.games_played[id]
-		tr.append(td)
+		if (settings.show_mtgs) {	
+			td = document.createElement('td')
+			td.textContent = loaded_standings.games_played[id]
+			tr.append(td)
+		}
 		
-		td = document.createElement('td')
-		td.classList.add('division')
-		td.classList.add('text')
-		let restricted = is_restricted(id)
-		if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
-			if (restricted) {
-				td.textContent = 'A*'
+		if (settings.show_finals) {
+			td = document.createElement('td')
+			td.classList.add('division')
+			td.classList.add('text')
+			let restricted = is_restricted(id)
+			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
+				if (restricted) {
+					td.textContent = 'A*'
+				} else {
+					td.textContent = 'A'
+				}
+				tr.classList.add('a-division')
+			} else if (restricted) {
+				td.textContent = '*'
+			} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
+				td.textContent = 'B'
+				tr.classList.add('b-division')
 			} else {
-				td.textContent = 'A'
+				td.innerHTML = '&mdash;'
 			}
-			tr.classList.add('a-division')
-		} else if (restricted) {
-			td.textContent = '*'
-		} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
-			td.textContent = 'B'
-			tr.classList.add('b-division')
-		} else {
-			td.innerHTML = '&mdash;'
-		}
-		td.addEventListener('click', handler(toggle_restricted, id, name))
-		tr.append(td)
+			td.addEventListener('click', handler(toggle_restricted, id, name))
+			tr.append(td)
 
-		td = document.createElement('td')
-		let bonus = bonus_met(loaded_standings.games_played[id])
-		if (bonus) {
-			let s = document.createElement('span')
-			s.textContent = (' +' + bonus_met(loaded_standings.games_played[id]))
-			td.append(s)
+			td = document.createElement('td')
+			let bonus = bonus_met(loaded_standings.games_played[id])
+			if (bonus) {
+				let s = document.createElement('span')
+				s.textContent = (' +' + bonus_met(loaded_standings.games_played[id]))
+				td.append(s)
+			}
+			tr.append(td)
 		}
-		tr.append(td)
 
-		td = document.createElement('td')
-		td.classList.add('last-col')
-		td.textContent = (score / loaded_standings.games_played[id] / standings_settings.maxscore).toFixed(2)
-		tr.append(td)
+		if (settings.show_win) {
+			td = document.createElement('td')
+			td.textContent = (score / loaded_standings.games_played[id] / standings_settings.maxscore).toFixed(2)
+			tr.append(td)
+		}
+		if (settings.show_avg_pts) {
+			td = document.createElement('td')
+			td.textContent = (score / loaded_standings.games_played[id]).toFixed(2)
+			tr.append(td)
+		}
+		if (settings.show_avg_place) {
+			td = document.createElement('td')
+			td.textContent = (overall_place[id] / loaded_standings.games_played[id]).toFixed(1)
+			tr.append(td)
+		}
 
 		for (let tournament of loaded_standings.standings_tournaments) {
 			td = document.createElement('td')
+			td.classList.add('week-col')
 			let val = calculate_points(loaded_standings.player_standings_by_player[id][tournament.tournamentId])
 			if (val) {
 				td.innerHTML = val

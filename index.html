@@ -54,6 +54,7 @@
 					<span class="spacer"></span>
 				</h3>
 				<table id="standings-settings-table" class="hide">
+
 					<tr>
 						<td colspan="2">
 							<h4>Points</h4>
@@ -68,11 +69,38 @@
 					</tr>
 					<tr>
 						<td>Combine same name</td>
-						<td><input type="checkbox" id="combine-names" checked class="need-reload"></td>
+						<td><input type="checkbox" checked id="combine-names" class="need-reload"></td>
 					</tr>
+
 					<tr>
 						<td colspan="2">
-							<h4>Finals</h4>
+							<h4>Totals</h4>
+						</td>
+					</tr>
+					<tr>
+						<td>Points></td>
+						<td><input type="checkbox" checked id="show-points"></td>
+					</tr>
+					<tr>
+						<td>Mtgs></td>
+						<td><input type="checkbox" checked id="show-mtgs"></td>
+					</tr>
+					<tr>
+						<td>Win %</td>
+						<td><input type="checkbox" checked id="show-win"></td>
+					</tr>
+					<tr>
+						<td>Avg Pts</td>
+						<td><input type="checkbox" id="show-avg-pts"></td>
+					</tr>
+					<tr>
+						<td>Avg Place</td>
+						<td><input type="checkbox" id="show-avg-place"></td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<h4>Finals<input type="checkbox" checked id="show-finals"></h4>
 						</td>
 					</tr>
 					<tr>
@@ -107,11 +135,11 @@
 							<tr>
 								<th class="keep">Pos</th>
 								<th class="keep">Player</th>
-								<th class="keep overall" data-score="0">Points</th>
+								<th class="keep" data-score="0">Points</th>
 								<th class="keep">Mtgs</th>
 								<th class="keep">Div</th>
 								<th class="keep">Bonus</th>
-								<th class="keep last-col">Win %</th>
+								<th class="keep">Win %</th>
 							</tr>
 						</thead>
 						<tbody>

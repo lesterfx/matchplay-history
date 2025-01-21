@@ -332,8 +332,8 @@ h3.sticky-header {
     vertical-align: bottom;
     text-align: center;
 }
-#standings-table .last-col {
-    border-right: 1px solid var(--text);
+#standings-table :not(.week-col)+.week-col {
+    border-left: 1px solid var(--text);
 }
 #standings-table th.keep {
     text-align: left;
