@@ -677,7 +677,7 @@ function show_standings_table(settings_already_loaded) {
 	
 	for (tournament of loaded_standings.standings_tournaments) {
 		th = document.createElement('th')
-		th.classList.add('week-col')
+		th.classList.add('week-col', 'vertical')
 		let span = document.createElement('span')
 		th.appendChild(span)
 		span.textContent = tournament.name
@@ -715,7 +715,6 @@ function show_standings_table(settings_already_loaded) {
 		if (standings_settings.show_points) {
 			td = document.createElement('td')
 			td.classList.add('overall')
-			td.dataset.score = score
 			td.textContent = score
 			tr.append(td)
 		}
@@ -793,6 +792,7 @@ function show_standings_table(settings_already_loaded) {
 		tbody.append(tr)
 		i++
 	}
+	table.scrollIntoView();
 }
 function toggle_restricted(id, name) {
 	let el = document.getElementById('a-restricted')

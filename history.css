@@ -335,10 +335,10 @@ h3.sticky-header {
 #standings-table :not(.week-col)+.week-col {
     border-left: 1px solid var(--text);
 }
-#standings-table th.keep {
+#standings-table th {
     text-align: left;
 }
-#standings-table th:not(.keep) span {
+#standings-table th.vertical span {
     writing-mode: vertical-rl;
     white-space: nowrap;
 }
