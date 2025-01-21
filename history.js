@@ -618,7 +618,7 @@ function show_standings_table(settings_already_loaded) {
 	let td
 
 	let headrow = table.querySelector('thead tr')
-	for (el of headrow.querySelectorAll('th:not(.keep)')) el.remove()
+	headrow.innerHTML = ''
 
 	th = document.createElement('th')
 	th.classList.add('keep')
@@ -656,19 +656,19 @@ function show_standings_table(settings_already_loaded) {
 		headrow.append(th)
 	}
 
-	if (standings_settings.show_win) {}
+	if (standings_settings.show_win) {
 		th = document.createElement('th')
 		th.classList.add('keep')
 		th.textContent = 'Win %'
 		headrow.append(th)
 	}
-	if (standings_settings.show_avg_pts) {}
+	if (standings_settings.show_avg_pts) {
 		th = document.createElement('th')
 		th.classList.add('keep')
 		th.textContent = 'Avg Pts'
 		headrow.append(th)
 	}
-	if (standings_settings.show_avg_place) {}
+	if (standings_settings.show_avg_place) {
 		th = document.createElement('th')
 		th.classList.add('keep')
 		th.textContent = 'Avg Place'
