@@ -638,12 +638,12 @@ function show_standings_table(settings_already_loaded) {
 	let tie_rank = 1
 	let tie_score = null
 	for (let [id, score] of overall_standings_entries) {
-		// settings.show_points
-		// settings.show_mtgs
-		// settings.show_win
-		// settings.show_avg_pts
-		// settings.show_avg_place
-		// settings.show_finals
+		// standings_settings.show_points
+		// standings_settings.show_mtgs
+		// standings_settings.show_win
+		// standings_settings.show_avg_pts
+		// standings_settings.show_avg_place
+		// standings_settings.show_finals
 
 		let tr = document.createElement('tr')
 		tr.classList.add('player')
@@ -652,7 +652,7 @@ function show_standings_table(settings_already_loaded) {
 			tie_rank = i
 			tie_score = score
 		}
-		if (settings.show_points) {
+		if (standings_settings.show_points) {
 			td = document.createElement('td')
 			td.classList.add('rank')
 			td.textContent = tie_rank
@@ -672,13 +672,13 @@ function show_standings_table(settings_already_loaded) {
 		td.textContent = score
 		tr.append(td)
 
-		if (settings.show_mtgs) {	
+		if (standings_settings.show_mtgs) {	
 			td = document.createElement('td')
 			td.textContent = loaded_standings.games_played[id]
 			tr.append(td)
 		}
 		
-		if (settings.show_finals) {
+		if (standings_settings.show_finals) {
 			td = document.createElement('td')
 			td.classList.add('division')
 			td.classList.add('text')
@@ -711,17 +711,17 @@ function show_standings_table(settings_already_loaded) {
 			tr.append(td)
 		}
 
-		if (settings.show_win) {
+		if (standings_settings.show_win) {
 			td = document.createElement('td')
 			td.textContent = (score / loaded_standings.games_played[id] / standings_settings.maxscore).toFixed(2)
 			tr.append(td)
 		}
-		if (settings.show_avg_pts) {
+		if (standings_settings.show_avg_pts) {
 			td = document.createElement('td')
 			td.textContent = (score / loaded_standings.games_played[id]).toFixed(2)
 			tr.append(td)
 		}
-		if (settings.show_avg_place) {
+		if (standings_settings.show_avg_place) {
 			td = document.createElement('td')
 			td.textContent = (overall_place[id] / loaded_standings.games_played[id]).toFixed(1)
 			tr.append(td)
