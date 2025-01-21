@@ -652,12 +652,10 @@ function show_standings_table(settings_already_loaded) {
 			tie_rank = i
 			tie_score = score
 		}
-		if (standings_settings.show_points) {
-			td = document.createElement('td')
-			td.classList.add('rank')
-			td.textContent = tie_rank
-			tr.append(td)
-		}
+		td = document.createElement('td')
+		td.classList.add('rank')
+		td.textContent = tie_rank
+		tr.append(td)
 		
 		td = document.createElement('td')
 		td.classList.add('text')
@@ -666,11 +664,13 @@ function show_standings_table(settings_already_loaded) {
 		td.title = id
 		tr.append(td)
 
-		td = document.createElement('td')
-		td.classList.add('overall')
-		td.dataset.score = score
-		td.textContent = score
-		tr.append(td)
+		if (standings_settings.show_points) {
+			td = document.createElement('td')
+			td.classList.add('overall')
+			td.dataset.score = score
+			td.textContent = score
+			tr.append(td)
+		}
 
 		if (standings_settings.show_mtgs) {	
 			td = document.createElement('td')
