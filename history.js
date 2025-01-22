@@ -579,7 +579,7 @@ async function load_standings() {
 			return 0
 		}
 	})
-	show_standings_table(true)
+	show_standings_table(true).scrollIntoView()
 }
 function show_standings_table(settings_already_loaded) {
 	if (!settings_already_loaded) {
@@ -621,56 +621,47 @@ function show_standings_table(settings_already_loaded) {
 	headrow.innerHTML = ''
 
 	th = document.createElement('th')
-	th.classList.add('keep')
 	th.textContent = 'Pos'
 	headrow.append(th)
 	
 	th = document.createElement('th')
-	th.classList.add('keep')
 	th.textContent = 'Player'
 	headrow.append(th)
 	
 	if (standings_settings.show_points) {
 		th = document.createElement('th')
-		th.classList.add('keep')
 		th.textContent = 'Points'
 		headrow.append(th)
 	}
 
 	if (standings_settings.show_mtgs) {
 		th = document.createElement('th')
-		th.classList.add('keep')
 		th.textContent = 'Mtgs'
 		headrow.append(th)
 	}
 	
 	if (standings_settings.show_finals) {
 		th = document.createElement('th')
-		th.classList.add('keep')
 		th.textContent = 'Div'
 		headrow.append(th)
 		
 		th = document.createElement('th')
-		th.classList.add('keep')
 		th.textContent = 'Bonus'
 		headrow.append(th)
 	}
 
 	if (standings_settings.show_win) {
 		th = document.createElement('th')
-		th.classList.add('keep')
 		th.textContent = 'Win %'
 		headrow.append(th)
 	}
 	if (standings_settings.show_avg_pts) {
 		th = document.createElement('th')
-		th.classList.add('keep')
 		th.textContent = 'Avg Pts'
 		headrow.append(th)
 	}
 	if (standings_settings.show_avg_place) {
 		th = document.createElement('th')
-		th.classList.add('keep')
 		th.textContent = 'Avg Place'
 		headrow.append(th)
 	}
@@ -706,7 +697,6 @@ function show_standings_table(settings_already_loaded) {
 		tr.append(td)
 		
 		td = document.createElement('td')
-		td.classList.add('text')
 		let name = all_data.player[id]
 		td.textContent = name
 		td.title = id
@@ -728,7 +718,6 @@ function show_standings_table(settings_already_loaded) {
 		if (standings_settings.show_finals) {
 			td = document.createElement('td')
 			td.classList.add('division')
-			td.classList.add('text')
 			let restricted = is_restricted(id)
 			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
 				if (restricted) {
@@ -792,7 +781,7 @@ function show_standings_table(settings_already_loaded) {
 		tbody.append(tr)
 		i++
 	}
-	table.scrollIntoView();
+	return table
 }
 function toggle_restricted(id, name) {
 	let el = document.getElementById('a-restricted')
