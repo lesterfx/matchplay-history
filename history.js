@@ -786,7 +786,7 @@ function show_standings_table(settings_already_loaded) {
 
 		for (let tournament of loaded_standings.standings_tournaments) {
 			td = document.createElement('td')
-			td.classList.add('wk')
+			// td.classList.add('wk')
 			let val = calculate_points(loaded_standings.player_standings_by_player[id][tournament.tournamentId])
 			if (val) {
 				td.innerHTML = val
