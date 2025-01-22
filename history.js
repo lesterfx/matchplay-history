@@ -723,7 +723,7 @@ function show_standings_table(settings_already_loaded) {
 		td = document.createElement('td')
 		let name = all_data.player[id]
 		td.textContent = name
-		td.classList.add('text')
+		// td.classList.add('text')
 		td.classList.add('has-text-align-left')
 		td.dataset.align = 'left'
 		tr.append(td)
@@ -742,7 +742,7 @@ function show_standings_table(settings_already_loaded) {
 		
 		if (standings_settings.show_finals) {
 			td = document.createElement('td')
-			td.classList.add('division', 'text')
+			// td.classList.add('division', 'text')
 			td.classList.add('has-text-align-left')
 			td.dataset.align = 'left'	
 			let restricted = is_restricted(id)
