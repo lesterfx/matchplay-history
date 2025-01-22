@@ -721,7 +721,7 @@ function show_standings_table(settings_already_loaded) {
 		td = document.createElement('td')
 		let name = all_data.player[id]
 		td.textContent = name
-		td.title = id
+		// td.title = id
 		tr.append(td)
 
 		if (standings_settings.show_points) {
@@ -755,7 +755,6 @@ function show_standings_table(settings_already_loaded) {
 				td.textContent = 'B'
 				tr.classList.add('b-division')
 			} else {
-				td.innerHTML = '&mdash;'
 				tr.classList.add('no-finals')
 			}
 			td.addEventListener('click', handler(toggle_restricted, id, name))
@@ -791,9 +790,6 @@ function show_standings_table(settings_already_loaded) {
 			let val = calculate_points(loaded_standings.player_standings_by_player[id][tournament.tournamentId])
 			if (val) {
 				td.innerHTML = val
-			} else {
-				// td.innerHTML = '&mdash;'
-				td.classList.add('empty')
 			}
 			tr.append(td)
 		}
