@@ -612,7 +612,8 @@ function show_standings_table(settings_already_loaded) {
 			let result = regex.exec(name);
 			if (result) {
 				return result.groups.abbr
-		} catch {
+			}
+		} catch (err) {
 			return
 		}
 	}
