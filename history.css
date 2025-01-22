@@ -355,7 +355,7 @@ h3.sticky-header {
 #standings-table .a-division {
     font-weight: bold;
 }
-#standings-table tr.player.no-finals {
+#standings-table tr.no-finals {
     opacity: 0.5;
 }
 #filter {

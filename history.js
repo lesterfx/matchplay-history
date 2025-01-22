@@ -707,27 +707,24 @@ function show_standings_table(settings_already_loaded) {
 	let tie_score = null
 	for (let [id, score] of overall_standings_entries) {
 		let tr = document.createElement('tr')
-		tr.classList.add('player')
 
 		if (score !== tie_score) {
 			tie_rank = i
 			tie_score = score
 		}
 		td = document.createElement('td')
-		td.classList.add('rank')
 		td.textContent = tie_rank
 		tr.append(td)
 		
 		td = document.createElement('td')
 		let name = all_data.player[id]
 		td.textContent = name
-		td.classList.add('name')
+		td.classList.add('text')
 		// td.title = id
 		tr.append(td)
 
 		if (standings_settings.show_points) {
 			td = document.createElement('td')
-			td.classList.add('overall')
 			td.textContent = score
 			tr.append(td)
 		}
