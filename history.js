@@ -689,7 +689,7 @@ function show_standings_table(settings_already_loaded) {
 	for (tournament of loaded_standings.standings_tournaments) {
 		th = document.createElement('th')
 		let custom_column_header = get_custom_column_header(tournament.name)
-		th.classList.add('week-col')
+		// th.classList.add('wk')
 		if (custom_column_header) {
 			th.textContent = custom_column_header
 		} else {
