@@ -685,10 +685,11 @@ function show_standings_table(settings_already_loaded) {
 	for (tournament of loaded_standings.standings_tournaments) {
 		th = document.createElement('th')
 		let custom_column_header = get_custom_column_header(tournament.name)
+		th.classList.add('week-col')
 		if (custom_column_header) {
 			th.textContent = custom_column_header
 		} else {
-			th.classList.add('week-col', 'vertical')
+			th.classList.add('vertical')
 			let span = document.createElement('span')
 			th.appendChild(span)
 			span.textContent = tournament.name
@@ -1115,6 +1116,9 @@ ready(async () => {
 	}
 	document.getElementById('copy-table').addEventListener('click', handler(function () {
 		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>table').innerText.trim()).catch(function () { });
+	}))
+	document.getElementById('copy-html').addEventListener('click', handler(function () {
+		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>table').outerHTML.trim()).catch(function () { });
 	}))
 
 	load_filters_history()

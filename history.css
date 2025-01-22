@@ -338,6 +338,9 @@ h3.sticky-header {
 #standings-table th {
     text-align: left;
 }
+#standings-table th:not(.vertical) {
+    padding-top: 4em;
+}
 #standings-table th.vertical span {
     writing-mode: vertical-rl;
     white-space: nowrap;
@@ -376,10 +379,12 @@ h3.sticky-header {
 .delete-tournament {
     cursor: pointer;
 }
-#copy-table {
+#copy-div {
     position: absolute;
     font-size: 1em;
+    margin-top: 1em;
+}
+#copy-div span {
     cursor: pointer;
     text-decoration: underline;
-    margin-top: 1em;
 }
