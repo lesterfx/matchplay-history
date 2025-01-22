@@ -608,7 +608,7 @@ function show_standings_table(settings_already_loaded) {
 			return
 		}
 		try {
-			let regex = standings_settings.custom_column_header
+			let regex = new RegExp(standings_settings.custom_column_header, 'gmi')
 			let result = regex.exec(name);
 			if (result) {
 				return result.groups.abbr
