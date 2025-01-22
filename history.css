@@ -332,7 +332,7 @@ h3.sticky-header {
     vertical-align: bottom;
     text-align: center;
 }
-#standings-table td:not(.week-col)+td.week-col {
+#standings-table td:not(.wk)+td.wk {
     border-left: 1px solid var(--text);
 }
 #standings-table th {

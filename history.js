@@ -668,7 +668,7 @@ function show_standings_table(settings_already_loaded) {
 
 	if (standings_settings.show_win) {
 		th = document.createElement('th')
-		th.textContent = 'Win %'
+		th.textContent = 'Win%'
 		headrow.append(th)
 	}
 	if (standings_settings.show_avg_pts) {
@@ -779,7 +779,7 @@ function show_standings_table(settings_already_loaded) {
 
 		for (let tournament of loaded_standings.standings_tournaments) {
 			td = document.createElement('td')
-			td.classList.add('week-col')
+			td.classList.add('wk')
 			let val = calculate_points(loaded_standings.player_standings_by_player[id][tournament.tournamentId])
 			if (val) {
 				td.innerHTML = val
