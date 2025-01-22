@@ -737,7 +737,7 @@ function show_standings_table(settings_already_loaded) {
 		
 		if (standings_settings.show_finals) {
 			td = document.createElement('td')
-			td.classList.add('division')
+			td.classList.add('division', 'text')
 			let restricted = is_restricted(id)
 			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
 				if (restricted) {
