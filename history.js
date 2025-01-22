@@ -721,6 +721,7 @@ function show_standings_table(settings_already_loaded) {
 		td = document.createElement('td')
 		let name = all_data.player[id]
 		td.textContent = name
+		td.classList.add('name')
 		// td.title = id
 		tr.append(td)
 
