@@ -642,6 +642,8 @@ function show_standings_table(settings_already_loaded) {
 	
 	th = document.createElement('th')
 	th.textContent = 'Player'
+	th.classList.add('has-text-align-left')
+	th.dataset.align = 'left'
 	headrow.append(th)
 	
 	if (standings_settings.show_points) {
@@ -659,6 +661,8 @@ function show_standings_table(settings_already_loaded) {
 	if (standings_settings.show_finals) {
 		th = document.createElement('th')
 		th.textContent = 'Div'
+		th.classList.add('has-text-align-left')
+		th.dataset.align = 'left'
 		headrow.append(th)
 		
 		th = document.createElement('th')
@@ -720,7 +724,8 @@ function show_standings_table(settings_already_loaded) {
 		let name = all_data.player[id]
 		td.textContent = name
 		td.classList.add('text')
-		// td.title = id
+		td.classList.add('has-text-align-left')
+		td.dataset.align = 'left'
 		tr.append(td)
 
 		if (standings_settings.show_points) {
@@ -738,6 +743,8 @@ function show_standings_table(settings_already_loaded) {
 		if (standings_settings.show_finals) {
 			td = document.createElement('td')
 			td.classList.add('division', 'text')
+			td.classList.add('has-text-align-left')
+			td.dataset.align = 'left'	
 			let restricted = is_restricted(id)
 			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
 				if (restricted) {
