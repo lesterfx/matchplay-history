@@ -470,6 +470,7 @@ function load_standings_settings() {
 	if (settings.minscore) document.getElementById('score-min').value = settings.minscore
 	if (settings.maxscore) document.getElementById('score-max').value = settings.maxscore
 	if (settings.combine_names !== undefined) document.getElementById('combine-names').checked = settings.combine_names
+	if (settings.custom_column_header) document.getElementById('custom-column-header').value = settings.custom_column_header
 
 	if (settings.show_points !== undefined) document.getElementById('show-points').checked = settings.show_points
 	if (settings.show_mtgs !== undefined) document.getElementById('show-mtgs').checked = settings.show_mtgs
@@ -493,6 +494,7 @@ function get_standings_settings() {
 	settings.minscore = Number(document.getElementById('score-min').value)
 	settings.maxscore = Number(document.getElementById('score-max').value)
 	settings.combine_names = document.getElementById('combine-names').checked
+	settings.custom_column_header = document.getElementById('custom-column-header').value
 
 	settings.show_points = document.getElementById('show-points').checked
 	settings.show_mtgs = document.getElementById('show-mtgs').checked
@@ -601,6 +603,19 @@ function show_standings_table(settings_already_loaded) {
 	let calculate_points = function(position) {
 		return Math.max(standings_settings.maxscore+1-position, standings_settings.minscore)
 	}
+	let get_custom_column_header = function(name) {
+		if (!standings_settings.custom_column_header) {
+			return
+		}
+		try {
+			let regex = standings_settings.custom_column_header
+			let result = regex.exec(name);
+			if (result) {
+				return result.groups.abbr
+		} catch {
+			return
+		}
+	}
 	let overall_standings = {}
 	let overall_place = {}
 	for (let id of Object.keys(loaded_standings.player_standings_by_player)) {
@@ -668,10 +683,15 @@ function show_standings_table(settings_already_loaded) {
 	
 	for (tournament of loaded_standings.standings_tournaments) {
 		th = document.createElement('th')
-		th.classList.add('week-col', 'vertical')
-		let span = document.createElement('span')
-		th.appendChild(span)
-		span.textContent = tournament.name
+		let custom_column_header = get_custom_column_header(tournament.name)
+		if (custom_column_header) {
+			th.textContent = custom_column_header
+		} else {
+			th.classList.add('week-col', 'vertical')
+			let span = document.createElement('span')
+			th.appendChild(span)
+			span.textContent = tournament.name
+		}
 		headrow.append(th)
 	}
 
@@ -742,9 +762,7 @@ function show_standings_table(settings_already_loaded) {
 			td = document.createElement('td')
 			let bonus = bonus_met(loaded_standings.games_played[id])
 			if (bonus) {
-				let s = document.createElement('span')
-				s.textContent = (' +' + bonus_met(loaded_standings.games_played[id]))
-				td.append(s)
+				td.textContent = ('+' + bonus_met(loaded_standings.games_played[id]))
 			}
 			tr.append(td)
 		}
