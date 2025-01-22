@@ -745,15 +745,10 @@ function show_standings_table(settings_already_loaded) {
 				} else {
 					td.textContent = 'A'
 				}
-				tr.classList.add('a-division')
 			} else if (restricted) {
 				td.textContent = '*'
-				tr.classList.add('no-finals')
 			} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
 				td.textContent = 'B'
-				tr.classList.add('b-division')
-			} else {
-				tr.classList.add('no-finals')
 			}
 			td.addEventListener('click', handler(toggle_restricted, id, name))
 			tr.append(td)
@@ -1109,10 +1104,10 @@ ready(async () => {
 		el.addEventListener('change', handler(show_standings_table))
 	}
 	document.getElementById('copy-table').addEventListener('click', handler(function () {
-		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>table').innerText.trim()).catch(function () { });
+		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>figure').innerText.trim()).catch(function () { });
 	}))
 	document.getElementById('copy-html').addEventListener('click', handler(function () {
-		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>table').outerHTML.trim()).catch(function () { });
+		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>figure').outerHTML.trim()).catch(function () { });
 	}))
 
 	load_filters_history()

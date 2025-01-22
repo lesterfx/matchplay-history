@@ -352,12 +352,6 @@ h3.sticky-header {
     text-decoration: underline;
     cursor: pointer;
 }
-#standings-table .a-division {
-    font-weight: bold;
-}
-#standings-table tr.no-finals {
-    opacity: 0.5;
-}
 #filter {
     min-width: 100%;
 }
