@@ -485,6 +485,7 @@ function load_standings_settings() {
 	if (settings.bonus_1) document.getElementById('bonus-1').value = settings.bonus_1
 	if (settings.bonus_2) document.getElementById('bonus-2').value = settings.bonus_2
 	if (settings.bonus_3) document.getElementById('bonus-3').value = settings.bonus_3
+	if (settings.bonus_players) document.getElementById('bonus-players').value = settings.bonus_players.join(',')
 	if (settings.a_restricted) document.getElementById('a-restricted').value = settings.a_restricted.join(',')
 	return settings
 }
@@ -509,6 +510,7 @@ function get_standings_settings() {
 	settings.bonus_1 = Number(document.getElementById('bonus-1').value)
 	settings.bonus_2 = Number(document.getElementById('bonus-2').value)
 	settings.bonus_3 = Number(document.getElementById('bonus-3').value)
+	settings.bonus_players = (document.getElementById('bonus-players').value).replaceAll(',', ' ').split(' ')
 	settings.a_restricted = (document.getElementById('a-restricted').value).replaceAll(',', ' ').split(' ')
 	
 	localStorage.setItem('standings-settings', JSON.stringify(settings))
@@ -588,16 +590,21 @@ function show_standings_table(settings_already_loaded) {
 		standings_settings = get_standings_settings()
 	}
 
-	let bonus_met = function(i) {
-		return (
+	let bonus_met = function(i, pid) {
+		let n = 0
+		for (let x of standings_settings.bonus_players) {
+			if (x == pid) n = 1
+		}
+		return [(
+			n +
 			Number(i >= standings_settings.bonus_1) +
 			Number(i >= standings_settings.bonus_2) +
 			Number(i >= standings_settings.bonus_3)
-		)
+		), n]
 	}
-	let is_restricted = function(i) {
+	let is_restricted = function(pid) {
 		for (let x of standings_settings.a_restricted) {
-			if (x == i) return true
+			if (x == pid) return true
 		}
 	}
 	let calculate_points = function(position) {
@@ -761,10 +768,14 @@ function show_standings_table(settings_already_loaded) {
 			tr.append(td)
 
 			td = document.createElement('td')
-			let bonus = bonus_met(loaded_standings.games_played[id])
+			let [bonus, player_earned] = bonus_met(loaded_standings.games_played[id], id)
 			if (bonus) {
-				td.textContent = ('+' + bonus_met(loaded_standings.games_played[id]))
+				td.textContent = ('+' + bonus)
+				if (player_earned) {
+					td.textContent += '†'
+				}
 			}
+			td.addEventListener('click', handler(toggle_bonus, id, name))
 			tr.append(td)
 		}
 
@@ -799,23 +810,39 @@ function show_standings_table(settings_already_loaded) {
 	}
 	return table
 }
-function toggle_restricted(id, name) {
-	let el = document.getElementById('a-restricted')
+function standings_toggle(input_id, add_prompt, remove_prompt, id, name) {
+	let el = document.getElementById(input_id)
 	let vals = el.value.replaceAll(',', ' ').split(' ')
 	let index = vals.indexOf(id)
 	if (index > -1) {
-		if (confirm(`Remove A Division restriction for ${name}?`)) {
+		if (confirm(remove_prompt)) {
 			vals.splice(index, 1)
 			el.value = vals.join(',')
 			show_standings_table()
 		}
 	} else {
-		if (confirm(`Restrict ${name} to A Division?`)) {
+		if (confirm(add_prompt)) {
 			vals.push(id)
 			el.value = vals.join(',')
 			show_standings_table()
 		}
 	}
+}
+function toggle_restricted(id, name) {
+	standings_toggle(
+		'a-restricted',
+		`Restrict ${name} to A Division?`,
+		`Remove A Division restriction for ${name}?`,
+		id
+	)
+}
+function toggle_bonus(id, name) {
+	standings_toggle(
+		'bonus-players',
+		`Add extra bonus for ${name}?`,
+		`Remove extra bonus for ${name}?`,
+		id
+	)
 }
 async function get_other(id) {
 	let refresh_players
