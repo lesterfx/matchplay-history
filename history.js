@@ -755,14 +755,14 @@ function show_standings_table(settings_already_loaded) {
 			let restricted = is_restricted(id)
 			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
 				if (restricted) {
-					td.textContent = 'A*'
+					td.innerHTML = 'A*'
 				} else {
-					td.textContent = 'A'
+					td.innerHTML = 'A&nbsp;'
 				}
 			} else if (restricted) {
-				td.textContent = '*'
+				td.innerHTML = '*'
 			} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
-				td.textContent = 'B'
+				td.innerHTML = 'B'
 			}
 			td.addEventListener('click', handler(toggle_restricted, id, name))
 			tr.append(td)
@@ -770,9 +770,11 @@ function show_standings_table(settings_already_loaded) {
 			td = document.createElement('td')
 			let [bonus, player_earned] = bonus_met(loaded_standings.games_played[id], id)
 			if (bonus) {
-				td.textContent = ('+' + bonus)
+				td.innerHTML = ('+' + bonus)
 				if (player_earned) {
-					td.textContent += '†'
+					td.innerHTML += '†'
+				} else {
+					td.innerHTML += '&nbsp;'
 				}
 			}
 			td.addEventListener('click', handler(toggle_bonus, id, name))
