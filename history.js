@@ -757,7 +757,7 @@ function show_standings_table(settings_already_loaded) {
 				if (restricted) {
 					td.innerHTML = 'A*'
 				} else {
-					td.innerHTML = 'A&nbsp;'
+					td.innerHTML = 'A&nbsp;&nbsp;'
 				}
 			} else if (restricted) {
 				td.innerHTML = '*'
@@ -774,7 +774,7 @@ function show_standings_table(settings_already_loaded) {
 				if (player_earned) {
 					td.innerHTML += '†'
 				} else {
-					td.innerHTML += '&nbsp;'
+					td.innerHTML += '&nbsp;&nbsp;'
 				}
 			}
 			td.addEventListener('click', handler(toggle_bonus, id, name))
