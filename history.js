@@ -743,7 +743,7 @@ function show_standings_table(settings_already_loaded) {
 
 		if (standings_settings.show_mtgs) {	
 			td = document.createElement('td')
-			td.textContent = loaded_standings.games_played[id]
+			td.innerHTML = loaded_standings.games_played[id] + '&nbsp;'
 			tr.append(td)
 		}
 		
