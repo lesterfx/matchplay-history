@@ -716,6 +716,8 @@ function show_standings_table(settings_already_loaded) {
 	let i = 1
 	let tie_rank = 1
 	let tie_score = null
+	added_restriction = false
+	added_bonus = false
 	for (let [id, score] of overall_standings_entries) {
 		let tr = document.createElement('tr')
 
@@ -753,6 +755,7 @@ function show_standings_table(settings_already_loaded) {
 			td.classList.add('has-text-align-left')
 			td.dataset.align = 'left'	
 			let restricted = is_restricted(id)
+			if (restricted) added_restriction = true
 			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
 				if (restricted) {
 					td.innerHTML = 'A*'
@@ -773,6 +776,7 @@ function show_standings_table(settings_already_loaded) {
 				td.innerHTML = ('+' + bonus)
 				if (player_earned) {
 					td.innerHTML += '†'
+					added_bonus = true
 				} else {
 					td.innerHTML += '&nbsp;&nbsp;'
 				}
@@ -809,6 +813,19 @@ function show_standings_table(settings_already_loaded) {
 
 		tbody.append(tr)
 		i++
+	}
+	let captions = []
+	if (added_restriction) {
+		captions.push('* Restricted to A Division')
+	}
+	if (added_bonus) {
+		captions.push('† Extra bonus added')
+	}
+	if (captions.length) {
+		let caption = document.createElement('figcaption')
+		caption.classList.add('wp-element-caption')
+		caption.textContent = captions.join('\n')
+		table.querySelector('figure').append(caption)
 	}
 	return table
 }
