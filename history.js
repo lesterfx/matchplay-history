@@ -814,6 +814,7 @@ function show_standings_table(settings_already_loaded) {
 		tbody.append(tr)
 		i++
 	}
+	table.querySelector('figure figcaption')?.remove()
 	let captions = []
 	if (added_restriction) {
 		captions.push('* Restricted to A Division')
@@ -824,7 +825,7 @@ function show_standings_table(settings_already_loaded) {
 	if (captions.length) {
 		let caption = document.createElement('figcaption')
 		caption.classList.add('wp-element-caption')
-		caption.textContent = captions.join('\n')
+		caption.innerHTML = captions.join('<br />')
 		table.querySelector('figure').append(caption)
 	}
 	return table
