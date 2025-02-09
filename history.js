@@ -585,6 +585,8 @@ async function load_standings() {
 	})
 	show_standings_table(true).scrollIntoView()
 }
+let a_divisions = []
+let b_divisions = []
 function show_standings_table(settings_already_loaded) {
 	if (!settings_already_loaded) {
 		standings_settings = get_standings_settings()
@@ -757,6 +759,7 @@ function show_standings_table(settings_already_loaded) {
 			let restricted = is_restricted(id)
 			if (restricted) added_restriction = true
 			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
+				a_divisions.push(name)
 				if (restricted) {
 					td.innerHTML = 'A*'
 				} else {
@@ -765,6 +768,7 @@ function show_standings_table(settings_already_loaded) {
 			} else if (restricted) {
 				td.innerHTML = '*'
 			} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
+				b_divisions.push(name)
 				td.innerHTML = 'B'
 			}
 			td.addEventListener('click', handler(toggle_restricted, id, name))
@@ -1162,6 +1166,12 @@ ready(async () => {
 	}))
 	document.getElementById('copy-html').addEventListener('click', handler(function () {
 		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>figure').outerHTML.trim()).catch(function () { });
+	}))
+	document.getElementById('copy-a-division').addEventListener('click', handler(function () {
+		navigator.clipboard && navigator.clipboard.writeText(a_divisions.join('\n')).catch(function () { });
+	}))
+	document.getElementById('copy-b-division').addEventListener('click', handler(function () {
+		navigator.clipboard && navigator.clipboard.writeText(b_divisions.join('\n')).catch(function () { });
 	}))
 
 	load_filters_history()

@@ -339,7 +339,7 @@ h3.sticky-header {
     text-align: left;
 }
 #standings-table th:not(.vertical) {
-    padding-top: 6em;
+    padding-top: 8em;
 }
 #standings-table th.vertical span {
     writing-mode: vertical-rl;
