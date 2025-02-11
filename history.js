@@ -885,7 +885,16 @@ function load_arenas() {
 	for (el of selected_tournaments()) {
 		let tid = el.dataset.id
 		let tournament = all_data.tournament[tid]
-		log(tournament)
+		let arenas = (
+			tournament.arenas ||
+			(await get({
+				endpoint: `tournaments/${tid}`,
+				query: {'includeArenas': 1}
+			})).data.arenas
+		)
+		for (arena of arenas) {
+			log(arena)
+		}
 	}
 }
 async function tournament_history(id) {  // formerly get_other
