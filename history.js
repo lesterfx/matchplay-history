@@ -724,8 +724,7 @@ function show_standings_table(settings_already_loaded) {
 	let tbody = table.querySelector('tbody')
 	tbody.innerHTML = ''
 
-	const overall_standings_entries = Object.entries(overall_standings);
-	overall_standings_entries.sort((a, b) => b[1] - a[1]);
+	const overall_standings_entries = sorted_dictionary(overal_standings);
 	let i = 1
 	let tie_rank = 1
 	let tie_score = null
@@ -910,8 +909,7 @@ async function load_arenas() {
 		}
 		// log('\n--\n')
 	}
-	const arenas_entries = Object.entries(arena_occurrences);
-	arenas_entries.sort((a, b) => b[1] - a[1]);
+	const arenas_entries = sorted_dictionary(arena_occurrences, true);
 	document.getElementById('arenas-table').classList.remove('hide')
 	let tbody = document.getElementById('arenas-tbody')
 	tbody.textContent = ''
@@ -928,6 +926,12 @@ async function load_arenas() {
 
 		tbody.appendChild(tr)
 	}
+}
+function sorted_dictionary(dictionary, descending) {
+	let sign = descending ? -1 : 1
+	return Object.entries(dictionary).sort(([keyA, valueA], [keyB, valueB]) => 
+		sign(valueA - valueB) || keyA.localeCompare(keyB)
+	);
 }
 async function tournament_history(id) {  // formerly get_other
 	let refresh_players
