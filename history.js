@@ -257,22 +257,26 @@ async function get_tournament_details(tid) {
 	return {pid: pid, players: players};
 }
 
-titles = ['Season Standings', 'Player Histories']
-getting_standings = Number(localStorage.getItem('getting_standings') || '0')
-async function switch_getting_standings() {
-	getting_standings = 1-getting_standings
-	localStorage.setItem('getting_standings', JSON.stringify(getting_standings))
-	show_getting_standings()
+modes = ['history', 'standings', 'arena']
+mode = modes.indexOf(Number(localStorage.getItem('getting_standings') || '0'))
+async function switch_mode(new_mode) {
+	mode = new_mode
+	localStorage.setItem('getting_standings', JSON.stringify(modes.indexOf(new_mode)))
+	show_mode()
 }
-function show_getting_standings() {
-	let el = document.getElementById('standings')
+function show_mode() {
 	let header = document.getElementById('header')
-	el.textContent = titles[getting_standings]
-	header.textContent = titles[1-getting_standings]
-	document.getElementById('standings-block').classList.toggle('hide', !getting_standings)
+	let divs = document.querySelectorAll('.modes')
+	let el = document.getElementById(`${mode}-mode`)
+	for (let div of divs) {
+		div.classList.remove('hide')
+	}
+	el.classList.add('hide')
 	
-	document.getElementById('active-tournament-block').classList.toggle('hide', getting_standings)
-	document.getElementById('selected').classList.toggle('hide', getting_standings)
+	header.textContent = el.textContent
+	document.getElementById('standings-block').classList.toggle('hide', mode != 'standings')
+	document.getElementById('active-tournament-block').classList.toggle('hide', mode != 'history')
+	document.getElementById('selected').classList.toggle('hide', mode == 'history')
 	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) el.classList.remove('active')
 	filter()
 }
@@ -353,7 +357,7 @@ async function refresh_tournament_timer() {
 }
 async function do_refresh_tournament() {
 	let status = all_data.tournament[active_tournament_id].status;
-	let changes = await get_other();
+	let changes = await tournament_history();
 	if (changes) {
 		await flash_screen();
 		return false;
@@ -374,10 +378,10 @@ async function flash_screen() {
 	}
 }
 async function click_tournament(id) {
-	if (getting_standings) {
-		return await tournament_clicked_standings()
+	if (mode == 'history') {
+		return await tournament_history(id)
 	} else {
-		return await get_other(id)
+		return await tournament_toggled()
 	}
 }
 function filter(save, value) {
@@ -398,7 +402,7 @@ function filter(save, value) {
 			regex.lastIndex = 0;
 			if (regex.test(tournament.name)) {
 				el.classList.remove('hide')
-				if (getting_standings) {
+				if (mode != 'history') {
 					el.classList.add('active')
 				}
 			} else {
@@ -416,7 +420,7 @@ function filter(save, value) {
 			return filters
 		})
 	}
-	tournament_clicked_standings()
+	tournament_toggled()
 }
 function delete_filter(x) {
 	let elem = x.parentElement
@@ -457,7 +461,7 @@ function remove_from_array(array, element) {
 		return true
 	}
 }
-async function tournament_clicked_standings() {
+async function tournament_toggled() {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)').length
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 	document.getElementById('standings-table').classList.add('hide')
@@ -868,7 +872,7 @@ function toggle_bonus(id, name) {
 		id
 	)
 }
-async function get_other(id) {
+async function tournament_history(id) {  // formerly get_other
 	let refresh_players
 	if (id) {
 		active_tournament_id = id
@@ -905,7 +909,7 @@ async function get_other(id) {
 		if (game.status != 'completed') in_progress.push([game.status, element]);
 	};
 	document.getElementById('active-tournament-title').scrollIntoView();
-	if (in_progress.length == 1 && !getting_standings) {
+	if (in_progress.length == 1 && mode == 'history') {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
 		element.dispatchEvent(new Event('click'))
@@ -1072,7 +1076,7 @@ async function main() {
 
 	await get_all_my_tournaments();
 
-	show_getting_standings()
+	show_mode()
 }
 
 ////////////////////////////////////////////////////////////////
@@ -1147,7 +1151,9 @@ ready(async () => {
 			token_promises = []
 		}
 	});
-	document.getElementById('standings').addEventListener('click', handler(switch_getting_standings))
+	document.getElementById('standings-mode').addEventListener('click', handler(switch_mode('standings')))
+	document.getElementById('history-mode').addEventListener('click', handler(switch_mode('history')))
+	document.getElementById('arena-mode').addEventListener('click', handler(switch_mode('arena')))
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
@@ -1156,7 +1162,7 @@ ready(async () => {
 		document.getElementById('standings-settings-table').classList.toggle('hide')
 	}))
 	for (let el of document.querySelectorAll('#standings-settings-table input.need-reload')) {
-		el.addEventListener('change', handler(tournament_clicked_standings))
+		el.addEventListener('change', handler(tournament_toggled))
 	}
 	for (let el of document.querySelectorAll('#standings-settings-table input:not(.need-reload)')) {
 		el.addEventListener('change', handler(show_standings_table))
@@ -1209,11 +1215,11 @@ function tabhandler(callback, ...args) {
 		try {
 			refresh_off()
 			let tabs = this.closest('.tabs')
-			if (getting_standings) {
-				this.classList.toggle('active')
-			} else {
+			if (mode == 'history') {
 				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
+			} else {
+				this.classList.toggle('active')
 			}
 			await callback(...args)
 		} catch (err) {
