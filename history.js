@@ -1154,13 +1154,13 @@ ready(async () => {
 			catcher(err)
 		}
 	});
-	document.getElementById('custom').addEventListener('click', function () {
-		try {
-			document.getElementById('custom-section').classList.remove('hide')
-		} catch (err) {
-			catcher(err)
-		}
-	})
+	// document.getElementById('custom').addEventListener('click', function () {
+	// 	try {
+	// 		document.getElementById('custom-section').classList.remove('hide')
+	// 	} catch (err) {
+	// 		catcher(err)
+	// 	}
+	// })
 	
 	document.getElementById('run-custom').addEventListener('click', async function () {
 		try {
