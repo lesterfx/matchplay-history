@@ -904,7 +904,6 @@ async function load_arenas() {
 	document.getElementById('arenas-table').classList.remove('hide')
 	let tbody = document.getElementById('arenas-tbody')
 	for ([arena, occurrences] of arenas_entries) {
-		log([occurrences, arena])
 		let tr = document.createElement('tr')
 		let td
 		td = document.createElement('td')
