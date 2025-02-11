@@ -896,7 +896,7 @@ async function load_arenas() {
 				query: {'includeArenas': 1}
 			})).data.arenas
 		)
-		arenas.sort((a, b) => b.name - a.name);
+		arenas.sort((a, b) => a.name.localeCompare(b.name));
 		for (arena of arenas) {
 			// if (arena.status == 'inactive') continue
 			log(arena.name)
