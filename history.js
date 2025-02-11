@@ -899,9 +899,10 @@ async function load_arenas() {
 		arenas.sort((a, b) => a.name.localeCompare(b.name));
 		for (arena of arenas) {
 			// if (arena.status == 'inactive') continue
-			log(arena.name)
-			if (!arena_occurrences[arena.name]) arena_occurrences[arena.name] = 0
-			arena_occurrences[arena.name] ++;
+			let name = arena.name.split(' (')[0]
+			log(name)
+			if (!arena_occurrences[name]) arena_occurrences[name] = 0
+			arena_occurrences[name] ++;
 		}
 		log('\n--\n')
 	}
