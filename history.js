@@ -896,6 +896,7 @@ async function load_arenas() {
 			})).data.arenas
 		)
 		for (arena of arenas) {
+			log(arena.name)
 			if (!arena_occurrences[arena.name]) arena_occurrences[arena.name] = 0
 			arena_occurrences[arena.name] ++;
 		}
