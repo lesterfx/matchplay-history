@@ -466,9 +466,10 @@ async function tournament_toggled() {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)').length
 	document.getElementById('arenas-title').textContent = `Arenas in ${n} tournaments`
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
-	document.getElementById('standings-table').classList.add('hide')
 	document.getElementById('load-standings').classList.toggle('hide', n==0)
+	document.getElementById('standings-table').classList.add('hide')
 	document.getElementById('load-arenas').classList.toggle('hide', n==0)
+	document.getElementById('arenas-table').classList.add('hide')
 }
 
 function load_standings_settings() {
