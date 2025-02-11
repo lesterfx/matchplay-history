@@ -878,7 +878,7 @@ function toggle_bonus(id, name) {
 		id
 	)
 }
-function load_arenas() {
+async function load_arenas() {
 	document.getElementById('load-arenas').classList.add('hide')
 	document.getElementById('arenas-table').classList.add('hide')
 
