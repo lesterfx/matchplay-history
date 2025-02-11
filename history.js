@@ -883,17 +883,19 @@ function load_arenas() {
 	document.getElementById('arenas-table').classList.add('hide')
 
 	for (el of selected_tournaments()) {
-		let tid = el.dataset.id
-		let tournament = all_data.tournament[tid]
-		let arenas = (
-			tournament.arenas ||
-			(await get({
+		let tid = el.dataset.id;
+		let tournament = all_data.tournament[tid];
+		let arenas
+		if (tournament.arenas) {
+			arenas = tournament.arenas
+		} else {
+			arenas = (await get({
 				endpoint: `tournaments/${tid}`,
 				query: {'includeArenas': 1}
 			})).data.arenas
-		)
+		}
 		for (arena of arenas) {
-			log(arena)
+			log(arena);
 		}
 	}
 }
