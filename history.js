@@ -901,7 +901,7 @@ async function load_arenas() {
 		for (arena of arenas) {
 			arena_names.push(arena.name.split(' (')[0])
 		}
-		arena_names = [...new Set(arena_names)]
+		arena_names = [...new Set(arena_names)]  // sometimes an arena was in the same tournament twice
 		arena_names.sort((a, b) => a.localeCompare(b));
 		for (name of arena_names) {
 			// if (arena.status == 'inactive') continue
@@ -1176,13 +1176,13 @@ ready(async () => {
 		}
 	})
 
-	document.getElementById('notify').addEventListener('click', function () {
-		try {
-			notifyMe()
-		} catch (err) {
-			catcher(err)
-		}
-	})
+	// document.getElementById('notify').addEventListener('click', function () {
+	// 	try {
+	// 		notifyMe()
+	// 	} catch (err) {
+	// 		catcher(err)
+	// 	}
+	// })
 	document.getElementById('log-out').addEventListener('click', async function () {
 		try {
 			this.parentElement.classList.remove('shown')
