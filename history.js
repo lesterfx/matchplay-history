@@ -1151,9 +1151,9 @@ ready(async () => {
 			token_promises = []
 		}
 	});
-	document.getElementById('standings-mode').addEventListener('click', handler(switch_mode('standings')))
-	document.getElementById('history-mode').addEventListener('click', handler(switch_mode('history')))
-	document.getElementById('arena-mode').addEventListener('click', handler(switch_mode('arena')))
+	document.getElementById('standings-mode').addEventListener('click', handler(switch_mode, 'standings'))
+	document.getElementById('history-mode').addEventListener('click', handler(switch_mode, 'history'))
+	document.getElementById('arena-mode').addEventListener('click', handler(switch_mode, 'arena'))
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
