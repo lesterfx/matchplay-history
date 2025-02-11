@@ -882,21 +882,27 @@ async function load_arenas() {
 	document.getElementById('load-arenas').classList.add('hide')
 	document.getElementById('arenas-table').classList.add('hide')
 
+	let arena_occurrences = {}
 	for (el of selected_tournaments()) {
 		let tid = el.dataset.id;
 		let tournament = all_data.tournament[tid];
-		let arenas
-		if (tournament.arenas) {
-			arenas = tournament.arenas
-		} else {
-			arenas = (await get({
+		let arenas = (
+			tournament.arenas
+			||
+			(await get({
 				endpoint: `tournaments/${tid}`,
 				query: {'includeArenas': 1}
 			})).data.arenas
-		}
+		)
 		for (arena of arenas) {
-			log(arena);
+			if (!arena_occurrences[arena.name]) arena_occurrences[arena.name] = 0
+			arena_occurrences[arena.name] ++;
 		}
+	}
+	const arenas_entries = Object.entries(arena_occurrences);
+	arenas_entries.sort((a, b) => b[1] - a[1]);
+	for ([arena, occurrences] of arenas_entries) {
+		log([occurrences, arena])
 	}
 }
 async function tournament_history(id) {  // formerly get_other
