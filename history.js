@@ -277,6 +277,7 @@ function show_mode() {
 	document.getElementById('standings-block').classList.toggle('hide', mode != 'standings')
 	document.getElementById('active-tournament-block').classList.toggle('hide', mode != 'history')
 	document.getElementById('selected-history').classList.toggle('hide', mode != 'history')
+	document.getElementById('arenas-block').classList.toggle('hide', mode != 'arena')
 	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) el.classList.remove('active')
 	filter()
 }
@@ -463,9 +464,11 @@ function remove_from_array(array, element) {
 }
 async function tournament_toggled() {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)').length
+	document.getElementById('arenas-title').textContent = `Arenas in ${n} tournaments`
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
 	document.getElementById('standings-table').classList.add('hide')
 	document.getElementById('load-standings').classList.toggle('hide', n==0)
+	document.getElementById('load-arenas').classList.toggle('hide', n==0)
 }
 
 function load_standings_settings() {
@@ -522,6 +525,9 @@ function get_standings_settings() {
 }
 let loaded_standings = {}
 let standings_settings
+function selected_tournaments() {
+	return document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)')
+}
 async function load_standings() {
 	document.getElementById('load-standings').classList.add('hide')
 	document.getElementById('standings-table').classList.add('hide')
@@ -534,7 +540,7 @@ async function load_standings() {
 
 	standings_settings = get_standings_settings()
 
-	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)')) {
+	for (el of selected_tournaments()) {
 		let tid = el.dataset.id
 		let tournament = all_data.tournament[tid]
 		loaded_standings.standings_tournaments.push(tournament)
@@ -872,6 +878,16 @@ function toggle_bonus(id, name) {
 		id
 	)
 }
+function load_arenas() {
+	document.getElementById('load-arenas').classList.add('hide')
+	document.getElementById('arenas-table').classList.add('hide')
+
+	for (el of selected_tournaments()) {
+		let tid = el.dataset.id
+		let tournament = all_data.tournament[tid]
+		log(tournament)
+	}
+}
 async function tournament_history(id) {  // formerly get_other
 	let refresh_players
 	if (id) {
@@ -1155,6 +1171,7 @@ ready(async () => {
 	document.getElementById('history-mode').addEventListener('click', handler(switch_mode, 'history'))
 	document.getElementById('arena-mode').addEventListener('click', handler(switch_mode, 'arena'))
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
+	document.getElementById('load-arenas').addEventListener('click', handler(load_arenas))
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
 	document.getElementById('filter').addEventListener('change', handler(filter, true))
