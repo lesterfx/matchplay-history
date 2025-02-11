@@ -888,19 +888,23 @@ async function load_arenas() {
 		let tid = el.dataset.id;
 		let tournament = all_data.tournament[tid];
 		// log(tournament.name)
-		let arenas = (
-			tournament.arenas
-			||
-			(await get({
+		let arena_names = []
+		let arenas
+		if (tournament.arenas) {
+			arenas = tournament.arenas
+		} else {
+			arenas = (await get({
 				endpoint: `tournaments/${tid}`,
 				query: {'includeArenas': 1}
 			})).data.arenas
-		)
-		arenas.sort((a, b) => a.name.localeCompare(b.name));
+		}
 		for (arena of arenas) {
+			arena_names.push(arena.name.split(' (')[0])
+		}
+		arena_names = [...new Set(arena_names)]
+		arena_names.sort((a, b) => a.localeCompare(b));
+		for (name of arena_names) {
 			// if (arena.status == 'inactive') continue
-			let name = arena.name.split(' (')[0]
-			// log(name)
 			if (!arena_occurrences[name]) arena_occurrences[name] = 0
 			arena_occurrences[name] ++;
 		}
