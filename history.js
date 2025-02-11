@@ -258,7 +258,7 @@ async function get_tournament_details(tid) {
 }
 
 modes = ['history', 'standings', 'arena']
-mode = modes.indexOf(Number(localStorage.getItem('getting_standings') || '0'))
+mode = modes[(Number(localStorage.getItem('getting_standings') || '0'))]
 async function switch_mode(new_mode) {
 	mode = new_mode
 	localStorage.setItem('getting_standings', JSON.stringify(modes.indexOf(new_mode)))
