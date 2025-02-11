@@ -900,7 +900,7 @@ async function load_arenas() {
 		}
 	}
 	const arenas_entries = Object.entries(arena_occurrences);
-	arenas_entries.sort((a, b) => a[1] - b[1]);
+	arenas_entries.sort((a, b) => b[1] - a[1]);
 	document.getElementById('arenas-table').classList.remove('hide')
 	let tbody = document.getElementById('arenas-tbody')
 	for ([arena, occurrences] of arenas_entries) {
