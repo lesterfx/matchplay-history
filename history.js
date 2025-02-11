@@ -886,6 +886,7 @@ async function load_arenas() {
 	for (el of selected_tournaments()) {
 		let tid = el.dataset.id;
 		let tournament = all_data.tournament[tid];
+		log(tournament.name)
 		let arenas = (
 			tournament.arenas
 			||
