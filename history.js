@@ -276,7 +276,7 @@ function show_mode() {
 	header.textContent = el.textContent
 	document.getElementById('standings-block').classList.toggle('hide', mode != 'standings')
 	document.getElementById('active-tournament-block').classList.toggle('hide', mode != 'history')
-	document.getElementById('selected').classList.toggle('hide', mode == 'history')
+	document.getElementById('selected-history').classList.toggle('hide', mode != 'history')
 	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) el.classList.remove('active')
 	filter()
 }
@@ -996,7 +996,7 @@ async function compare_player(id) {
 }
 async function merge_tournaments() {
 	let tournaments
-	document.getElementById('selected').scrollIntoView();
+	document.getElementById('selected-history').scrollIntoView();
 	let merged_tournaments = {};
 	for (uid in active_players) {
 		for await (tournaments of get_tournaments_paginated(uid)) {
