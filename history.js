@@ -887,7 +887,7 @@ async function load_arenas() {
 	for (el of selected_tournaments()) {
 		let tid = el.dataset.id;
 		let tournament = all_data.tournament[tid];
-		log(tournament.name)
+		// log(tournament.name)
 		let arenas = (
 			tournament.arenas
 			||
@@ -900,11 +900,11 @@ async function load_arenas() {
 		for (arena of arenas) {
 			// if (arena.status == 'inactive') continue
 			let name = arena.name.split(' (')[0]
-			log(name)
+			// log(name)
 			if (!arena_occurrences[name]) arena_occurrences[name] = 0
 			arena_occurrences[name] ++;
 		}
-		log('\n--\n')
+		// log('\n--\n')
 	}
 	const arenas_entries = Object.entries(arena_occurrences);
 	arenas_entries.sort((a, b) => b[1] - a[1]);
