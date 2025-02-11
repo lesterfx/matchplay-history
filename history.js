@@ -900,9 +900,22 @@ async function load_arenas() {
 		}
 	}
 	const arenas_entries = Object.entries(arena_occurrences);
-	arenas_entries.sort((a, b) => b[1] - a[1]);
+	arenas_entries.sort((a, b) => a[1] - b[1]);
+	document.getElementById('arenas-table').classList.remove('hide')
+	let tbody = document.getElementById('arenas-tbody')
 	for ([arena, occurrences] of arenas_entries) {
 		log([occurrences, arena])
+		let tr = document.createElement('tr')
+		let td
+		td = document.createElement('td')
+		td.textContent = arena
+		tr.appendChild(td)
+		
+		td = document.createElement('td')
+		td.textContent = occurrences
+		tr.appendChild(td)
+
+		tbody.appendChild(tr)
 	}
 }
 async function tournament_history(id) {  // formerly get_other
