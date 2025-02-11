@@ -901,8 +901,8 @@ async function load_arenas() {
 			log(arena.name)
 			if (!arena_occurrences[arena.name]) arena_occurrences[arena.name] = 0
 			arena_occurrences[arena.name] ++;
-			log()
 		}
+		log('')
 	}
 	const arenas_entries = Object.entries(arena_occurrences);
 	arenas_entries.sort((a, b) => b[1] - a[1]);
