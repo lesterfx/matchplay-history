@@ -930,7 +930,7 @@ async function load_arenas() {
 function sorted_dictionary(dictionary, descending) {
 	let sign = descending ? -1 : 1
 	return Object.entries(dictionary).sort(([keyA, valueA], [keyB, valueB]) => 
-		sign(valueA - valueB) || keyA.localeCompare(keyB)
+		sign * (valueA - valueB) || keyA.localeCompare(keyB)
 	);
 }
 async function tournament_history(id) {  // formerly get_other
