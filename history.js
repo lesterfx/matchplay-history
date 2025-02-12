@@ -724,7 +724,7 @@ function show_standings_table(settings_already_loaded) {
 	let tbody = table.querySelector('tbody')
 	tbody.innerHTML = ''
 
-	const overall_standings_entries = sorted_dictionary(overal_standings);
+	const overall_standings_entries = sorted_dictionary(overall_standings);
 	let i = 1
 	let tie_rank = 1
 	let tie_score = null
