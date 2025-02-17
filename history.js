@@ -257,22 +257,27 @@ async function get_tournament_details(tid) {
 	return {pid: pid, players: players};
 }
 
-titles = ['Season Standings', 'Player Histories']
-getting_standings = Number(localStorage.getItem('getting_standings') || '0')
-async function switch_getting_standings() {
-	getting_standings = 1-getting_standings
-	localStorage.setItem('getting_standings', JSON.stringify(getting_standings))
-	show_getting_standings()
+modes = ['history', 'standings', 'arena']
+mode = modes[(Number(localStorage.getItem('getting_standings') || '0'))]
+async function switch_mode(new_mode) {
+	mode = new_mode
+	localStorage.setItem('getting_standings', JSON.stringify(modes.indexOf(new_mode)))
+	show_mode()
 }
-function show_getting_standings() {
-	let el = document.getElementById('standings')
+function show_mode() {
 	let header = document.getElementById('header')
-	el.textContent = titles[getting_standings]
-	header.textContent = titles[1-getting_standings]
-	document.getElementById('standings-block').classList.toggle('hide', !getting_standings)
+	let divs = document.querySelectorAll('.modes')
+	let el = document.getElementById(`${mode}-mode`)
+	for (let div of divs) {
+		div.classList.remove('hide')
+	}
+	el.classList.add('hide')
 	
-	document.getElementById('active-tournament-block').classList.toggle('hide', getting_standings)
-	document.getElementById('selected').classList.toggle('hide', getting_standings)
+	header.textContent = el.textContent
+	document.getElementById('standings-block').classList.toggle('hide', mode != 'standings')
+	document.getElementById('active-tournament-block').classList.toggle('hide', mode != 'history')
+	document.getElementById('selected-history').classList.toggle('hide', mode != 'history')
+	document.getElementById('arenas-block').classList.toggle('hide', mode != 'arena')
 	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) el.classList.remove('active')
 	filter()
 }
@@ -353,7 +358,7 @@ async function refresh_tournament_timer() {
 }
 async function do_refresh_tournament() {
 	let status = all_data.tournament[active_tournament_id].status;
-	let changes = await get_other();
+	let changes = await tournament_history();
 	if (changes) {
 		await flash_screen();
 		return false;
@@ -374,10 +379,10 @@ async function flash_screen() {
 	}
 }
 async function click_tournament(id) {
-	if (getting_standings) {
-		return await tournament_clicked_standings()
+	if (mode == 'history') {
+		return await tournament_history(id)
 	} else {
-		return await get_other(id)
+		return await tournament_toggled()
 	}
 }
 function filter(save, value) {
@@ -398,7 +403,7 @@ function filter(save, value) {
 			regex.lastIndex = 0;
 			if (regex.test(tournament.name)) {
 				el.classList.remove('hide')
-				if (getting_standings) {
+				if (mode != 'history') {
 					el.classList.add('active')
 				}
 			} else {
@@ -416,7 +421,7 @@ function filter(save, value) {
 			return filters
 		})
 	}
-	tournament_clicked_standings()
+	tournament_toggled()
 }
 function delete_filter(x) {
 	let elem = x.parentElement
@@ -457,29 +462,89 @@ function remove_from_array(array, element) {
 		return true
 	}
 }
-async function tournament_clicked_standings() {
+async function tournament_toggled() {
 	let n = document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)').length
+	document.getElementById('arenas-title').textContent = `Arenas in ${n} tournaments`
 	document.getElementById('standings-title').textContent = `Standings across ${n} tournaments`
-	document.getElementById('standings-table').classList.add('hide')
 	document.getElementById('load-standings').classList.toggle('hide', n==0)
+	document.getElementById('standings-table').classList.add('hide')
+	document.getElementById('load-arenas').classList.toggle('hide', n==0)
+	document.getElementById('arenas-table').classList.add('hide')
 }
 
+function load_standings_settings() {
+	let settings = JSON.parse(localStorage.getItem('standings-settings') || '{}')
+
+	if (settings.minscore) document.getElementById('score-min').value = settings.minscore
+	if (settings.maxscore) document.getElementById('score-max').value = settings.maxscore
+	if (settings.combine_names !== undefined) document.getElementById('combine-names').checked = settings.combine_names
+	if (settings.custom_column_header) document.getElementById('custom-column-header').value = settings.custom_column_header
+
+	if (settings.show_points !== undefined) document.getElementById('show-points').checked = settings.show_points
+	if (settings.show_mtgs !== undefined) document.getElementById('show-mtgs').checked = settings.show_mtgs
+	if (settings.show_win !== undefined) document.getElementById('show-win').checked = settings.show_win
+	if (settings.show_avg_pts !== undefined) document.getElementById('show-avg-pts').checked = settings.show_avg_pts
+	if (settings.show_avg_place !== undefined) document.getElementById('show-avg-place').checked = settings.show_avg_place
+	if (settings.show_finals !== undefined) document.getElementById('show-finals').checked = settings.show_finals
+
+	if (settings.b_attendance) document.getElementById('b-attendance').value = settings.b_attendance
+	if (settings.a_attendance) document.getElementById('a-attendance').value = settings.a_attendance
+	if (settings.a_size) document.getElementById('a-size').value = settings.a_size
+	if (settings.bonus_1) document.getElementById('bonus-1').value = settings.bonus_1
+	if (settings.bonus_2) document.getElementById('bonus-2').value = settings.bonus_2
+	if (settings.bonus_3) document.getElementById('bonus-3').value = settings.bonus_3
+	if (settings.bonus_players) document.getElementById('bonus-players').value = settings.bonus_players.join(',')
+	if (settings.a_restricted) document.getElementById('a-restricted').value = settings.a_restricted.join(',')
+	return settings
+}
+function get_standings_settings() {
+	let settings = {}
+	
+	settings.minscore = Number(document.getElementById('score-min').value)
+	settings.maxscore = Number(document.getElementById('score-max').value)
+	settings.combine_names = document.getElementById('combine-names').checked
+	settings.custom_column_header = document.getElementById('custom-column-header').value
+
+	settings.show_points = document.getElementById('show-points').checked
+	settings.show_mtgs = document.getElementById('show-mtgs').checked
+	settings.show_win = document.getElementById('show-win').checked
+	settings.show_avg_pts = document.getElementById('show-avg-pts').checked
+	settings.show_avg_place = document.getElementById('show-avg-place').checked
+	settings.show_finals = document.getElementById('show-finals').checked
+
+	settings.b_attendance = Number(document.getElementById('b-attendance').value)
+	settings.a_attendance = Number(document.getElementById('a-attendance').value)
+	settings.a_size = Number(document.getElementById('a-size').value)
+	settings.bonus_1 = Number(document.getElementById('bonus-1').value)
+	settings.bonus_2 = Number(document.getElementById('bonus-2').value)
+	settings.bonus_3 = Number(document.getElementById('bonus-3').value)
+	settings.bonus_players = (document.getElementById('bonus-players').value).replaceAll(',', ' ').split(' ')
+	settings.a_restricted = (document.getElementById('a-restricted').value).replaceAll(',', ' ').split(' ')
+	
+	localStorage.setItem('standings-settings', JSON.stringify(settings))
+	return settings
+}
+let loaded_standings = {}
+let standings_settings
+function selected_tournaments() {
+	return document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)')
+}
 async function load_standings() {
 	document.getElementById('load-standings').classList.add('hide')
-	let overall_standings = {}
-	let games_played = {}
-	let player_standings_by_player = {}
-	let n = 0
-	let standings_tournaments = []
-	let maxscore = Number(document.getElementById('score-max').value)
-	let minscore = Number(document.getElementById('score-min').value)
-	let combine_names = document.getElementById('combine-names').checked
-	let id_by_name = {}
-	for (el of document.querySelectorAll('#my-tournaments.tabs .box.active:not(.fake)')) {
-		n ++;
+	document.getElementById('standings-table').classList.add('hide')
+
+	loaded_standings.overall_standings = {}
+	loaded_standings.games_played = {}
+	loaded_standings.player_standings_by_player = {}
+	loaded_standings.standings_tournaments = []
+	loaded_standings.id_by_name = {}
+
+	standings_settings = get_standings_settings()
+
+	for (el of selected_tournaments()) {
 		let tid = el.dataset.id
 		let tournament = all_data.tournament[tid]
-		standings_tournaments.push(tournament)
+		loaded_standings.standings_tournaments.push(tournament)
 		let standings = await get({
 			endpoint: `tournaments/${tid}/standings`
 		})
@@ -500,30 +565,27 @@ async function load_standings() {
 		}
 		for (let entry of standings) {
 			let id = entry.playerId
-			if (combine_names) {
-				alternate_id = id_by_name[all_data.player[entry.playerId].toLowerCase()]
+			if (standings_settings.combine_names) {
+				alternate_id = loaded_standings.id_by_name[all_data.player[entry.playerId].toLowerCase()]
 				if (alternate_id) {
 					id = alternate_id
 				} else {
-					id_by_name[all_data.player[entry.playerId].toLowerCase()] = id
+					loaded_standings.id_by_name[all_data.player[entry.playerId].toLowerCase()] = id
 				}
 			}
-			let points = Math.max(maxscore+1-entry.position, minscore)
-			if (!player_standings_by_player[id]) {
-				player_standings_by_player[id] = {}
-				overall_standings[id] = 0
-				games_played[id] = 0
+			if (!loaded_standings.player_standings_by_player[id]) {
+				loaded_standings.player_standings_by_player[id] = {}
+				loaded_standings.games_played[id] = 0
 			}
-			if (player_standings_by_player[id][tid]) {
+			if (loaded_standings.player_standings_by_player[id][tid]) {
 				alert(`multiple entries for ${id} in ${tournament.name}`)
 			}
-			player_standings_by_player[id][tid] = points
-			overall_standings[id] += points
-			games_played[id] += 1
+			loaded_standings.player_standings_by_player[id][tid] = entry.position
+			loaded_standings.games_played[id] += 1
 		}
 	}
 	
-	standings_tournaments.sort((a,b) => {
+	loaded_standings.standings_tournaments.sort((a,b) => {
 		if (a.startUtc < b.startUtc) {
 			return -1
 		} else if (a.startUtc < b.startUtc) {
@@ -532,7 +594,59 @@ async function load_standings() {
 			return 0
 		}
 	})
-	// log(standings_tournaments)
+	show_standings_table(true).scrollIntoView()
+}
+let a_divisions = []
+let b_divisions = []
+function show_standings_table(settings_already_loaded) {
+	if (!settings_already_loaded) {
+		standings_settings = get_standings_settings()
+	}
+
+	let bonus_met = function(i, pid) {
+		let n = 0
+		for (let x of standings_settings.bonus_players) {
+			if (x == pid) n = 1
+		}
+		return [(
+			n +
+			Number(i >= standings_settings.bonus_1) +
+			Number(i >= standings_settings.bonus_2) +
+			Number(i >= standings_settings.bonus_3)
+		), n]
+	}
+	let is_restricted = function(pid) {
+		for (let x of standings_settings.a_restricted) {
+			if (x == pid) return true
+		}
+	}
+	let calculate_points = function(position) {
+		return Math.max(standings_settings.maxscore+1-position, standings_settings.minscore)
+	}
+	let get_custom_column_header = function(name) {
+		if (!standings_settings.custom_column_header) {
+			return
+		}
+		try {
+			let regex = new RegExp(standings_settings.custom_column_header, 'gmi')
+			let result = regex.exec(name);
+			if (result) {
+				return result.groups.abbr
+			}
+		} catch (err) {
+			return
+		}
+	}
+	let overall_standings = {}
+	let overall_place = {}
+	for (let id of Object.keys(loaded_standings.player_standings_by_player)) {
+		overall_standings[id] = 0
+		overall_place[id] = 0
+		for (let position of Object.values(loaded_standings.player_standings_by_player[id])) {
+			overall_standings[id] += calculate_points(position)
+			overall_place[id] += position
+		}
+	}
 
 	let table = document.getElementById('standings-table')
 	table.classList.remove('hide')
@@ -540,82 +654,286 @@ async function load_standings() {
 	let td
 
 	let headrow = table.querySelector('thead tr')
-	for (el of headrow.querySelectorAll('th:not(.keep)')) el.remove()
+	headrow.innerHTML = ''
 
-	for (tournament of standings_tournaments) {
+	th = document.createElement('th')
+	th.textContent = 'Pos'
+	headrow.append(th)
+	
+	th = document.createElement('th')
+	th.textContent = 'Player'
+	th.classList.add('has-text-align-left')
+	th.dataset.align = 'left'
+	headrow.append(th)
+	
+	if (standings_settings.show_points) {
 		th = document.createElement('th')
-		let span = document.createElement('span')
-		th.appendChild(span)
-		span.textContent = tournament.name
+		th.textContent = 'Points'
+		headrow.append(th)
+	}
+
+	if (standings_settings.show_mtgs) {
+		th = document.createElement('th')
+		th.textContent = 'Mtgs'
+		headrow.append(th)
+	}
+	
+	if (standings_settings.show_finals) {
+		th = document.createElement('th')
+		th.textContent = 'Div'
+		th.classList.add('has-text-align-left')
+		th.dataset.align = 'left'
+		headrow.append(th)
+		
+		th = document.createElement('th')
+		th.textContent = 'Bonus'
+		headrow.append(th)
+	}
+
+	if (standings_settings.show_win) {
+		th = document.createElement('th')
+		th.textContent = 'Win%'
+		headrow.append(th)
+	}
+	if (standings_settings.show_avg_pts) {
+		th = document.createElement('th')
+		th.textContent = 'Avg Pts'
+		headrow.append(th)
+	}
+	if (standings_settings.show_avg_place) {
+		th = document.createElement('th')
+		th.textContent = 'Avg Place'
+		headrow.append(th)
+	}
+	
+	for (tournament of loaded_standings.standings_tournaments) {
+		th = document.createElement('th')
+		let custom_column_header = get_custom_column_header(tournament.name)
+		// th.classList.add('wk')
+		if (custom_column_header) {
+			th.textContent = custom_column_header
+		} else {
+			th.classList.add('vertical')
+			let span = document.createElement('span')
+			th.appendChild(span)
+			span.textContent = tournament.name
+		}
 		headrow.append(th)
 	}
 
 	let tbody = table.querySelector('tbody')
 	tbody.innerHTML = ''
-	for (let id in overall_standings) {
-		let tr = document.createElement('tr')
-		tr.classList.add('player')
 
+	const overall_standings_entries = sorted_dictionary(overall_standings, true);
+	let i = 1
+	let tie_rank = 1
+	let tie_score = null
+	added_restriction = false
+	added_bonus = false
+	for (let [id, score] of overall_standings_entries) {
+		let tr = document.createElement('tr')
+
+		if (score !== tie_score) {
+			tie_rank = i
+			tie_score = score
+		}
 		td = document.createElement('td')
-		td.classList.add('rank')
-		td.textContent = 'rank'
+		td.textContent = tie_rank
 		tr.append(td)
 		
 		td = document.createElement('td')
-		td.classList.add('name')
-		td.textContent = all_data.player[id]
+		let name = all_data.player[id]
+		td.textContent = name
+		// td.classList.add('text')
+		td.classList.add('has-text-align-left')
+		td.dataset.align = 'left'
 		tr.append(td)
 
-		td = document.createElement('td')
-		td.classList.add('overall')
-		td.dataset.score = overall_standings[id]
-		td.textContent = overall_standings[id]
-		tr.append(td)
-
-		td = document.createElement('td')
-		td.textContent = games_played[id]
-		tr.append(td)
-
-		td = document.createElement('td')
-		td.classList.add('last-col')
-		td.textContent = (overall_standings[id] / games_played[id] / maxscore).toFixed(2)
-		tr.append(td)
-
-		for (tournament of standings_tournaments) {
+		if (standings_settings.show_points) {
 			td = document.createElement('td')
-			let val = player_standings_by_player[id][tournament.tournamentId]
+			td.textContent = score
+			tr.append(td)
+		}
+
+		if (standings_settings.show_mtgs) {	
+			td = document.createElement('td')
+			td.innerHTML = loaded_standings.games_played[id] + '&nbsp;'
+			tr.append(td)
+		}
+		
+		if (standings_settings.show_finals) {
+			td = document.createElement('td')
+			// td.classList.add('division', 'text')
+			td.classList.add('has-text-align-left')
+			td.dataset.align = 'left'	
+			let restricted = is_restricted(id)
+			if (restricted) added_restriction = true
+			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
+				a_divisions.push(name)
+				if (restricted) {
+					td.innerHTML = 'A*'
+				} else {
+					td.innerHTML = 'A&nbsp;&nbsp;'
+				}
+			} else if (restricted) {
+				td.innerHTML = '*'
+			} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
+				b_divisions.push(name)
+				td.innerHTML = 'B'
+			}
+			td.addEventListener('click', handler(toggle_restricted, id, name))
+			tr.append(td)
+
+			td = document.createElement('td')
+			let [bonus, player_earned] = bonus_met(loaded_standings.games_played[id], id)
+			if (bonus) {
+				td.innerHTML = ('+' + bonus)
+				if (player_earned) {
+					td.innerHTML += '†'
+					added_bonus = true
+				} else {
+					td.innerHTML += '&nbsp;&nbsp;'
+				}
+			}
+			td.addEventListener('click', handler(toggle_bonus, id, name))
+			tr.append(td)
+		}
+
+		if (standings_settings.show_win) {
+			td = document.createElement('td')
+			td.textContent = (score / loaded_standings.games_played[id] / standings_settings.maxscore).toFixed(2)
+			tr.append(td)
+		}
+		if (standings_settings.show_avg_pts) {
+			td = document.createElement('td')
+			td.textContent = (score / loaded_standings.games_played[id]).toFixed(0)
+			tr.append(td)
+		}
+		if (standings_settings.show_avg_place) {
+			td = document.createElement('td')
+			td.textContent = (overall_place[id] / loaded_standings.games_played[id]).toFixed(1)
+			tr.append(td)
+		}
+
+		for (let tournament of loaded_standings.standings_tournaments) {
+			td = document.createElement('td')
+			// td.classList.add('wk')
+			let val = calculate_points(loaded_standings.player_standings_by_player[id][tournament.tournamentId])
 			if (val) {
 				td.innerHTML = val
-			} else {
-				// td.innerHTML = '&mdash;'
-				td.classList.add('empty')
 			}
 			tr.append(td)
 		}
 
 		tbody.append(tr)
-		insertSorted(tr, tbody, (el) => {
-			return -Number(el.querySelector('td.overall').dataset.score)
-		})
-	}
-
-	let i = 1
-	let tie_rank = 1
-	let tie_score = null
-	for (let row of tbody.querySelectorAll('tr.player')) {
-		let score = row.querySelector('.overall').dataset.score
-		if (score !== tie_score) {
-			tie_rank = i
-			tie_score = score
-		}
-		row.querySelector('td.rank').textContent = tie_rank
 		i++
 	}
-
-	document.getElementById('load-standings').classList.remove('hide')
-
+	table.querySelector('figure figcaption')?.remove()
+	let captions = []
+	if (added_restriction) {
+		captions.push('* Restricted to A Division')
+	}
+	if (added_bonus) {
+		captions.push('† Extra bonus added')
+	}
+	if (captions.length) {
+		let caption = document.createElement('figcaption')
+		caption.classList.add('wp-element-caption')
+		caption.innerHTML = captions.join('<br />')
+		table.querySelector('figure').append(caption)
+	}
+	return table
 }
-async function get_other(id) {
+function standings_toggle(input_id, add_prompt, remove_prompt, id, name) {
+	let el = document.getElementById(input_id)
+	let vals = el.value.replaceAll(',', ' ').split(' ')
+	let index = vals.indexOf(id)
+	if (index > -1) {
+		if (confirm(remove_prompt)) {
+			vals.splice(index, 1)
+			el.value = vals.join(',')
+			show_standings_table()
+		}
+	} else {
+		if (confirm(add_prompt)) {
+			vals.push(id)
+			el.value = vals.join(',')
+			show_standings_table()
+		}
+	}
+}
+function toggle_restricted(id, name) {
+	standings_toggle(
+		'a-restricted',
+		`Restrict ${name} to A Division?`,
+		`Remove A Division restriction for ${name}?`,
+		id
+	)
+}
+function toggle_bonus(id, name) {
+	standings_toggle(
+		'bonus-players',
+		`Add extra bonus for ${name}?`,
+		`Remove extra bonus for ${name}?`,
+		id
+	)
+}
+async function load_arenas() {
+	document.getElementById('load-arenas').classList.add('hide')
+	document.getElementById('arenas-table').classList.add('hide')
+
+	let arena_occurrences = {}
+	for (el of selected_tournaments()) {
+		let tid = el.dataset.id;
+		let tournament = all_data.tournament[tid];
+		// log(tournament.name)
+		let arena_names = []
+		let arenas
+		if (tournament.arenas) {
+			arenas = tournament.arenas
+		} else {
+			arenas = (await get({
+				endpoint: `tournaments/${tid}`,
+				query: {'includeArenas': 1}
+			})).data.arenas
+		}
+		for (arena of arenas) {
+			arena_names.push(arena.name.split(' (')[0])
+		}
+		arena_names = [...new Set(arena_names)]  // sometimes an arena was in the same tournament twice
+		arena_names.sort((a, b) => a.localeCompare(b));
+		for (name of arena_names) {
+			// if (arena.status == 'inactive') continue
+			if (!arena_occurrences[name]) arena_occurrences[name] = 0
+			arena_occurrences[name] ++;
+		}
+		// log('\n--\n')
+	}
+	const arenas_entries = sorted_dictionary(arena_occurrences, true);
+	document.getElementById('arenas-table').classList.remove('hide')
+	let tbody = document.getElementById('arenas-tbody')
+	tbody.textContent = ''
+	for ([arena, occurrences] of arenas_entries) {
+		let tr = document.createElement('tr')
+		let td
+		td = document.createElement('td')
+		td.textContent = arena
+		tr.appendChild(td)
+		
+		td = document.createElement('td')
+		td.textContent = occurrences
+		tr.appendChild(td)
+
+		tbody.appendChild(tr)
+	}
+}
+function sorted_dictionary(dictionary, descending) {
+	let sign = descending ? -1 : 1
+	return Object.entries(dictionary).sort(([keyA, valueA], [keyB, valueB]) => 
+		sign * (valueA - valueB) || keyA.localeCompare(keyB)
+	);
+}
+async function tournament_history(id) {  // formerly get_other
 	let refresh_players
 	if (id) {
 		active_tournament_id = id
@@ -652,7 +970,7 @@ async function get_other(id) {
 		if (game.status != 'completed') in_progress.push([game.status, element]);
 	};
 	document.getElementById('active-tournament-title').scrollIntoView();
-	if (in_progress.length == 1 && !getting_standings) {
+	if (in_progress.length == 1 && mode == 'history') {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
 		element.dispatchEvent(new Event('click'))
@@ -739,7 +1057,7 @@ async function compare_player(id) {
 }
 async function merge_tournaments() {
 	let tournaments
-	document.getElementById('selected').scrollIntoView();
+	document.getElementById('selected-history').scrollIntoView();
 	let merged_tournaments = {};
 	for (uid in active_players) {
 		for await (tournaments of get_tournaments_paginated(uid)) {
@@ -819,7 +1137,7 @@ async function main() {
 
 	await get_all_my_tournaments();
 
-	show_getting_standings()
+	show_mode()
 }
 
 ////////////////////////////////////////////////////////////////
@@ -844,13 +1162,13 @@ ready(async () => {
 			catcher(err)
 		}
 	});
-	document.getElementById('custom').addEventListener('click', function () {
-		try {
-			document.getElementById('custom-section').classList.remove('hide')
-		} catch (err) {
-			catcher(err)
-		}
-	})
+	// document.getElementById('custom').addEventListener('click', function () {
+	// 	try {
+	// 		document.getElementById('custom-section').classList.remove('hide')
+	// 	} catch (err) {
+	// 		catcher(err)
+	// 	}
+	// })
 	
 	document.getElementById('run-custom').addEventListener('click', async function () {
 		try {
@@ -862,13 +1180,13 @@ ready(async () => {
 		}
 	})
 
-	document.getElementById('notify').addEventListener('click', function () {
-		try {
-			notifyMe()
-		} catch (err) {
-			catcher(err)
-		}
-	})
+	// document.getElementById('notify').addEventListener('click', function () {
+	// 	try {
+	// 		notifyMe()
+	// 	} catch (err) {
+	// 		catcher(err)
+	// 	}
+	// })
 	document.getElementById('log-out').addEventListener('click', async function () {
 		try {
 			this.parentElement.classList.remove('shown')
@@ -894,19 +1212,38 @@ ready(async () => {
 			token_promises = []
 		}
 	});
-	document.getElementById('standings').addEventListener('click', handler(switch_getting_standings))
+	document.getElementById('standings-mode').addEventListener('click', handler(switch_mode, 'standings'))
+	document.getElementById('history-mode').addEventListener('click', handler(switch_mode, 'history'))
+	document.getElementById('arena-mode').addEventListener('click', handler(switch_mode, 'arena'))
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
+	document.getElementById('load-arenas').addEventListener('click', handler(load_arenas))
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
 	document.getElementById('filter').addEventListener('change', handler(filter, true))
 	document.getElementById('standings-settings').addEventListener('click', handler(function () {
 		document.getElementById('standings-settings-table').classList.toggle('hide')
 	}))
+	for (let el of document.querySelectorAll('#standings-settings-table input.need-reload')) {
+		el.addEventListener('change', handler(tournament_toggled))
+	}
+	for (let el of document.querySelectorAll('#standings-settings-table input:not(.need-reload)')) {
+		el.addEventListener('change', handler(show_standings_table))
+	}
 	document.getElementById('copy-table').addEventListener('click', handler(function () {
-		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>table').innerText.trim()).catch(function () { });
+		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>figure').innerText.trim()).catch(function () { });
+	}))
+	document.getElementById('copy-html').addEventListener('click', handler(function () {
+		navigator.clipboard && navigator.clipboard.writeText(document.querySelector('#standings-table>figure').outerHTML.trim()).catch(function () { });
+	}))
+	document.getElementById('copy-a-division').addEventListener('click', handler(function () {
+		navigator.clipboard && navigator.clipboard.writeText(a_divisions.join('\n')).catch(function () { });
+	}))
+	document.getElementById('copy-b-division').addEventListener('click', handler(function () {
+		navigator.clipboard && navigator.clipboard.writeText(b_divisions.join('\n')).catch(function () { });
 	}))
 
 	load_filters_history()
+	load_standings_settings()
 
 	try {
 		await main();
@@ -940,11 +1277,11 @@ function tabhandler(callback, ...args) {
 		try {
 			refresh_off()
 			let tabs = this.closest('.tabs')
-			if (getting_standings) {
-				this.classList.toggle('active')
-			} else {
+			if (mode == 'history') {
 				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
+			} else {
+				this.classList.toggle('active')
 			}
 			await callback(...args)
 		} catch (err) {

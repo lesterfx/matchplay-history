@@ -20,9 +20,11 @@
 			<div class="button">☰</div>
 			<div class="items">
 				<div id="log-out">Log out</div>
-				<div id="custom">Enable custom API query</div>
-				<div id="standings">Season Standings</div>
-				<div id="notify">Test notification</div>
+				<!-- <div id="custom">Enable custom API query</div> -->
+				<div class="modes" id="standings-mode">Season Standings</div>
+				<div class="modes" id="history-mode">Player Histories</div>
+				<div class="modes" id="arena-mode">Arena Stats</div>
+				<!-- <div id="notify">Test notification</div> -->
 			</div>
 		</div>
 		<h1 id="header">&nbsp;</h1>
@@ -43,6 +45,19 @@
 				<div id="my-tournaments" class="tabs" data-tabgroup="my-tournaments">
 				</div>
 			</div>
+			<div class="block hide" id="arenas-block">
+				<h3 class="sticky-header">
+					<span id="arenas-title">Arenas</span>
+					<span class="refresh" id="load-arenas">
+						<span class="text">load</span>
+					</span>
+					<span class="spacer"></span>
+				</h3>
+				<table id="arenas-table" class="hide">
+					<thead><tr><th>Arena Name</th><th>Occurrences</th></tr></thead>
+					<tbody id="arenas-tbody"></tbody>
+				</table>
+			</div>
 			<div class="block hide" id="standings-block">
 				<h3 class="sticky-header">
 					<span id="standings-title">Standings</span>
@@ -54,34 +69,97 @@
 					<span class="spacer"></span>
 				</h3>
 				<table id="standings-settings-table" class="hide">
+
 					<tr>
-						<td>Score Max</td>
-						<td><input id="score-max" type="number" pattern="[0-9]*" value="40"></td>
+						<td colspan="2">
+							<h4>Weekly</h4>
+						</td>
 					</tr>
 					<tr>
-						<td>Score Min</td>
-						<td><input id="score-min" type="number" pattern="[0-9]*" value="5"></td>
+						<td>Score Range</td>
+						<td>
+							<input id="score-min" type="number" pattern="[0-9]*" value="5" size="3">
+							<input id="score-max" type="number" pattern="[0-9]*" value="40" size="3">
+						</td>
 					</tr>
 					<tr>
 						<td>Combine same name</td>
-						<td><input type="checkbox" id="combine-names" checked></td>
+						<td><input type="checkbox" checked id="combine-names" class="need-reload"></td>
+					</tr>
+					<tr>
+						<td>Custom column header</td>
+						<td><input id="custom-column-header" value="S\d*(?<abbr>W\d*)" placeholder="regex with abbr named group"></td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<h4>Totals</h4>
+						</td>
+					</tr>
+					<tr>
+						<td>Points</td>
+						<td><input type="checkbox" checked id="show-points"></td>
+					</tr>
+					<tr>
+						<td>Mtgs</td>
+						<td><input type="checkbox" checked id="show-mtgs"></td>
+					</tr>
+					<tr>
+						<td>Win %</td>
+						<td><input type="checkbox" checked id="show-win"></td>
+					</tr>
+					<tr>
+						<td>Avg Pts</td>
+						<td><input type="checkbox" id="show-avg-pts"></td>
+					</tr>
+					<tr>
+						<td>Avg Place</td>
+						<td><input type="checkbox" id="show-avg-place"></td>
+					</tr>
+
+					<tr>
+						<td colspan="2">
+							<h4>Finals<input type="checkbox" checked id="show-finals"></h4>
+						</td>
+					</tr>
+					<tr>
+						<td>B Division min attendance</td>
+						<td><input id="b-attendance" type="number" pattern="[0-9]*" value="3" size="2"></td>
+					</tr>
+					<tr>
+						<td>A Division min attendance</td>
+						<td><input id="a-attendance" type="number" pattern="[0-9]*" value="5" size="2"></td>
+					</tr>
+					<tr>
+						<td>A Division size</td>
+						<td><input id="a-size" type="number" pattern="[0-9]*" value="16" size="3"></td>
+					</tr>
+					<tr>
+						<td>Attendance bonus thresholds</td>
+						<td>
+							<input id="bonus-1" type="number" pattern="[0-9]*" value="5" size="2">
+							<input id="bonus-2" type="number" pattern="[0-9]*" value="7" size="2">
+							<input id="bonus-3" type="number" pattern="[0-9]*" value="9" size="2">
+						</td>
+					</tr>
+					<tr>
+						<td>Extra bonus players</td>
+						<td><input id="bonus-players" pattern="^\d+(\d*(,| ))*\d*$" value="" placeholder="comma-separated list of IDs"></td>
+					</tr>
+					<tr>
+						<td>A Division restricted players</td>
+						<td><input id="a-restricted" pattern="^\d+(\d*(,| ))*\d*$" value="" placeholder="comma-separated list of IDs"></td>
 					</tr>
 				</table>
 				<div id="standings-table" class="hide">
-					<span id="copy-table">copy table to clipboard</span>
-					<table>
-						<thead>
-							<tr>
-								<th class="keep">Pos</th>
-								<th class="keep">Player</th>
-								<th class="keep overall" data-score="0">Points</th>
-								<th class="keep">Mtgs</th>
-								<th class="keep last-col">Win %</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
+					<div id="copy-div">
+						copy to clipboard<br />
+						<span id="copy-table">as table</span><br />
+						<span id="copy-html">as html</span><br />
+						<span id="copy-a-division">A Division players</span><br />
+						<span id="copy-b-division">B Division players</span>
+					</div>
+					<figure class="wp-block-table standings-table has-small-font-size"><table><thead><tr></tr></thead><tbody></tbody></table></figure>
 				</div>
 				</div>
 			</div>
@@ -97,7 +175,7 @@
 				<div id="active-tournament" class="tabs" data-tabgroup="active-tournament">
 				</div>
 			</div>
-			<div id="selected">
+			<div id="selected-history">
 				<div class="sticky-header boxgroup singular" id="selected-game"></div>
 				<div id="player-histories" class="block"></div>
 			</div>
