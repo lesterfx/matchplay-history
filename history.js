@@ -181,8 +181,7 @@ async function* get_tournaments_paginated(uid) {  // paginate
 			save_data('tournament', tournament);
 		};
 		yield data;
-		need_more = false
-	} while (need_more)
+	} while (0) // need_more)
 }
 async function get_tournaments(uid) {  // paginate
 	let response = await get({
