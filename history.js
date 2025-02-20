@@ -88,10 +88,10 @@ async function get(options) {
 //     console.log('db needs upgrade')
 //     const db = event.target.result;
 //     const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
-//     objectStore.createIndex("game", "player1", { unique: false });
-//     objectStore.createIndex("game", "player2", { unique: false });
-//     objectStore.createIndex("game", "player3", { unique: false });
-//     objectStore.createIndex("game", "player4", { unique: false });
+//     objectStore.createIndex("game", "user1", { unique: false });
+//     objectStore.createIndex("game", "user2", { unique: false });
+//     objectStore.createIndex("game", "user3", { unique: false });
+//     objectStore.createIndex("game", "user4", { unique: false });
 //     console.log('db upgrade finished')
 // };
 
@@ -100,12 +100,14 @@ async function get(options) {
 //     db = event.target.result;
 // };
 
-// function add_game_to_db(game) {
+function add_game_to_db(game) {
+	[game.player1, game.player2, game.player3, game.player4] = game.userIds
+	console.log(game)
 // 	const gameObjectStore = db
 // 		.transaction("history", "readwrite")
 // 		.objectStore("game");
 // 	customerObjectStore.add(game);  // or .put, if it's already there
-// }
+}
 
 ////////////////////// indexedDB //////////////////////
 
@@ -270,6 +272,7 @@ async function get_games_from_tournament(tournament, add_players) {
 	let changes = 0;
 	for (game of games) {
 		changes += save_data('game', game);
+		add_game_to_db(game);
 	};
 	return {games: games, changes: changes};
 }
