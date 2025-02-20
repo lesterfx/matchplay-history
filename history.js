@@ -190,7 +190,7 @@ async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginat
 		};
 		yield data;
 		query.page ++;
-		if (page_limit && query.page > to_page) return query.page
+		if (to_page && query.page > to_page) return query.page
 	} while (need_more)
 	return need_more && query.page
 }
