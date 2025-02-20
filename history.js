@@ -71,6 +71,44 @@ async function get(options) {
 	}
 }
 
+////////////////////// indexedDB //////////////////////
+
+// let db;
+
+// const dbName = "history";
+
+// const request = indexedDB.open(dbName, 2);
+
+// request.onerror = (event) => {
+//     console.log(event)
+//     alert('db error')
+// };
+
+// request.onupgradeneeded = (event) => {
+//     console.log('db needs upgrade')
+//     const db = event.target.result;
+//     const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
+//     objectStore.createIndex("game", "player1", { unique: false });
+//     objectStore.createIndex("game", "player2", { unique: false });
+//     objectStore.createIndex("game", "player3", { unique: false });
+//     objectStore.createIndex("game", "player4", { unique: false });
+//     console.log('db upgrade finished')
+// };
+
+// request.onsuccess = (event) => {
+//     console.log('db open success')
+//     db = event.target.result;
+// };
+
+// function add_game_to_db(game) {
+// 	const gameObjectStore = db
+// 		.transaction("history", "readwrite")
+// 		.objectStore("game");
+// 	customerObjectStore.add(game);  // or .put, if it's already there
+// }
+
+////////////////////// indexedDB //////////////////////
+
 async function get_me() {
 	try {
 		let response = await get({
@@ -204,6 +242,7 @@ async function get_games_from_tournament(tournament, add_players) {
 		pid = my_pid_by_organizer[tid];
 	} else {
 		let result = await get_tournament_details(tid);
+
 		pid = result.pid
 		my_pid_by_organizer[tid] = pid;
 
