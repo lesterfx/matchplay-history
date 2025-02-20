@@ -155,7 +155,10 @@ async function get_all_my_tournaments() {
 	}
 }
 
-async function load_more_tournaments(page) {
+async function load_more_tournaments(page, element) {
+	if (element) {
+		element.remove()
+	}
 	let in_progress = []
 	let tournament_generator = get_tournaments_paginated(myUserId, page, page)
 	let result;
@@ -1611,9 +1614,9 @@ async function add_tournament_by_id(tid) {
 }
 function load_more_tournaments_button(page) {
 	let box = notitle('tournament', 0)
-	box.textContent = 'Load older...'
+	box.textContent = `Add page ${page}...`
 	box.classList.add('fake', 'box', 'nostyle')
-	box.addEventListener('click', handler(load_more_tournaments, page))
+	box.addEventListener('click', handler(load_more_tournaments, page, box))
 	my_tournaments_tab('completed').append(box)
 }
 function manual_tournament_button() {
