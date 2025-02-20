@@ -142,7 +142,7 @@ async function get_all_my_tournaments() {
 
 	let tournament_generator = get_tournaments_paginated(myUserId, 1, 1)
 	let result;
-    while (!(result = await gen.next()).done) {
+    while (!(result = await tournament_generator.next()).done) {
 		let tournaments = result.value
 		for (let tournament of tournaments) {
 			let element = add_tournament(tournament);
@@ -152,7 +152,7 @@ async function get_all_my_tournaments() {
 	}
 	console.log(result.value)
 	if (result.value) {
-		load_more_tournaments_button(tournament_generator.value);
+		load_more_tournaments_button(result.value);
 	}
 	let manual_tournaments = get_storage_array('manual_tournaments')
 	await Promise.all(manual_tournaments.map(async (t) => {
