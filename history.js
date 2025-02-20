@@ -170,6 +170,7 @@ async function load_more_tournaments(page, element) {
 			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 		}
 	}
+	filter()
 	load_more_tournaments_button(result.value);
 	return in_progress
 }
