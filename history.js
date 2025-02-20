@@ -138,7 +138,7 @@ async function get_all_my_tournaments() {
 	my_lowest_tournament = undefined
 	document.getElementById('my-tournaments').innerHTML = ''
 	
-	let in_progress = await load_more_tournaments()
+	let in_progress = await load_more_tournaments(1)
 
 	let manual_tournaments = get_storage_array('manual_tournaments')
 	await Promise.all(manual_tournaments.map(async (t) => {
