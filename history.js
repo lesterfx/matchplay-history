@@ -134,7 +134,7 @@ async function get_all_my_tournaments() {
 	let in_progress = []
 	document.getElementById('my-tournaments').innerHTML = ''
 	// let tournaments = await get_tournaments(myUserId);
-	for await (let tournaments of get_tournaments_paginated(myUserId)) {
+	for await (let tournaments of get_tournaments_paginated(myUserId, 1)) {
 		for (let tournament of tournaments) {
 			let element = add_tournament(tournament);
 			all_my_tournaments[tournament.tournamentId] = tournament
@@ -156,14 +156,14 @@ async function get_all_my_tournaments() {
 	}
 }
 
-async function* get_tournaments_paginated(uid) {  // paginate
+async function* get_tournaments_paginated(uid, page_limit) {  // paginate
 	let query = {
 		played: uid,
 		page: 0 // increments before called
 	}
 	let need_more = true
 	do {
-		query['page'] ++;
+		query.page ++;
 		let response = await get({
 			endpoint: 'tournaments',
 			query: query
@@ -181,7 +181,8 @@ async function* get_tournaments_paginated(uid) {  // paginate
 			save_data('tournament', tournament);
 		};
 		yield data;
-	} while (0) // need_more)
+		if (page_limit && query.page >= page_limit) need_more = false
+	} while (need_more)
 }
 async function get_tournaments(uid) {  // paginate
 	let response = await get({
@@ -1099,7 +1100,7 @@ async function merge_tournaments() {
 	document.getElementById('selected-history').scrollIntoView();
 	let merged_tournaments = {};
 	for (uid in active_players) {
-		for await (tournaments of get_tournaments_paginated(uid)) {
+		for await (tournaments of get_tournaments_paginated(uid, 1)) {
 			for (let tournament of tournaments) {
 				let tid = tournament.tournamentId
 				if (all_my_tournaments[tid]) {
