@@ -73,40 +73,43 @@ async function get(options) {
 
 ////////////////////// indexedDB //////////////////////
 
-// let db;
+let db;
 
-// const dbName = "history";
+const dbName = "history";
 
-// const request = indexedDB.open(dbName, 2);
+const request = indexedDB.open(dbName, 1);
 
-// request.onerror = (event) => {
-//     console.log(event)
-//     alert('db error')
-// };
+request.onerror = (event) => {
+    console.log(event)
+    alert('db error')
+};
 
-// request.onupgradeneeded = (event) => {
-//     console.log('db needs upgrade')
-//     const db = event.target.result;
-//     const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
-//     objectStore.createIndex("game", "user1", { unique: false });
-//     objectStore.createIndex("game", "user2", { unique: false });
-//     objectStore.createIndex("game", "user3", { unique: false });
-//     objectStore.createIndex("game", "user4", { unique: false });
-//     console.log('db upgrade finished')
-// };
+request.onupgradeneeded = (event) => {
+    console.log('db needs upgrade')
+    const db = event.target.result;
+    const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
+    objectStore.createIndex("game", "user1", { unique: false });
+    objectStore.createIndex("game", "user2", { unique: false });
+    objectStore.createIndex("game", "user3", { unique: false });
+    objectStore.createIndex("game", "user4", { unique: false });
+    console.log('db upgrade finished')
+};
 
-// request.onsuccess = (event) => {
-//     console.log('db open success')
-//     db = event.target.result;
-// };
+request.onsuccess = (event) => {
+    console.log('db open success')
+    db = event.target.result;
+};
 
 function add_game_to_db(game) {
 	[game.player1, game.player2, game.player3, game.player4] = game.userIds
 	console.log(game)
-// 	const gameObjectStore = db
-// 		.transaction("history", "readwrite")
-// 		.objectStore("game");
-// 	customerObjectStore.add(game);  // or .put, if it's already there
+	// const gameObjectStore = db
+	// 	.transaction("history", "readwrite")
+	// 	.objectStore("game");
+	// customerObjectStore.add(game);  // or .put, if it's already there
+}
+function add_tournament_to_db(tournament) {
+
 }
 
 ////////////////////// indexedDB //////////////////////
@@ -272,8 +275,13 @@ async function get_games_from_tournament(tournament, add_players) {
 	let changes = 0;
 	for (game of games) {
 		changes += save_data('game', game);
-		add_game_to_db(game);
+		if (tournament.status == 'completed') {
+			add_game_to_db(game);
+		}
 	};
+	if (tournament.status == 'completed') {
+		add_tournament_to_db(tournament)
+	}
 	return {games: games, changes: changes};
 }
 async function get_tournament_details(tid) {
