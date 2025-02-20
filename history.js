@@ -139,18 +139,19 @@ async function get_all_my_tournaments() {
 	let in_progress = []
 	document.getElementById('my-tournaments').innerHTML = ''
 	// let tournaments = await get_tournaments(myUserId);
+
 	let tournament_generator = get_tournaments_paginated(myUserId, 1, 1)
-	for await (let tournaments of tournament_generator) {
+	let result;
+    while (!(result = await gen.next()).done) {
+		let tournaments = result.value
 		for (let tournament of tournaments) {
 			let element = add_tournament(tournament);
 			all_my_tournaments[tournament.tournamentId] = tournament
 			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 		}
 	}
-	let n = await tournament_generator.next()
-	console.log(n)
-	console.log(n.value)
-	if (n.value) {
+	console.log(result.value)
+	if (result.value) {
 		load_more_tournaments_button(tournament_generator.value);
 	}
 	let manual_tournaments = get_storage_array('manual_tournaments')
