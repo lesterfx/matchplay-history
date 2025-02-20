@@ -170,9 +170,7 @@ async function load_more_tournaments(page, element) {
 			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 		}
 	}
-	if (result.value) {
-		load_more_tournaments_button(result.value);
-	}
+	load_more_tournaments_button(result.value);
 	return in_progress
 }
 
@@ -189,25 +187,33 @@ async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginat
 		});
 		let data = response.data
 		for (tournament of data) {
-			if (tournament.tournamentId <= my_lowest_tournament) {
+			save_data('tournament', tournament);
+			if (uid != myUserId && tournament.tournamentId <= my_lowest_tournament) {
 				need_more = false
 				// log(`do not need more because ${tournament.tournamentId} <= ${my_lowest_tournament}`)
 			}
-			if (query.page >= response.meta.last_page) {
-				// log(`do not need more because ${query.page} >= ${response.meta.last_page}`)
-				need_more = false
-			}
-			save_data('tournament', tournament);
 		};
+		if (query.page >= response.meta.last_page) {
+			// log(`do not need more because ${query.page} >= ${response.meta.last_page}`)
+			need_more = false
+		}
 		yield data;
 		query.page ++;
 		if (need_more && to_page && query.page > to_page) {
 			console.log(`to_page && query.page > to_page, query.page=${query.page}`)
-			return query.page
+			return {
+				'next': query.page,
+				'last': response.meta.last_page,
+				'message': `load page ${query.page} of ${response.meta.last_page}`
+			}
 		}
 	} while (need_more)
 	console.log(`done with get_tournaments_paginated, need_more=${need_more}, query.page=${query.page}`)
-	return need_more && query.page
+	return {
+		'next': need_more && query.page,
+		'last': response.meta.last_page,
+		'message': `load page ${query.page} of ${response.meta.last_page}`
+	}
 }
 async function get_tournaments(uid) {  // paginate
 	let response = await get({
@@ -1612,9 +1618,11 @@ async function add_tournament_by_id(tid) {
 	await get_tournament_details(tid)
 	add_tournament(all_data.tournament[tid], true)
 }
-function load_more_tournaments_button(page) {
+function load_more_tournaments_button(value) {
+	let page = value.next
+	if (!page) return
 	let box = notitle('tournament', 0)
-	box.textContent = `Add page ${page}...`
+	box.textContent = value.message
 	box.classList.add('fake', 'box', 'nostyle')
 	box.addEventListener('click', handler(load_more_tournaments, page, box))
 	my_tournaments_tab('completed').append(box)
