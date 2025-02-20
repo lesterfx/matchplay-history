@@ -206,7 +206,6 @@ async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginat
 		query.page ++;
 		next_page.next = need_more && query.page
 		next_page.last = response.meta.last_page
-		next_page.message = `load page ${next_page.next} of ${next_page.last}`
 		if (need_more && to_page && query.page > to_page) {
 			console.log(`to_page && query.page > to_page, query.page=${query.page}`)
 			return next_page
@@ -1619,12 +1618,11 @@ async function add_tournament_by_id(tid) {
 	add_tournament(all_data.tournament[tid], true)
 }
 function load_more_tournaments_button(value) {
-	let page = value.next
-	if (!page) return
+	if (!value.next) return
 	let box = notitle('tournament', 0)
-	box.textContent = value.message
+	box.textContent = `load page ${value.next} of ${value.last}`
 	box.classList.add('fake', 'box', 'nostyle')
-	box.addEventListener('click', handler(load_more_tournaments, page, box))
+	box.addEventListener('click', handler(load_more_tournaments, value.next, box))
 	my_tournaments_tab('completed').append(box)
 }
 function manual_tournament_button() {
