@@ -88,10 +88,10 @@ request.onupgradeneeded = (event) => {
     console.log('db needs upgrade')
     const db = event.target.result;
     const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
-    objectStore.createIndex("game", "user1", { unique: false });
-    objectStore.createIndex("game", "user2", { unique: false });
-    objectStore.createIndex("game", "user3", { unique: false });
-    objectStore.createIndex("game", "user4", { unique: false });
+    objectStore.createIndex("user1", "user1", { unique: false });
+    objectStore.createIndex("user2", "user2", { unique: false });
+    objectStore.createIndex("user3", "user3", { unique: false });
+    objectStore.createIndex("user4", "user4", { unique: false });
     console.log('db upgrade finished')
 };
 
@@ -101,7 +101,7 @@ request.onsuccess = (event) => {
 };
 
 function add_game_to_db(game) {
-	[game.player1, game.player2, game.player3, game.player4] = game.userIds
+	[game.user1, game.user2, game.user3, game.user4] = game.userIds
 	console.log(game)
 	// const gameObjectStore = db
 	// 	.transaction("history", "readwrite")
