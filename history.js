@@ -180,6 +180,11 @@ async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginat
 		page: (from_page || 1) // increments before called
 	}
 	let need_more = true
+	let next_page = {
+		'next': null,
+		'last': null,
+		'message': 'load next page'
+	}
 	do {
 		let response = await get({
 			endpoint: 'tournaments',
@@ -199,21 +204,16 @@ async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginat
 		}
 		yield data;
 		query.page ++;
+		next_page.next = need_more && query.page
+		next_page.last = response.meta.last_page
+		next_page.message = `load page ${next_page.next} of ${next_page.last}`
 		if (need_more && to_page && query.page > to_page) {
 			console.log(`to_page && query.page > to_page, query.page=${query.page}`)
-			return {
-				'next': query.page,
-				'last': response.meta.last_page,
-				'message': `load page ${query.page} of ${response.meta.last_page}`
-			}
+			return next_page
 		}
 	} while (need_more)
 	console.log(`done with get_tournaments_paginated, need_more=${need_more}, query.page=${query.page}`)
-	return {
-		'next': need_more && query.page,
-		'last': response.meta.last_page,
-		'message': `load page ${query.page} of ${response.meta.last_page}`
-	}
+	return next_page
 }
 async function get_tournaments(uid) {  // paginate
 	let response = await get({
