@@ -74,6 +74,7 @@ async function get(options) {
 ////////////////////// indexedDB //////////////////////
 
 // let db;
+
 // const dbName = "history";
 
 // const request = indexedDB.open(dbName, 2);
