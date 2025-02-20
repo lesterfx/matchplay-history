@@ -192,8 +192,12 @@ async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginat
 		};
 		yield data;
 		query.page ++;
-		if (to_page && query.page > to_page) return query.page
+		if (to_page && query.page > to_page) {
+			console.log(`to_page && query.page > to_page, query.page=${query.page}`)
+			return query.page
+		}
 	} while (need_more)
+	console.log(`done with get_tournaments_paginated, need_more=${need_more}, query.page=${query.page}`)
 	return need_more && query.page
 }
 async function get_tournaments(uid) {  // paginate
