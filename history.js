@@ -136,24 +136,10 @@ async function get_all_my_tournaments() {
 	document.getElementById('my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
 	my_lowest_tournament = undefined
-	let in_progress = []
 	document.getElementById('my-tournaments').innerHTML = ''
-	// let tournaments = await get_tournaments(myUserId);
+	
+	let in_progress = await load_more_tournaments()
 
-	let tournament_generator = get_tournaments_paginated(myUserId, 1, 1)
-	let result;
-    while (!(result = await tournament_generator.next()).done) {
-		let tournaments = result.value
-		for (let tournament of tournaments) {
-			let element = add_tournament(tournament);
-			all_my_tournaments[tournament.tournamentId] = tournament
-			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
-		}
-	}
-	console.log(result.value)
-	if (result.value) {
-		load_more_tournaments_button(result.value);
-	}
 	let manual_tournaments = get_storage_array('manual_tournaments')
 	await Promise.all(manual_tournaments.map(async (t) => {
 		await add_tournament_by_id(t)
@@ -167,6 +153,24 @@ async function get_all_my_tournaments() {
 		element.dispatchEvent(new Event('click'))
 		activate_tab(my_tournaments_tab(status))
 	}
+}
+
+async function load_more_tournaments(page) {
+	let in_progress = []
+	let tournament_generator = get_tournaments_paginated(myUserId, page, page)
+	let result;
+    while (!(result = await tournament_generator.next()).done) {
+		let tournaments = result.value
+		for (let tournament of tournaments) {
+			let element = add_tournament(tournament);
+			all_my_tournaments[tournament.tournamentId] = tournament
+			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
+		}
+	}
+	if (result.value) {
+		load_more_tournaments_button(result.value);
+	}
+	return in_progress
 }
 
 async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginate
