@@ -147,8 +147,9 @@ async function get_all_my_tournaments() {
 			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 		}
 	}
-	console.log(tournament_generator)
-	console.log(tournament_generator.value)
+	let n = tournament_generator.next()
+	console.log(n)
+	console.log(n.value)
 	if (tournament_generator.value) {
 		load_more_tournaments_button(tournament_generator.value);
 	}
