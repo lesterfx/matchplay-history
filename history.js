@@ -104,9 +104,9 @@ function add_game_to_db(game) {
 	[game.user1, game.user2, game.user3, game.user4] = game.userIds
 	console.log(game)
 	const gameObjectStore = db
-		.transaction("history", "readwrite")
+		.transaction("game", "readwrite")
 		.objectStore("game");
-	customerObjectStore.add(game);  // or .put, if it's already there
+	gameObjectStore.add(game);  // or .put, if it's already there
 }
 function add_tournament_to_db(tournament) {
 
