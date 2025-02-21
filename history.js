@@ -233,33 +233,36 @@ async function get_games_from_tournaments(tournaments) {
 	const promises = tids.map(get_and_populate_games_from_tournament);
 	await Promise.all(promises);
 }
+function add_game_to_player_standing(game) {
+	for (uid of game.userIds) {
+		if (uid == myUserId) {
+			continue
+		}
+		if (active_players[uid]) {
+			let won = did_i_win(game, uid)
+			if (won !== null) {
+				if (won) {
+					winloss[uid].won ++;
+				} else {
+					winloss[uid].lost ++;
+				}
+				update_player_standing(uid)
+				update_player_standing(uid, document.getElementById('selected-game'))
+			}
+			add_player_game({
+				uid: uid,
+				game: game,
+				won: won,
+				order: -tid
+			})
+		};
+	};
+}
 async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
 	let tournament_games = (await get_games_from_tournament(tournament)).games;
 	for (game of tournament_games) {
-		for (uid of game.userIds) {
-			if (uid == myUserId) {
-				continue
-			}
-			if (active_players[uid]) {
-				let won = did_i_win(game, uid)
-				if (won !== null) {
-					if (won) {
-						winloss[uid].won ++;
-					} else {
-						winloss[uid].lost ++;
-					}
-					update_player_standing(uid)
-					update_player_standing(uid, document.getElementById('selected-game'))
-				}
-				add_player_game({
-					uid: uid,
-					game: game,
-					won: won,
-					order: -tid
-				})
-			};
-		};
+		add_game_to_player_standing(game)
 	};
 	let listnodes = document.querySelectorAll(`#player-histories div.player-history div.merged-tournaments`);
 	for (listnode of listnodes) {
@@ -1119,7 +1122,7 @@ async function compare_players_from_game(id) {
 			active_players[uid] = 1;
 		}
 	};
-	await merge_tournaments();
+	await load_active_players_history();
 }
 async function compare_player(id) {
 	document.getElementById('player-histories').innerHTML = ''
@@ -1129,10 +1132,10 @@ async function compare_player(id) {
 	active_players = {}
 	active_players[id] = true
 	if (add_active_player(id)) {
-		await merge_tournaments()
+		await load_active_players_history()
 	}
 }
-async function merge_tournaments() {
+async function load_active_players_history() {  // formerly merge_tournaments
 	let tournaments
 	document.getElementById('selected-history').scrollIntoView();
 	let merged_tournaments = {};
