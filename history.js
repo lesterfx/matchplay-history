@@ -108,6 +108,16 @@ function add_game_to_db(game) {
 		.objectStore("game");
 	gameObjectStore.add(game);  // or .put, if it's already there
 }
+async function* get_games_from_db(uid) {
+	const gameObjectStore = db
+		.transaction("game")
+		.objectStore("game");
+	
+	yield* await gameObjectStore.index("user1").get(uid)
+	yield* await gameObjectStore.index("user2").get(uid)
+	yield* await gameObjectStore.index("user3").get(uid)
+	yield* await gameObjectStore.index("user4").get(uid)
+}
 function add_tournament_to_db(tournament) {
 
 }
@@ -256,7 +266,11 @@ async function get_and_populate_games_from_tournament(tid) {
 	let tournament_games = (await get_games_from_tournament(tournament)).games;
 	for (uid in active_players) {
 		for (game of tournament_games) {
-			add_game_to_player_standing(game, uid)
+			for (uid of game.userIds) {
+				if (uid == target_uid) {
+					add_game_to_player_standing(game, uid)
+				}
+			}
 		}
 	};
 	let listnodes = document.querySelectorAll(`#player-histories div.player-history div.merged-tournaments`);
@@ -1133,19 +1147,23 @@ async function compare_player(id) {
 async function load_active_players_history() {  // formerly merge_tournaments
 	let tournaments
 	document.getElementById('selected-history').scrollIntoView();
-	let merged_tournaments = {};
+	// let merged_tournaments = {};
 	for (uid in active_players) {
-		for await (tournaments of get_tournaments_paginated(uid, 1, 1)) {
-			for (let tournament of tournaments) {
-				let tid = tournament.tournamentId
-				if (all_my_tournaments[tid]) {
-					add_player_tournament(uid, tid)
-					merged_tournaments[tid] = true
-				}
-			};
-		};
+		for (game of await get_games_from_db(uid)) {
+			add_game_to_player_standing(game, uid)
+		}
+
+		// for await (tournaments of get_tournaments_paginated(uid, 1, 1)) {
+		// 	for (let tournament of tournaments) {
+		// 		let tid = tournament.tournamentId
+		// 		if (all_my_tournaments[tid]) {
+		// 			add_player_tournament(uid, tid)
+		// 			merged_tournaments[tid] = true
+		// 		}
+		// 	};
+		// };
 	};
-	await get_games_from_tournaments(merged_tournaments);
+	// await get_games_from_tournaments(merged_tournaments);
 }
 function rank(game, uid) {
 	let playerId
