@@ -233,36 +233,31 @@ async function get_games_from_tournaments(tournaments) {
 	const promises = tids.map(get_and_populate_games_from_tournament);
 	await Promise.all(promises);
 }
-function add_game_to_player_standing(game) {
-	for (uid of game.userIds) {
-		if (uid == myUserId) {
-			continue
+function add_game_to_player_standing(game, uid) {
+	let won = did_i_win(game, uid)
+	if (won !== null) {
+		if (won) {
+			winloss[uid].won ++;
+		} else {
+			winloss[uid].lost ++;
 		}
-		if (active_players[uid]) {
-			let won = did_i_win(game, uid)
-			if (won !== null) {
-				if (won) {
-					winloss[uid].won ++;
-				} else {
-					winloss[uid].lost ++;
-				}
-				update_player_standing(uid)
-				update_player_standing(uid, document.getElementById('selected-game'))
-			}
-			add_player_game({
-				uid: uid,
-				game: game,
-				won: won,
-				order: -tid
-			})
-		};
-	};
+		update_player_standing(uid)
+		update_player_standing(uid, document.getElementById('selected-game'))
+	}
+	add_player_game({
+		uid: uid,
+		game: game,
+		won: won,
+		order: -tid
+	})
 }
 async function get_and_populate_games_from_tournament(tid) {
 	let tournament = all_data.tournament[tid]
 	let tournament_games = (await get_games_from_tournament(tournament)).games;
-	for (game of tournament_games) {
-		add_game_to_player_standing(game)
+	for (uid in active_players) {
+		for (game of tournament_games) {
+			add_game_to_player_standing(game, uid)
+		}
 	};
 	let listnodes = document.querySelectorAll(`#player-histories div.player-history div.merged-tournaments`);
 	for (listnode of listnodes) {
