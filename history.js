@@ -126,27 +126,26 @@ function add_tournament_to_db(tournament) {
 }
 
 async function* iterate_index(index, key) {
-    const request = index.openCursor(key);
-
-    // Return an async generator that processes the cursor results
-    yield* (async function* () {
-        return new Promise((resolve, reject) => {
-            request.onsuccess = (event) => {
-                const cursor = event.target.result;
-                if (cursor) {
-                    (async function processCursor() {
-                        yield cursor.value;
-                        cursor.continue();
-                    })().then(resolve);
-                } else {
-                    resolve();
-                }
-            };
-
-            request.onerror = (event) => reject(event.target.error);
-        });
-    })();
-}
+	// Open a cursor on the given index filtered by the key.
+	const request = index.openCursor(key);
+  
+	while (true) {
+	  // Wait for the cursor request to complete.
+	  const cursor = await new Promise((resolve, reject) => {
+		request.onerror = () => reject(request.error);
+		request.onsuccess = () => resolve(request.result);
+	  });
+  
+	  // If there are no more records, exit the loop.
+	  if (!cursor) break;
+  
+	  // Yield the current record's value.
+	  yield cursor.value;
+  
+	  // Continue to the next record.
+	  cursor.continue();
+	}
+  }
 
 
 ////////////////////// indexedDB //////////////////////
