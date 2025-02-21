@@ -113,11 +113,13 @@ async function* get_games_from_db(uid) {
 		.transaction("game")
 		.objectStore("game");
 	
-	yield* await iterate_cursor(gameObjectStore.index("user1"), uid)
-	yield* await iterate_cursor(gameObjectStore.index("user2"), uid)
-	yield* await iterate_cursor(gameObjectStore.index("user3"), uid)
-	yield* await iterate_cursor(gameObjectStore.index("user4"), uid)
+	for (key of ['user1', 'user2', 'user3', 'user4']) {
+		let results = await iterate_cursor(gameObjectStore.index(key), uid)
+		console.log(`for ${key}:`, results)
+		yield* results
+	}
 }
+
 function add_tournament_to_db(tournament) {
 
 }
