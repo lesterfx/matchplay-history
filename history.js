@@ -114,13 +114,10 @@ async function* get_games_from_db(uid) {
 		.objectStore("game");
 	
 	for (key of ['user1', 'user2', 'user3', 'user4']) {
-		let results = await iterate_cursor(gameObjectStore.index(key), uid)
-		let reses = []
-		for (let res of results) {
-			console.log(`in ${key}:`, res)
-			reses.push(res)
+		for await (const item of iterateIndex(gameObjectStore.index(key), myKey)) {
+			console.log(item);
+			yield item;
 		}
-		yield* reses
 	}
 }
 
@@ -129,34 +126,28 @@ function add_tournament_to_db(tournament) {
 }
 
 
-// Helper function to iterate over a cursor and yield results
-async function* iterate_cursor(index, value) {
-    const request = index.openCursor(IDBKeyRange.only(value)); // Filter by uid
-
-    let resolveCursor;
-    const cursorPromise = new Promise((resolve) => (resolveCursor = resolve));
-
-    request.onsuccess = (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-            resolveCursor({ value: cursor.value, cursor }); // Resolve the next result
-        } else {
-            resolveCursor(null); // No more results
-        }
-    };
-
-    request.onerror = (event) => {
-        throw event.target.error;
-    };
-
-    // Iterate over the cursor results
-    let result;
-    while ((result = await cursorPromise)) {
-        yield result.value; // Yield the game object
-        result.cursor.continue(); // Move to the next matching record
-        await new Promise((resolve) => (resolveCursor = resolve)); // Wait for next result
-    }
+async function* iterate_index(index, key) {
+    return new Promise((resolve, reject) => {
+        const request = index.openCursor(key);
+        
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
+            if (cursor) {
+                resolve((async function* () {
+                    do {
+                        yield cursor.value;
+                        cursor.continue();
+                    } while (await new Promise(res => cursor.onsuccess = res));
+                })());
+            } else {
+                resolve((async function* () {})());
+            }
+        };
+        
+        request.onerror = (event) => reject(event.target.error);
+    });
 }
+
 
 ////////////////////// indexedDB //////////////////////
 
