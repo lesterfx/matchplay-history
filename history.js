@@ -113,13 +113,33 @@ async function* get_games_from_db(uid) {
 		.transaction("game")
 		.objectStore("game");
 	
-	yield* await gameObjectStore.index("user1").get(uid)
-	yield* await gameObjectStore.index("user2").get(uid)
-	yield* await gameObjectStore.index("user3").get(uid)
-	yield* await gameObjectStore.index("user4").get(uid)
+	yield* await iterate_cursor(gameObjectStore.index("user1"), uid)
+	yield* await iterate_cursor(gameObjectStore.index("user2"), uid)
+	yield* await iterate_cursor(gameObjectStore.index("user3"), uid)
+	yield* await iterate_cursor(gameObjectStore.index("user4"), uid)
 }
 function add_tournament_to_db(tournament) {
 
+}
+
+
+// Helper function to iterate over a cursor and yield results
+async function* iterate_cursor(index, value) {
+    const request = index.openCursor(IDBKeyRange.only(value)); // Filter by uid
+
+    await new Promise((resolve, reject) => {
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
+            if (cursor) {
+                yield cursor.value; // Yield the game object
+                cursor.continue(); // Move to the next matching record
+            } else {
+                resolve(); // No more results
+            }
+        };
+
+        request.onerror = (event) => reject(event.target.error);
+    });
 }
 
 ////////////////////// indexedDB //////////////////////
@@ -1149,7 +1169,7 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	document.getElementById('selected-history').scrollIntoView();
 	// let merged_tournaments = {};
 	for (uid in active_players) {
-		for (game of await get_games_from_db(uid)) {
+		for (let game of await get_games_from_db(uid)) {
 			add_game_to_player_standing(game, uid)
 		}
 
