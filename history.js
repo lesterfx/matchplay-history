@@ -1179,7 +1179,8 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	document.getElementById('selected-history').scrollIntoView();
 	// let merged_tournaments = {};
 	for (uid in active_players) {
-		for (let game of await get_games_from_db(uid)) {
+		console.log(`getting games from db uid=${uid}`)
+		for await (let game of await get_games_from_db(uid)) {
 			add_game_to_player_standing(game, uid)
 		}
 
