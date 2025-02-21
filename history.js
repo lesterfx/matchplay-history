@@ -125,30 +125,27 @@ function add_tournament_to_db(tournament) {
 
 }
 
-
 async function* iterate_index(index, key) {
     const request = index.openCursor(key);
 
-    // Wrap cursor iteration in a Promise
-    yield* await new Promise((resolve, reject) => {
-        const results = (async function* () {
+    // Return an async generator that processes the cursor results
+    yield* (async function* () {
+        return new Promise((resolve, reject) => {
             request.onsuccess = (event) => {
                 const cursor = event.target.result;
                 if (cursor) {
-                    (async function iterate() {
+                    (async function processCursor() {
                         yield cursor.value;
                         cursor.continue();
                     })().then(resolve);
                 } else {
-                    resolve((async function* () {})());
+                    resolve();
                 }
             };
 
             request.onerror = (event) => reject(event.target.error);
-        })();
-
-        return results;
-    });
+        });
+    })();
 }
 
 
