@@ -114,7 +114,7 @@ async function* get_games_from_db(uid) {
 		.objectStore("game");
 	
 	for (key of ['user1', 'user2', 'user3', 'user4']) {
-		for await (const item of iterateIndex(gameObjectStore.index(key), myKey)) {
+		for await (const item of iterate_index(gameObjectStore.index(key), myKey)) {
 			console.log(item);
 			yield item;
 		}
