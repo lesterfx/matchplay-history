@@ -127,19 +127,29 @@ function add_tournament_to_db(tournament) {
 async function* iterate_cursor(index, value) {
     const request = index.openCursor(IDBKeyRange.only(value)); // Filter by uid
 
-    await new Promise((resolve, reject) => {
-        request.onsuccess = (event) => {
-            const cursor = event.target.result;
-            if (cursor) {
-                yield cursor.value; // Yield the game object
-                cursor.continue(); // Move to the next matching record
-            } else {
-                resolve(); // No more results
-            }
-        };
+    let resolveCursor;
+    const cursorPromise = new Promise((resolve) => (resolveCursor = resolve));
 
-        request.onerror = (event) => reject(event.target.error);
-    });
+    request.onsuccess = (event) => {
+        const cursor = event.target.result;
+        if (cursor) {
+            resolveCursor({ value: cursor.value, cursor }); // Resolve the next result
+        } else {
+            resolveCursor(null); // No more results
+        }
+    };
+
+    request.onerror = (event) => {
+        throw event.target.error;
+    };
+
+    // Iterate over the cursor results
+    let result;
+    while ((result = await cursorPromise)) {
+        yield result.value; // Yield the game object
+        result.cursor.continue(); // Move to the next matching record
+        await new Promise((resolve) => (resolveCursor = resolve)); // Wait for next result
+    }
 }
 
 ////////////////////// indexedDB //////////////////////
