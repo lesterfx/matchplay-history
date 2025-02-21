@@ -115,8 +115,12 @@ async function* get_games_from_db(uid) {
 	
 	for (key of ['user1', 'user2', 'user3', 'user4']) {
 		let results = await iterate_cursor(gameObjectStore.index(key), uid)
-		console.log(`for ${key}:`, results)
-		yield* results
+		let reses = []
+		for (let res of results) {
+			console.log(`in ${key}:`, res)
+			reses.push(res)
+		}
+		yield* reses
 	}
 }
 
