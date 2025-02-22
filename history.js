@@ -1168,16 +1168,13 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	document.getElementById('selected-history').scrollIntoView();
 	// let merged_tournaments = {};
 	for (uid in active_players) {
-		uid = Number(uid)
-		if (uid && !isNaN(uid)) {
+		if (Number(uid) && !isNaN(uid)) {
+			uid = Number(uid)
 			let games = (await get_games_from_db(uid))
 			console.log(`games for ${uid}: ${games}`)
 			for (let game of games) {
 				add_game_to_player_standing(game, uid)
 			}
-		} else {
-			let el = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"] .boxgroup`);
-			el.textContent = 'Player unclaimed. Cannot get history.'
 		}
 
 		// for await (tournaments of get_tournaments_paginated(uid, 1, 1)) {
@@ -1485,8 +1482,12 @@ function add_active_player(id) {
 	let boxgroup = document.createElement('div')
 	boxgroup.classList.add('boxgroup')
 	playerbox.append(fakefill(boxgroup))
+	if (!id) {
+		boxgroup.textContent = 'Player unclaimed. Cannot get history.'
+	}
 
 	document.getElementById('player-histories').prepend(playerbox);
+
 	return true
 }
 function add_player_tournament(uid, tid) {
