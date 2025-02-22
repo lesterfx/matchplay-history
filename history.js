@@ -1177,15 +1177,6 @@ async function load_active_players_history() {  // formerly merge_tournaments
 			}
 		}
 
-		// for await (tournaments of get_tournaments_paginated(uid, 1, 1)) {
-		// 	for (let tournament of tournaments) {
-		// 		let tid = tournament.tournamentId
-		// 		if (all_my_tournaments[tid]) {
-		// 			add_player_tournament(uid, tid)
-		// 			merged_tournaments[tid] = true
-		// 		}
-		// 	};
-		// };
 	};
 	// await get_games_from_tournaments(merged_tournaments);
 }
@@ -1297,13 +1288,6 @@ ready(async () => {
 		}
 	})
 
-	// document.getElementById('notify').addEventListener('click', function () {
-	// 	try {
-	// 		notifyMe()
-	// 	} catch (err) {
-	// 		catcher(err)
-	// 	}
-	// })
 	document.getElementById('log-out').addEventListener('click', async function () {
 		try {
 			this.parentElement.classList.remove('shown')
@@ -1475,10 +1459,6 @@ function add_active_player(id) {
 
 	h2.append(title('user', id, 'span'))
 
-	let merged = document.createElement('div')
-	merged.classList.add('merged-tournaments')
-	playerbox.append(merged)
-	
 	let boxgroup = document.createElement('div')
 	boxgroup.classList.add('boxgroup')
 	playerbox.append(fakefill(boxgroup))
@@ -1489,11 +1469,6 @@ function add_active_player(id) {
 	}
 
 	return true
-}
-function add_player_tournament(uid, tid) {
-	let trow = title('tournament', tid);
-	let selector = `#player-histories div.player-history[data-playerid="${uid}"] div.merged-tournaments`
-	document.querySelector(selector).append(trow)
 }
 
 function title(kind, id, element_type) {
@@ -1724,24 +1699,3 @@ function fakefill(element) {
 	}
 	return element;
 }
-function notifyMe() {
-	log('notifications...')
-	if (!('Notification' in window)) {
-		log('This browser does not support desktop notification');
-	} else {
-		if (Notification.permission !== 'granted' && Notification.permission != 'denied') {
-			log(`Permission is ${Notification.permission}`)
-			Notification.requestPermission()
-		}
-		log(`Notification permission is ${Notification.permission}`)
-		if (Notification.permission === "granted") {
-			log(`Sending notification`)
-			new Notification("Hi there!", {
-                body: 'This is a test notification.'
-            });
-		} else {
-			log(`Notification permission is ${Notification.permission}`)
-		}
-	}
-  }
-  
