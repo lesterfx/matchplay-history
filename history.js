@@ -125,9 +125,7 @@ async function get_games_from_db(uid) {
 	  
 	  // Wrap the getAll request in a Promise to await its result
 	  const entries = await new Promise((resolve, reject) => {
-		console.log(`getAll(${uid})`)
 		const request = index.getAll(uid);
-		console.log(`ok`)
 		request.onsuccess = () => resolve(request.result);
 		request.onerror = () => reject(request.error);
 	  });
@@ -1171,7 +1169,7 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	// let merged_tournaments = {};
 	for (uid in active_players) {
 		if (uid) {
-			let games = (await get_games_from_db(uid))
+			let games = (await get_games_from_db(Number(uid)))
 			console.log(`games for ${uid}: ${games}`)
 			for (let game of games) {
 				add_game_to_player_standing(game, uid)
