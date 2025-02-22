@@ -1172,7 +1172,7 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	for (uid in active_players) {
 		if (uid) {
 			let games = (await get_games_from_db(uid))
-			console.log(`games: ${games}`)
+			console.log(`games for ${uid}: ${games}`)
 			for (let game of games) {
 				add_game_to_player_standing(game, uid)
 			}
