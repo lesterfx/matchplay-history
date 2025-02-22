@@ -111,8 +111,7 @@ function add_game_to_db(game) {
 
 async function get_games_from_db(uid) {
 	if (typeof uid !== "number") {
-		console.log('not a numeric uid. no results to be expected')
-		return []
+		console.log(`not a numeric uid, ${uid}. error expected!`)
 	}
 	const transaction = db.transaction("game");
 	const gameObjectStore = transaction.objectStore("game");
