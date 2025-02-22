@@ -108,43 +108,30 @@ function add_game_to_db(game) {
 		.objectStore("game");
 	gameObjectStore.add(game);  // or .put, if it's already there
 }
-async function* get_games_from_db(uid) {
-	const gameObjectStore = db
-		.transaction("game")
-		.objectStore("game");
+
+async function get_games_from_db(uid) {
+	const transaction = db.transaction("game");
+	const gameObjectStore = transaction.objectStore("game");
 	
-	for (key of ['user1', 'user2', 'user3', 'user4']) {
-		for await (const item of iterate_index(gameObjectStore.index(key), key)) {
-			console.log(item);
-			yield item;
-		}
-	}
-}
-
-function add_tournament_to_db(tournament) {
-
-}
-
-async function* iterate_index(index, key) {
-	// Open a cursor on the given index filtered by the key.
-	const request = index.openCursor(key);
-  
-	while (true) {
-	  // Wait for the cursor request to complete.
-	  const cursor = await new Promise((resolve, reject) => {
-		request.onerror = () => reject(request.error);
+	let result = [];
+	const indexNames = ['user1', 'user2', 'user3', 'user4'];
+	
+	for (const key of indexNames) {
+	  // Get the index for the current user key
+	  const index = gameObjectStore.index(key);
+	  
+	  // Wrap the getAll request in a Promise to await its result
+	  const entries = await new Promise((resolve, reject) => {
+		const request = index.getAll(uid);
 		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
 	  });
-  
-	  // If there are no more records, exit the loop.
-	  if (!cursor) break;
-  
-	  // Yield the current record's value.
-	  yield cursor.value;
-  
-	  // Continue to the next record.
-	  cursor.continue();
+	  
+	  // Merge the entries into the overall result array
+	  result = result.concat(entries);
 	}
+	
+	return result;
   }
 
 
