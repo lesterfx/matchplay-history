@@ -135,7 +135,7 @@ async function get_games_from_db(uid) {
 }
 
 function add_tournament_to_db(tournament) {
-	
+
 }
 
 
@@ -1167,7 +1167,9 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	// let merged_tournaments = {};
 	for (uid in active_players) {
 		console.log(`getting games from db uid=${uid}`)
-		for await (let game of await get_games_from_db(uid)) {
+		let games = await get_games_from_db(uid)
+		for (let game of games) {
+			console.log(game)
 			add_game_to_player_standing(game, uid)
 		}
 
