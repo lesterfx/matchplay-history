@@ -128,9 +128,10 @@ async function get_games_from_db(uid) {
 	  });
 	  
 	  // Merge the entries into the overall result array
+	  console.log(`for ${key}, got ${entries}`)
 	  result = result.concat(entries);
 	}
-	
+	console.log(`concatenated: ${result}`)
 	return result;
 }
 
