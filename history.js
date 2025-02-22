@@ -1482,11 +1482,11 @@ function add_active_player(id) {
 	let boxgroup = document.createElement('div')
 	boxgroup.classList.add('boxgroup')
 	playerbox.append(fakefill(boxgroup))
+	document.getElementById('player-histories').prepend(playerbox);
 	if (!id) {
 		boxgroup.textContent = 'Player unclaimed. Cannot get history.'
+		return false
 	}
-
-	document.getElementById('player-histories').prepend(playerbox);
 
 	return true
 }
