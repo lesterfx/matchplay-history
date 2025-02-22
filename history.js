@@ -110,6 +110,10 @@ function add_game_to_db(game) {
 }
 
 async function get_games_from_db(uid) {
+	if (typeof uid !== Number) {
+		console.log('not a numeric uid. no results to be expected')
+		return []
+	}
 	const transaction = db.transaction("game");
 	const gameObjectStore = transaction.objectStore("game");
 	
