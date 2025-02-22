@@ -132,7 +132,11 @@ async function get_games_from_db(uid) {
 	}
 	
 	return result;
-  }
+}
+
+function add_tournament_to_db(tournament) {
+	
+}
 
 
 ////////////////////// indexedDB //////////////////////
