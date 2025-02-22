@@ -126,16 +126,16 @@ async function get_games_from_db(uid) {
 	  
 	  // Wrap the getAll request in a Promise to await its result
 	  const entries = await new Promise((resolve, reject) => {
+		console.log(`getAll(${uid})`)
 		const request = index.getAll(uid);
+		console.log(`ok`)
 		request.onsuccess = () => resolve(request.result);
 		request.onerror = () => reject(request.error);
 	  });
 	  
 	  // Merge the entries into the overall result array
-	  console.log(`for ${key}, got ${entries}`)
 	  result = result.concat(entries);
 	}
-	console.log(`concatenated: ${result}`)
 	return result;
 }
 
