@@ -1171,10 +1171,15 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	document.getElementById('selected-history').scrollIntoView();
 	// let merged_tournaments = {};
 	for (uid in active_players) {
-		let games = (await get_games_from_db(Number(uid)))
-		console.log(`games: ${games}`)
-		for (let game of games) {
-			add_game_to_player_standing(game, uid)
+		if (!uid) {
+			let games = (await get_games_from_db(uid))
+			console.log(`games: ${games}`)
+			for (let game of games) {
+				add_game_to_player_standing(game, uid)
+			}
+		} else {
+			let el = document.querySelector(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
+			el.textContent = 'Player unclaimed'
 		}
 
 		// for await (tournaments of get_tournaments_paginated(uid, 1, 1)) {
