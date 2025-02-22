@@ -1178,7 +1178,7 @@ async function load_active_players_history() {  // formerly merge_tournaments
 				add_game_to_player_standing(game, uid)
 			}
 		} else {
-			let el = document.querySelector(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
+			let el = document.querySelector(`#player-histories div.player-history[data-playerid="${uid}"] .boxgroup`);
 			el.textContent = 'Player unclaimed'
 		}
 
