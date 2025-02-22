@@ -276,7 +276,7 @@ function add_game_to_player_standing(game, uid) {
 		uid: uid,
 		game: game,
 		won: won,
-		order: -tid
+		order: -game.tournamentId
 	})
 }
 async function get_and_populate_games_from_tournament(tid) {
