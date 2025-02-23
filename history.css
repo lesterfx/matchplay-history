@@ -112,6 +112,12 @@ body.flash {
     background: var(--lost-background);
     border-color: var(--lost-border);
 }
+#cache-button {
+    text-decoration: underline;
+}
+#cache-button.stale {
+    color: var(--lost-background);
+}
 #log pre {
     background: var(--background);
     padding: 2px;
@@ -367,7 +373,7 @@ h3.sticky-header {
     display: inline-block;
     margin-left: 10px;
 }
-#filters-lefter {
+.filters-lefter {
     display: inline-block;
 }
 #standings-settings {

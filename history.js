@@ -402,11 +402,18 @@ function show_mode() {
 	el.classList.add('hide')
 	
 	header.textContent = el.textContent
+	
 	document.getElementById('standings-block').classList.toggle('hide', mode != 'standings')
+
 	document.getElementById('active-tournament-block').classList.toggle('hide', mode != 'history')
 	document.getElementById('selected-history').classList.toggle('hide', mode != 'history')
+	document.getElementById('cache-status').classList.toggle('hide', mode != 'history')
+	
 	document.getElementById('arenas-block').classList.toggle('hide', mode != 'arena')
-	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) el.classList.remove('active')
+	
+	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
+		el.classList.remove('active')
+	}
 	filter()
 }
 async function refresh_tournaments_click() {
