@@ -77,7 +77,7 @@ let db;
 
 const dbName = "history";
 
-const request = indexedDB.open(dbName, 1);
+const request = indexedDB.open(dbName, 2);
 
 request.onerror = (event) => {
     console.log(event)
@@ -86,14 +86,18 @@ request.onerror = (event) => {
 
 request.onupgradeneeded = (event) => {
     console.log('db needs upgrade')
+
     const db = event.target.result;
-    const objectStore = db.createObjectStore("tournament", {keyPath: "tournamentId"});
-    const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
+
+    db.createObjectStore("tournament", {keyPath: "tournamentId"});
+    
+	const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
     objectStore.createIndex("user1", "user1", { unique: false });
     objectStore.createIndex("user2", "user2", { unique: false });
     objectStore.createIndex("user3", "user3", { unique: false });
     objectStore.createIndex("user4", "user4", { unique: false });
-    console.log('db upgrade finished')
+    
+	console.log('db upgrade finished')
 };
 
 request.onsuccess = (event) => {
