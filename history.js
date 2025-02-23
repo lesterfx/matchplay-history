@@ -89,14 +89,17 @@ request.onupgradeneeded = (event) => {
 
     const db = event.target.result;
 
-    db.createObjectStore("tournament", {keyPath: "tournamentId"});
-    
-	const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
-    objectStore.createIndex("user1", "user1", { unique: false });
-    objectStore.createIndex("user2", "user2", { unique: false });
-    objectStore.createIndex("user3", "user3", { unique: false });
-    objectStore.createIndex("user4", "user4", { unique: false });
-    
+	if (event.oldVersion < 1) {
+		const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
+		objectStore.createIndex("user1", "user1", { unique: false });
+		objectStore.createIndex("user2", "user2", { unique: false });
+		objectStore.createIndex("user3", "user3", { unique: false });
+		objectStore.createIndex("user4", "user4", { unique: false });
+	}
+	if (event.oldVersion < 2) {
+		db.createObjectStore("tournament", {keyPath: "tournamentId"});
+	}
+
 	console.log('db upgrade finished')
 };
 
