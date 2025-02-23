@@ -85,7 +85,7 @@ request.onerror = (event) => {
 };
 
 request.onupgradeneeded = (event) => {
-    console.log('db needs upgrade')
+    console.log(`db needs upgrade from ${event.oldVersion} to ${event.newVersion}`)
 
     const db = event.target.result;
 
@@ -116,9 +116,9 @@ function add_game_to_db(game) {
 	gameObjectStore.put(game);
 }
 
-async function get_games_from_db_by_uid(uid) {
-	if (typeof uid !== "number") {
-		console.log(`not a numeric uid, ${uid}. error expected!`)
+async function get_games_from_db_by_userId(userId) {
+	if (typeof userId !== "number") {
+		console.log(`not a numeric userId, ${userId}. error expected!`)
 	}
 	const transaction = db.transaction("game");
 	const gameObjectStore = transaction.objectStore("game");
@@ -132,7 +132,7 @@ async function get_games_from_db_by_uid(uid) {
 	  
 	  // Wrap the getAll request in a Promise to await its result
 	  const entries = await new Promise((resolve, reject) => {
-		const request = index.getAll(uid);
+		const request = index.getAll(userId);
 		request.onsuccess = () => resolve(request.result);
 		request.onerror = () => reject(request.error);
 	  });
@@ -148,6 +148,15 @@ function add_tournament_to_db(tournament) {
 		.transaction("tournament", "readwrite")
 		.objectStore("tournament");
 	tournamentObjectStore.put(tournament);
+}
+async function get_tournament_from_db(tournamentId) {
+	const transaction = db.transaction(["tournament"]);
+	const objectStore = transaction.objectStore("tournament");
+	return await new Promise((resolve, reject) => {
+		const request = objectStore.get(tournamentId);
+		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
+	});
 }
 
 
@@ -247,11 +256,9 @@ async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginat
 		next_page.next = need_more && query.page
 		next_page.last = response.meta.last_page
 		if (need_more && to_page && query.page > to_page) {
-			console.log(`to_page && query.page > to_page, query.page=${query.page}`)
 			return next_page
 		}
 	} while (need_more)
-	console.log(`done with get_tournaments_paginated, need_more=${need_more}, query.page=${query.page}`)
 	return next_page
 }
 async function get_tournaments(uid) {  // paginate
@@ -1180,7 +1187,7 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	for (uid in active_players) {
 		if (Number(uid) && !isNaN(uid)) {
 			uid = Number(uid)
-			let games = (await get_games_from_db_by_uid(uid))
+			let games = (await get_games_from_db_by_userId(uid))
 			console.log(`games for ${uid}: ${games}`)
 			for (let game of games) {
 				add_game_to_player_standing(game, uid)
@@ -1616,6 +1623,9 @@ function add_tournament(tournament, manual) {
 		del.addEventListener('click', handler(remove_manual_tournament, 'event', tid))
 	}
 	box.addEventListener('click', tabhandler(click_tournament, tid))
+	if (get_tournament_from_db(tid)) {
+		box.classList.add('cached')
+	}
 	// my_tournaments_tab(tournament.status).append(box);
 	insertSorted(box, my_tournaments_tab(tournament.status), (el) => {
 		return -el.dataset.id;
