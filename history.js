@@ -149,6 +149,15 @@ function add_tournament_to_db(tournament) {
 		.objectStore("tournament");
 	tournamentObjectStore.put(tournament);
 }
+async function get_tournaments_from_db() {
+	const transaction = db.transaction(["tournament"]);
+	const objectStore = transaction.objectStore("tournament");
+	return await new Promise((resolve, reject) => {
+		const request = objectStore.getAll();
+		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
+	});
+}
 async function get_tournament_from_db(tournamentId) {
 	const transaction = db.transaction(["tournament"]);
 	const objectStore = transaction.objectStore("tournament");
@@ -1348,6 +1357,7 @@ ready(async () => {
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
 	document.getElementById('filter').addEventListener('change', handler(filter, true))
+	document.getElementById('cache-button').addEventListener('click', handler(update_cache, true))
 	document.getElementById('standings-settings').addEventListener('click', handler(function () {
 		document.getElementById('standings-settings-table').classList.toggle('hide')
 	}))
@@ -1372,6 +1382,7 @@ ready(async () => {
 
 	load_filters_history()
 	load_standings_settings()
+	update_cache(false)
 
 	try {
 		await main();
@@ -1379,6 +1390,22 @@ ready(async () => {
 		catcher(err)
 	}
 });
+
+async function update_cache(do_update) {
+	if (!do_update) {
+		let cacheSize = Number(localStorage.getItem('cacheSize') || '25')
+		let option = document.querySelector(`'#cache-size option[value=${cacheSize}]`)
+		if (option) option.checked = true
+	}
+	let tournaments = await get_tournaments_from_db()
+	let max = document.querySelector('#cache-size option:checked').value
+	console.log(`${tournaments.length} tournaments cached, of ${max}`)
+	if (tournaments.length < max) {
+		$('#cache-button').classList.add('stale')
+	} else {
+		$('#cache-button').classList.remove('stale')
+	}
+}
 
 function load_filters_history() {
 	for (let x of document.querySelectorAll('#filters>div')) {

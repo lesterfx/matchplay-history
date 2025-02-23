@@ -378,7 +378,8 @@ h3.sticky-header {
     margin-left: 10px;
 }
 .filters-lefter {
-    display: inline-block;
+    cursor: initial;
+    flex-grow: 0;
 }
 #standings-settings {
     cursor: pointer;
