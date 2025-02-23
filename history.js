@@ -213,7 +213,7 @@ async function load_more_tournaments(page, element) {
     while (!(result = await tournament_generator.next()).done) {
 		let tournaments = result.value
 		for (let tournament of tournaments) {
-			let element = add_tournament(tournament);
+			let element = await add_tournament(tournament);
 			all_my_tournaments[tournament.tournamentId] = tournament
 			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
 		}
@@ -1605,7 +1605,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 	}
 	return box;
 }
-function add_tournament(tournament, manual) {
+async function add_tournament(tournament, manual) {
 	let tid = tournament.tournamentId
 	if (my_lowest_tournament) {
 		my_lowest_tournament = Math.min(my_lowest_tournament, tid)
@@ -1657,7 +1657,7 @@ async function add_manual_tournament() {
 async function add_tournament_by_id(tid) {
 	if (all_my_tournaments[tid]) return
 	await get_tournament_details(tid)
-	add_tournament(all_data.tournament[tid], true)
+	await add_tournament(all_data.tournament[tid], true)
 }
 function load_more_tournaments_button(value) {
 	if (!value.next) return
