@@ -1623,7 +1623,7 @@ function add_tournament(tournament, manual) {
 		del.addEventListener('click', handler(remove_manual_tournament, 'event', tid))
 	}
 	box.addEventListener('click', tabhandler(click_tournament, tid))
-	let cached_tourney = await get_tournament_from_db(tid)
+	let cached_tourney = (await get_tournament_from_db(tid));
 	if (cached_tourney) {
 		console.log(cached_tourney)
 		box.classList.add('cached')
