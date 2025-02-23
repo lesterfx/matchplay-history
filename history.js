@@ -87,6 +87,7 @@ request.onerror = (event) => {
 request.onupgradeneeded = (event) => {
     console.log('db needs upgrade')
     const db = event.target.result;
+    const objectStore = db.createObjectStore("tournament", {keyPath: "tournamentId"});
     const objectStore = db.createObjectStore("game", {keyPath: "gameId"});
     objectStore.createIndex("user1", "user1", { unique: false });
     objectStore.createIndex("user2", "user2", { unique: false });
@@ -102,14 +103,13 @@ request.onsuccess = (event) => {
 
 function add_game_to_db(game) {
 	[game.user1, game.user2, game.user3, game.user4] = game.userIds
-	console.log(game)
 	const gameObjectStore = db
 		.transaction("game", "readwrite")
 		.objectStore("game");
-	gameObjectStore.add(game);  // or .put, if it's already there
+	gameObjectStore.put(game);
 }
 
-async function get_games_from_db(uid) {
+async function get_games_from_db_by_uid(uid) {
 	if (typeof uid !== "number") {
 		console.log(`not a numeric uid, ${uid}. error expected!`)
 	}
@@ -137,7 +137,10 @@ async function get_games_from_db(uid) {
 }
 
 function add_tournament_to_db(tournament) {
-
+	const tournamentObjectStore = db
+		.transaction("tournament", "readwrite")
+		.objectStore("tournament");
+	tournamentObjectStore.put(tournament);
 }
 
 
@@ -1170,7 +1173,7 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	for (uid in active_players) {
 		if (Number(uid) && !isNaN(uid)) {
 			uid = Number(uid)
-			let games = (await get_games_from_db(uid))
+			let games = (await get_games_from_db_by_uid(uid))
 			console.log(`games for ${uid}: ${games}`)
 			for (let game of games) {
 				add_game_to_player_standing(game, uid)
