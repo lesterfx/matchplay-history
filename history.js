@@ -1394,7 +1394,7 @@ ready(async () => {
 async function update_cache(do_update) {
 	if (!do_update) {
 		let cacheSize = Number(localStorage.getItem('cacheSize') || '25')
-		let option = document.querySelector(`'#cache-size option[value="${cacheSize}"]`)
+		let option = document.querySelector(`#cache-size option[value="${cacheSize}"]`)
 		if (option) option.checked = true
 	}
 	let tournaments = await get_tournaments_from_db()
