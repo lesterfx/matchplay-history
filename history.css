@@ -114,9 +114,10 @@ body.flash {
 }
 #cache-button {
     text-decoration: underline;
+    cursor: pointer;
 }
 #cache-button.stale {
-    color: var(--lost-background);
+    color: var(--lost-border);
 }
 #log pre {
     background: var(--background);
@@ -288,13 +289,16 @@ h3.sticky-header {
     z-index: 10;
 }
 #options>.items>div {
-    padding: 2px;
     border-radius: 10px;
     background: var(--group-background);
     cursor: pointer;
     padding: .5em;
     margin-bottom: 1px;
 }
+#options>.items>div.modes {
+    padding-left: 1em;
+}
+
 #options:not(.shown)>.items {
     visibility: hidden;
 }

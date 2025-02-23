@@ -397,9 +397,9 @@ function show_mode() {
 	let divs = document.querySelectorAll('.modes')
 	let el = document.getElementById(`${mode}-mode`)
 	for (let div of divs) {
-		div.classList.remove('hide')
+		div.classList.remove('active')
 	}
-	el.classList.add('hide')
+	el.classList.add('active')
 	
 	header.textContent = el.textContent
 	
