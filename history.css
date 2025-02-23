@@ -90,6 +90,9 @@ body.flash {
     display: inline-block;
     flex-grow: 1;
 }
+.box.cached {
+    border-color: transparent;
+}
 .box.nostyle {
     background: none;
     border: none;
