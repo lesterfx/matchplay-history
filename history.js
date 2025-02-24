@@ -1415,7 +1415,7 @@ async function update_cache(do_update) {
 	let tournaments = await get_tournaments_from_db()
 	let max = document.querySelector('#cache-size option:checked').value
 	console.log(`${tournaments.length} tournaments cached, of ${max}`)
-	let button = document.getElementById('#cache-button')
+	let button = document.getElementById('cache-button')
 	if (tournaments.length < max) {
 		button.classList.add('stale')
 		button.textContent = 'cache now'
