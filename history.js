@@ -103,15 +103,22 @@ request.onupgradeneeded = (event) => {
 	console.log('db upgrade finished')
 };
 
+success_callbacks = []
 request.onsuccess = (event) => {
     console.log('db open success')
     db = event.target.result;
+	for ([callback, args] of success_callbacks) {
+		console.log(`calling ${callback} callback`)
+		callback(...args)
+	}
 };
 function when_db_ready(callback, ...args) {
-	console.log('callback requested when db is ready')
-	request.onsuccess = (event) => {
-		console.log('db is ready, calling callback')
+	if (db) {
+		console.log('db was already ready, so calling now')
 		callback(...args)
+	} else {
+		console.log('callback added for db')
+		success_callbacks.push([callback, args])
 	}
 }
 
