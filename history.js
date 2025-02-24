@@ -71,7 +71,7 @@ async function get(options) {
 	}
 }
 
-////////////////////// indexedDB //////////////////////
+////////////////////// start indexedDB //////////////////////
 
 let db;
 
@@ -108,7 +108,9 @@ request.onsuccess = (event) => {
     db = event.target.result;
 };
 function when_db_ready(callback, ...args) {
+	console.log('callback requested when db is ready')
 	request.onsuccess = (event) => {
+		console.log('db is ready, calling callback')
 		callback(...args)
 	}
 }
@@ -174,7 +176,7 @@ async function get_tournament_from_db(tournamentId) {
 }
 
 
-////////////////////// indexedDB //////////////////////
+////////////////////// end indexedDB //////////////////////
 
 async function get_me() {
 	try {
