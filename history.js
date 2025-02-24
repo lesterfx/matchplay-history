@@ -107,6 +107,11 @@ request.onsuccess = (event) => {
     console.log('db open success')
     db = event.target.result;
 };
+function when_db_ready(callback, ...args) {
+	request.onsuccess = (event) => {
+		callback(...args)
+	}
+}
 
 function add_game_to_db(game) {
 	[game.user1, game.user2, game.user3, game.user4] = game.userIds
@@ -150,7 +155,7 @@ function add_tournament_to_db(tournament) {
 	tournamentObjectStore.put(tournament);
 }
 async function get_tournaments_from_db() {
-	const transaction = db.transaction(["tournament"]);
+	const transaction = db.transaction("tournament");
 	const objectStore = transaction.objectStore("tournament");
 	return await new Promise((resolve, reject) => {
 		const request = objectStore.getAll();
@@ -159,7 +164,7 @@ async function get_tournaments_from_db() {
 	});
 }
 async function get_tournament_from_db(tournamentId) {
-	const transaction = db.transaction(["tournament"]);
+	const transaction = db.transaction("tournament");
 	const objectStore = transaction.objectStore("tournament");
 	return await new Promise((resolve, reject) => {
 		const request = objectStore.get(tournamentId);
@@ -1382,7 +1387,8 @@ ready(async () => {
 
 	load_filters_history()
 	load_standings_settings()
-	update_cache(false)
+
+	when_db_ready(update_cache, false)
 
 	try {
 		await main();
