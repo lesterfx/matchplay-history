@@ -1439,7 +1439,7 @@ async function update_cache(do_update) {
 async function cache_next_tournament() {
 	let box = document.querySelector(`.box[data-kind="tournament"]:not(.cached)`)
 	if (box) {
-		await get_tournament_details(tid, true)
+		await get_tournament_details(box.dataset.id, true)
 		setTimeout(cache_next_tournament)
 	} else {
 		update_cache()
