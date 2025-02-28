@@ -1408,10 +1408,6 @@ ready(async () => {
 	load_filters_history()
 	load_standings_settings()
 
-	let cacheSize = Number(localStorage.getItem('cacheSize') || '25')
-	let option = document.querySelector(`#cache-size option[value="${cacheSize}"]`)
-	if (option) option.checked = true
-
 	when_db_ready(update_cache)
 
 	try {
@@ -1423,19 +1419,12 @@ ready(async () => {
 
 async function update_cache(updating) {
 	let tournaments = await get_tournaments_from_db()
-	let max = document.querySelector('#cache-size option:checked').value
 	let button = document.getElementById('cache-button')
 	let stop_button = document.getElementById('stop-cache')
 
 	document.getElementById('cache-status').textContent = tournaments.length.toString()
 
-	if (tournaments.length < max) {
-		button.classList.add('stale')
-		button.textContent = 'cache now'
-	} else {
-		button.classList.remove('stale')
-		button.textContent = ''
-	}
+	button.textContent = 'cache now'
 	if (updating) {
 		button.classList.add('hide')
 		stop_button.classList.remove('hide')
