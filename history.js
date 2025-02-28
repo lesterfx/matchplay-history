@@ -343,10 +343,14 @@ async function get_and_populate_games_from_tournament(tid) {
 async function get_games_from_tournament(tournament, add_players) {
 	let tid = tournament.tournamentId;
 	let pid;
+	let games;
+	let changes;
 	if (my_pid_by_organizer[tid] && !add_players) {
 		pid = my_pid_by_organizer[tid];
 	} else {
 		let result = await get_tournament_details(tid, true);
+		games = result.games
+		changes = result.changes
 
 		pid = result.pid
 		my_pid_by_organizer[tid] = pid;
@@ -365,7 +369,7 @@ async function get_games_from_tournament(tournament, add_players) {
 			};
 		}
 	};
-	return {games: result.games, changes: result.changes};
+	return {games: games, changes: changes};
 }
 async function get_tournament_details(tid, get_games) {
 	let response = await get({
