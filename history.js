@@ -158,9 +158,11 @@ async function get_games_from_db_by_userId(userId) {
 }
 
 function add_tournament_to_db(tournament) {
-	const tournamentObjectStore = db
-		.transaction("tournament", "readwrite")
-		.objectStore("tournament");
+	const transaction = db.transaction("tournament", "readwrite")
+	const tournamentObjectStore = transaction.objectStore("tournament");
+	transaction.oncomplete = (event) => {
+		console.log('tournament added to db', event)
+	  };
 	tournamentObjectStore.put(tournament);
 }
 async function get_tournaments_from_db() {
