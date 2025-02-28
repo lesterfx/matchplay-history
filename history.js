@@ -375,17 +375,17 @@ async function get_tournament_details(tid, get_games) {
 			includeArenas: 1
 		}
 	});
-	let tournament_details = response.data;
+	let tournament = response.data;
 	save_data('tournament', response.data)
 	let pid;
-	let players = tournament_details.players;
+	let players = tournament.players;
 	for (player of players) {
 		if (player.claimedBy == myUserId) {
 			pid = player.playerId;
 			break;
 		};
 	}
-	for (arena of tournament_details.arenas) {
+	for (arena of tournament.arenas) {
 		save_data('arena', arena);
 	};
 	let changes = 0;
