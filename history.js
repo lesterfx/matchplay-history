@@ -1373,7 +1373,7 @@ ready(async () => {
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
 	document.getElementById('filter').addEventListener('change', handler(filter, true))
-	document.getElementById('cache-button').addEventListener('click', handler(update_cache, true))
+	document.getElementById('cache-button').addEventListener('click', handler(cache_next_tournament, true))
 	document.getElementById('standings-settings').addEventListener('click', handler(function () {
 		document.getElementById('standings-settings-table').classList.toggle('hide')
 	}))
@@ -1399,7 +1399,11 @@ ready(async () => {
 	load_filters_history()
 	load_standings_settings()
 
-	when_db_ready(update_cache, false)
+	let cacheSize = Number(localStorage.getItem('cacheSize') || '25')
+	let option = document.querySelector(`#cache-size option[value="${cacheSize}"]`)
+	if (option) option.checked = true
+
+	when_db_ready(update_cache)
 
 	try {
 		await main();
@@ -1408,18 +1412,14 @@ ready(async () => {
 	}
 });
 
-async function update_cache(do_update) {
-	if (!do_update) {
-		let cacheSize = Number(localStorage.getItem('cacheSize') || '25')
-		let option = document.querySelector(`#cache-size option[value="${cacheSize}"]`)
-		if (option) option.checked = true
-	}
+async function update_cache(updating) {
 	let tournaments = await get_tournaments_from_db()
 	let max = document.querySelector('#cache-size option:checked').value
-	console.log(`${tournaments.length} tournaments cached, of ${max}`)
 	let button = document.getElementById('cache-button')
-	document.getElementById('cache-status').textContent = tournaments.length.toString()
 	let stop_button = document.getElementById('stop-cache')
+
+	document.getElementById('cache-status').textContent = tournaments.length.toString()
+
 	if (tournaments.length < max) {
 		button.classList.add('stale')
 		button.textContent = 'cache now'
@@ -1427,26 +1427,29 @@ async function update_cache(do_update) {
 		button.classList.remove('stale')
 		button.textContent = ''
 	}
-	if (do_update) {
+	if (updating) {
 		button.classList.add('hide')
 		stop_button.classList.remove('hide')
-		cache_next_tournament()
 	} else {
 		stop_button.classList.add('hide')
 		button.classList.remove('hide')
 	}
 }
 async function cache_next_tournament() {
+	let tid
+	let updating
 	let box = document.querySelector('.box[data-kind="tournament"][data-id]:not(.cached)')
-	if (!box) {
+	if (box) tid = Number(box.dataset.id)
+	if (tid) {
+		console.log(`caching tournament ${tid}`)
+		await get_tournament_details(tid, true)
+		setTimeout(cache_next_tournament)
+		updating = true
+	} else {
 		console.log(`no more tournaments to cache (${tid})`)
-		update_cache()
-		return
+		updating = false
 	}
-	let tid = Number(box.dataset.id)
-	console.log(`caching tournament ${tid}`)
-	await get_tournament_details(tid, true)
-	setTimeout(cache_next_tournament)
+	update_cache(updating)
 }
 
 function load_filters_history() {
