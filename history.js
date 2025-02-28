@@ -1437,15 +1437,16 @@ async function update_cache(do_update) {
 	}
 }
 async function cache_next_tournament() {
-	let tid = document.querySelector('.box[data-kind="tournament"][data-id]:not(.cached)').dataset.id
-	if (Number(tid)) {
-		console.log(`caching tournament ${tid}`)
-		await get_tournament_details(tid, true)
-		setTimeout(cache_next_tournament)
-	} else {
+	let box = document.querySelector('.box[data-kind="tournament"][data-id]:not(.cached)')
+	if (!box) {
 		console.log(`no more tournaments to cache (${tid})`)
 		update_cache()
+		return
 	}
+	let tid = Number(box.dataset.id)
+	console.log(`caching tournament ${tid}`)
+	await get_tournament_details(tid, true)
+	setTimeout(cache_next_tournament)
 }
 
 function load_filters_history() {
