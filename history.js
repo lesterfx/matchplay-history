@@ -1416,12 +1416,17 @@ async function update_cache(do_update) {
 	let max = document.querySelector('#cache-size option:checked').value
 	console.log(`${tournaments.length} tournaments cached, of ${max}`)
 	let button = document.getElementById('cache-button')
+	document.getElementById('cache-status').textContent = tournaments.length.toString()
 	if (tournaments.length < max) {
 		button.classList.add('stale')
 		button.textContent = 'cache now'
 	} else {
 		button.classList.remove('stale')
 		button.textContent = ''
+	}
+	if (do_update) {
+		button.classList.add('hide')
+		stop_button.classList.remove('hide')
 	}
 }
 
