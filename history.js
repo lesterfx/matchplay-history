@@ -1437,11 +1437,13 @@ async function update_cache(do_update) {
 	}
 }
 async function cache_next_tournament() {
-	let box = document.querySelector(`.box[data-kind="tournament"]:not(.cached)`)
-	if (box) {
-		await get_tournament_details(box.dataset.id, true)
+	let tid = document.querySelector(`.box[data-kind="tournament"]:not(.cached)`).dataset.tid
+	if (tid) {
+		console.log(`caching tournament ${tid}`)
+		await get_tournament_details(tid, true)
 		setTimeout(cache_next_tournament)
 	} else {
+		console.log(`no more tournaments to cache (${tid})`)
 		update_cache()
 	}
 }
