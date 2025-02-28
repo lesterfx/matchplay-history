@@ -402,6 +402,7 @@ async function get_tournament_details(tid, get_games) {
 		};
 		if (tournament.status == 'completed') {
 			add_tournament_to_db(tournament)
+			console.log(`tournament ${tid} cached`)
 			for (let box of document.querySelectorAll(`.box[data-kind="tournament"][data-id="${tid}"]`)) {
 				box.classList.add('cached')
 			}
