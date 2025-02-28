@@ -344,7 +344,7 @@ async function get_games_from_tournament(tournament, add_players) {
 	if (my_pid_by_organizer[tid] && !add_players) {
 		pid = my_pid_by_organizer[tid];
 	} else {
-		let result = await get_tournament_details(tid);
+		let result = await get_tournament_details(tid, true);
 
 		pid = result.pid
 		my_pid_by_organizer[tid] = pid;
@@ -362,29 +362,10 @@ async function get_games_from_tournament(tournament, add_players) {
 				}
 			};
 		}
-	
 	};
-	let response = await get({
-		endpoint: `tournaments/${tid}/games`,
-		query: {player: pid}
-	});
-	let games = response.data
-	let changes = 0;
-	for (game of games) {
-		changes += save_data('game', game);
-		if (tournament.status == 'completed') {
-			add_game_to_db(game);
-		}
-	};
-	if (tournament.status == 'completed') {
-		add_tournament_to_db(tournament)
-		for (let box of document.querySelectorAll(`.box[data-kind="tournament"][data-id="${tid}"]`)) {
-			box.classList.add('cached')
-		}
-	}
-	return {games: games, changes: changes};
+	return {games: result.games, changes: result.changes};
 }
-async function get_tournament_details(tid) {
+async function get_tournament_details(tid, get_games) {
 	let response = await get({
 		endpoint: `tournaments/${tid}`,
 		query: {
@@ -405,7 +386,28 @@ async function get_tournament_details(tid) {
 	for (arena of tournament_details.arenas) {
 		save_data('arena', arena);
 	};
-	return {pid: pid, players: players};
+	let changes = 0;
+	let games = null;
+	if (get_games) {
+		let response = await get({
+			endpoint: `tournaments/${tid}/games`,
+			query: {player: pid}
+		});
+		games = response.data
+		for (game of games) {
+			changes += save_data('game', game);
+			if (tournament.status == 'completed') {
+				add_game_to_db(game);
+			}
+		};
+		if (tournament.status == 'completed') {
+			add_tournament_to_db(tournament)
+			for (let box of document.querySelectorAll(`.box[data-kind="tournament"][data-id="${tid}"]`)) {
+				box.classList.add('cached')
+			}
+		}
+	}
+	return {pid: pid, players: players, games: games, changes: changes};
 }
 
 modes = ['history', 'standings', 'arena']
@@ -1417,6 +1419,7 @@ async function update_cache(do_update) {
 	console.log(`${tournaments.length} tournaments cached, of ${max}`)
 	let button = document.getElementById('cache-button')
 	document.getElementById('cache-status').textContent = tournaments.length.toString()
+	let stop_button = document.getElementById('stop-cache')
 	if (tournaments.length < max) {
 		button.classList.add('stale')
 		button.textContent = 'cache now'
@@ -1427,6 +1430,19 @@ async function update_cache(do_update) {
 	if (do_update) {
 		button.classList.add('hide')
 		stop_button.classList.remove('hide')
+		cache_next_tournament()
+	} else {
+		stop_button.classList.add('hide')
+		button.classList.remove('hide')
+	}
+}
+async function cache_next_tournament() {
+	let box = document.querySelector(`.box[data-kind="tournament"]:not(.cached)`)
+	if (box) {
+		await get_tournament_details(tid, true)
+		setTimeout(cache_next_tournament)
+	} else {
+		update_cache()
 	}
 }
 
