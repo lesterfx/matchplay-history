@@ -161,7 +161,7 @@ function add_tournament_to_db(tournament) {
 	const transaction = db.transaction("tournament", "readwrite")
 	const tournamentObjectStore = transaction.objectStore("tournament");
 	transaction.oncomplete = (event) => {
-		console.log('tournament added to db', event)
+		console.log('tournament added to db', event, tournament)
 	  };
 	tournamentObjectStore.put(tournament);
 }
@@ -408,6 +408,8 @@ async function get_tournament_details(tid, get_games) {
 			for (let box of document.querySelectorAll(`.box[data-kind="tournament"][data-id="${tid}"]`)) {
 				box.classList.add('cached')
 			}
+		} else {
+			console.log(`not caching tournament because status is ${tournament.status}`)
 		}
 	}
 	return {pid: pid, players: players, games: games, changes: changes};
