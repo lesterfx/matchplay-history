@@ -105,19 +105,15 @@ request.onupgradeneeded = (event) => {
 
 success_callbacks = []
 request.onsuccess = (event) => {
-    console.log('db open success')
     db = event.target.result;
 	for ([callback, args] of success_callbacks) {
-		console.log(`calling ${callback} callback`)
 		callback(...args)
 	}
 };
 function when_db_ready(callback, ...args) {
 	if (db) {
-		console.log('db was already ready, so calling now')
 		callback(...args)
 	} else {
-		console.log('callback added for db')
 		success_callbacks.push([callback, args])
 	}
 }
@@ -160,9 +156,6 @@ async function get_games_from_db_by_userId(userId) {
 function add_tournament_to_db(tournament) {
 	const transaction = db.transaction("tournament", "readwrite")
 	const tournamentObjectStore = transaction.objectStore("tournament");
-	transaction.oncomplete = (event) => {
-		console.log('tournament added to db', event, tournament)
-	  };
 	tournamentObjectStore.put(tournament);
 }
 async function get_tournaments_from_db() {
@@ -408,7 +401,6 @@ async function get_tournament_details(tid, get_games) {
 		};
 		if (tournament.status == 'completed') {
 			add_tournament_to_db(tournament)
-			console.log(`tournament ${tid} cached`)
 			for (let box of document.querySelectorAll(`.box[data-kind="tournament"][data-id="${tid}"]`)) {
 				box.classList.add('cached')
 			}
@@ -1232,7 +1224,6 @@ async function load_active_players_history() {  // formerly merge_tournaments
 		if (Number(uid) && !isNaN(uid)) {
 			uid = Number(uid)
 			let games = (await get_games_from_db_by_userId(uid))
-			console.log(`games for ${uid}: ${games}`)
 			for (let game of games) {
 				add_game_to_player_standing(game, uid)
 			}
@@ -1253,14 +1244,14 @@ function rank(game, uid) {
 
 	let result = game.resultPositions
 	if (!result || !result.length || result.includes(null)) {
-		if (game.suggestions && game.suggestions.length) {
+		if (game.suggestions && game.suggestions.length == 1) {
 			result = game.suggestions[0].results
 		} else {
 			log('game has no resultPositions or suggestions')
-			log(game)
 			return null
 		}
 	}
+	log(game)
 	return result.indexOf(playerId)
 }
 function did_i_win(game, uid) {
@@ -1438,7 +1429,6 @@ async function cache_next_tournament(first) {
 	let box = document.querySelector('.box[data-kind="tournament"][data-id]:not(.cached)')
 	if (box) tid = Number(box.dataset.id)
 	if (tid) {
-		console.log(`caching tournament ${tid}`)
 		await get_tournament_details(tid, true)
 		setTimeout(cache_next_tournament)
 		update_cache(true)
@@ -1641,6 +1631,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 	let wordrank = game.status;
 	if (typeof won == 'undefined') {
 		let win_rank = rankiness(game);
+		console.log(game, win_rank)
 		if (typeof win_rank != 'undefined') {
 			let percent = win_rank.place / win_rank.maxplace * 100
 			box.style.cssText = `--winmix: ${percent}%`;
@@ -1706,7 +1697,6 @@ async function add_tournament(tournament, manual) {
 	box.addEventListener('click', tabhandler(click_tournament, tid));
 	let cached_tourney = (await get_tournament_from_db(tid));
 	if (cached_tourney) {
-		console.log(cached_tourney)
 		box.classList.add('cached')
 	}
 	// my_tournaments_tab(tournament.status).append(box);
