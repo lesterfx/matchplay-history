@@ -1433,21 +1433,22 @@ async function update_cache(updating) {
 		button.classList.remove('hide')
 	}
 }
-async function cache_next_tournament() {
+async function cache_next_tournament(first) {
 	let tid
-	let updating
 	let box = document.querySelector('.box[data-kind="tournament"][data-id]:not(.cached)')
 	if (box) tid = Number(box.dataset.id)
 	if (tid) {
 		console.log(`caching tournament ${tid}`)
 		await get_tournament_details(tid, true)
 		setTimeout(cache_next_tournament)
-		updating = true
+		update_cache(true)
 	} else {
+		update_cache(false)
+		if (first) {
+			alert('All completed tournaments on this page are already cached.')
+		}
 		console.log(`no more tournaments to cache (${tid})`)
-		updating = false
 	}
-	update_cache(updating)
 }
 
 function load_filters_history() {
