@@ -1243,6 +1243,14 @@ function rank(game, uid) {
 	}
 
 	let result = game.resultPositions
+	if (!result || !result.length || result.includes(null)) {
+		if (game.suggestions && game.suggestions.length == 1) {
+			result = game.suggestions[0].results
+		} else {
+			log('game has no resultPositions or suggestions')
+			return null
+		}
+	}
 	if (game.resultPoints) {
 		let points = []
 		game.playerIds.forEach((player, index) => {
@@ -1254,14 +1262,8 @@ function rank(game, uid) {
 		for ([score, player] of points) {
 			results_from_points.push(player)
 		}
-	}
-	if (!result || !result.length || result.includes(null)) {
-		if (game.suggestions && game.suggestions.length == 1) {
-			result = game.suggestions[0].results
-		} else {
-			log('game has no resultPositions or suggestions')
-			return null
-		}
+		log(`resultPositions: ${result}`)
+		log(`via points: ${results_from_points}`)
 	}
 	log(game)
 	return result.indexOf(playerId)
