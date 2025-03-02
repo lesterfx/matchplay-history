@@ -1631,12 +1631,12 @@ function add_player_game(options) {
 	parent.append(box);
 }
 function add_active_game(game) {
-	let box = game_element(game, true, false);
+	let box = game_element(game, true, false, undefined, true);
 	box.addEventListener('click', tabhandler(compare_players_from_game, game.gameId));
 	active_tournament_tab(game.status).append(box);
 	return box;
 }
-function game_element(game, inc_players, inc_tournament, won) {
+function game_element(game, inc_players, inc_tournament, won, skip_bars) {
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank = game.status;
 	if (typeof won == 'undefined') {
@@ -1673,10 +1673,12 @@ function game_element(game, inc_players, inc_tournament, won) {
 		box.append(plist);
 		for (uid of game.userIds) {
 			let li = document.createElement('li');
-			let vsBar = document.createElement('span')
-			vsBar.dataset.uid = uid
-			vsBar.classList.add('vs-bars')
-			li.append(vsBar)
+			if (!skip_bars) {
+				let vsBar = document.createElement('span')
+				vsBar.dataset.uid = uid
+				vsBar.classList.add('vs-bars')
+				li.append(vsBar)
+			}
 			li.append(title('user', uid, 'span'));
 			plist.append(li);
 		}
