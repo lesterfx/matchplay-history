@@ -1083,6 +1083,18 @@ function rank(game, uid) {
 	}
 
 	let result = game.resultPositions
+	if (game.resultScores) {
+		let score_results = []
+		let player, score
+		for ([player, score] of map(game.playerIds, game.resultScores)) {
+			score_results.push([Number(score), player])
+		}
+		score_results.sort()
+		log('-')
+		log(`via resultScores: ${score_results}`)
+		log(`via result: ${result}`)
+		log('-')
+	}
 	if (!result || !result.length || result.includes(null)) {
 		if (game.suggestions && game.suggestions.length) {
 			result = game.suggestions[0].results
