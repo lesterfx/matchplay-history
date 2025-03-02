@@ -1233,46 +1233,41 @@ async function load_active_players_history() {  // formerly merge_tournaments
 	// await get_games_from_tournaments(merged_tournaments);
 }
 function rank(game, uid) {
-	let playerId
-	for (let i=0; i<game.userIds.length; i++) {
-		let userId = game.userIds[i]
-		if (userId == uid) {
-			playerId = game.playerIds[i]
-			break
-		}
+	let index = game.userIds.indexOf(uid)
+	let playerId = game.playerIds[index]
+
+	// real results are best, but not for fair strikes
+	let result = game.resultPositions
+	if (result && result.length && !result.includes(null)) {
+		return result.indexOf(playerId)
 	}
 
-	let result = game.resultPositions
-	if (!result || !result.length || result.includes(null)) {
-		if (game.suggestions && game.suggestions.length == 1) {
-			result = game.suggestions[0].results
-		} else {
-			log('game has no resultPositions or suggestions')
-			return null
-		}
+	// suggested results even works with fair strikes
+	if (game.suggestions && game.suggestions.length == 1) {
+		return game.suggestions[0].results.indexOf(playerId)
 	}
+	
+	// if there are no suggestions and it's fair strikes, can't differentiate ties
 	if (game.resultPoints) {
-		let points = []
-		game.playerIds.forEach((player, index) => {
-			const pt = game.resultPoints[index]
-			points.push([Number(pt), player])
-		})
-		points.sort()
-		points.reverse()
-		let results_from_points = []
-		for ([score, player] of points) {
-			results_from_points.push(player)
+		let my_points = game.resultPoints[index]
+		let point_choices = [...game.resultPoints]
+		point_choices.sort()
+		let initial_rank = point_choices.indexOf(my_points)
+		let occurrences = 0;
+		for (pt of point_choices) {
+			if (pt == my_points) {
+				occurrences ++;
+			}
 		}
-		log(`resultPositions: ${result}`)
-		log(`via points-----: ${points}`)
+		return initial_rank + (occurrences-1)/2
 	}
-	log(game)
-	return result.indexOf(playerId)
+
+	return null
 }
 function did_i_win(game, uid) {
 	let me = rank(game, myUserId)
 	let other = rank(game, uid)
-	if (me === null || other === null) return null
+	if (me === null || other === null && me === other) return null
 	return me < other
 }
 function rankiness(game) {
