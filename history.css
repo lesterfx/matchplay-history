@@ -289,15 +289,21 @@ h3.sticky-header {
     height: 0;
     z-index: 10;
 }
+#options>.items-group {
+    background: var(--background);
+    padding: 1px;
+}
 #options>.items div.item {
     border-radius: 10px;
     background: var(--group-background);
     cursor: pointer;
     padding: .5em;
-    margin-bottom: 1px;
 }
-#options>.items div.modes {
-    padding-left: 1em;
+#options>.items div.item+div.item {
+    margin-top: 1px;
+}
+#options>.items div.modes::before {
+    content: '>';
 }
 
 #options:not(.shown)>.items {
