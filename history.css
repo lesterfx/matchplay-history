@@ -292,6 +292,7 @@ h3.sticky-header {
 #options>.items>.items-group {
     background: var(--background);
     padding: 1px;
+    border-radius: 0 11px 11px 11px;
 }
 #options>.items div.item {
     border-radius: 10px;
@@ -303,14 +304,20 @@ h3.sticky-header {
     margin-top: 1px;
 }
 #options>.items div.modes::before {
-    content: '&nbsp;';
+    content: ' ';
+    width: 1em;
+    display: inline-block;
 }
-#options>.items div.modes::before {
-    content: '>&nbsp;';
+#options>.items div.modes.active::before {
+    content: '•';
 }
 
 #options:not(.shown)>.items {
     visibility: hidden;
+}
+#options.shown .button {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 #options .button {
     clear: both;
