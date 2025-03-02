@@ -1258,6 +1258,7 @@ function rank(game, uid) {
 			points.push([Number(pt), player])
 		})
 		points.sort()
+		points.reverse()
 		let results_from_points = []
 		for ([score, player] of points) {
 			results_from_points.push(player)
