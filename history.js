@@ -1663,7 +1663,7 @@ function game_element(game, inc_players, inc_tournament, won, skip_bars) {
 	box.classList.add('box');
 	let tit = title('arena', game.arenaId);
 	let wordspan = document.createElement('span');
-	wordspan.textContent = wordrank;
+	wordspan.innerHTML = wordrank;
 	tit.append(wordspan);
 
 	box.append(tit);
