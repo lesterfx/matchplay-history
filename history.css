@@ -289,14 +289,14 @@ h3.sticky-header {
     height: 0;
     z-index: 10;
 }
-#options>.items>div {
+#options>.items div.item {
     border-radius: 10px;
     background: var(--group-background);
     cursor: pointer;
     padding: .5em;
     margin-bottom: 1px;
 }
-#options>.items>div.modes {
+#options>.items div.modes {
     padding-left: 1em;
 }
 

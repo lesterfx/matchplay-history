@@ -1267,7 +1267,10 @@ function rank(game, uid) {
 function did_i_win(game, uid) {
 	let me = rank(game, myUserId)
 	let other = rank(game, uid)
-	if (me === null || other === null || me === other) return null
+	if (me === null || other === null) return null
+	if (me == other) {
+		return 'tie'
+	}
 	return me < other
 }
 function rankiness(game) {
