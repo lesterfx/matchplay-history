@@ -1264,7 +1264,7 @@ function rank(game, uid) {
 			results_from_points.push(player)
 		}
 		log(`resultPositions: ${result}`)
-		log(`via points: ${results_from_points}`)
+		log(`via points-----: ${results_from_points}`)
 	}
 	log(game)
 	return result.indexOf(playerId)
