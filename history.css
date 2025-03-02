@@ -308,6 +308,7 @@ h3.sticky-header {
     width: 1em;
     display: inline-block;
 }
+#options>.items div.modes:hover::before,
 #options>.items div.modes.active::before {
     content: '•';
 }
