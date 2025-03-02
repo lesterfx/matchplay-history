@@ -1083,15 +1083,19 @@ function rank(game, uid) {
 	}
 
 	let result = game.resultPositions
-	if (game.resultScores) {
-		let score_results = []
+	if (game.resultPoints) {
+		let points = []
 		let player, score
-		for ([player, score] of map(game.playerIds, game.resultScores)) {
-			score_results.push([Number(score), player])
+		for ([player, score] of map(game.playerIds, game.resultPoints)) {
+			points.push([Number(score), player])
 		}
-		score_results.sort()
+		points.sort()
+		let results_from_points = []
+		for ([score, player] of points) {
+			results_from_points.push(player)
+		}
 		log('-')
-		log(`via resultScores: ${score_results}`)
+		log(`via resultScores: ${results_from_points}`)
 		log(`via result: ${result}`)
 		log('-')
 	}
