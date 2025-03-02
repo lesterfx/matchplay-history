@@ -1646,7 +1646,7 @@ function game_element(game, inc_players, inc_tournament, won) {
 			let percent = win_rank.place / win_rank.maxplace * 100
 			box.style.cssText = `--winmix: ${percent}%`;
 			box.classList.add('winmix');
-			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place] || ['1 strike']
+			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place] || ['&times;']
 		} else {
 			wordrank = stringify(win_rank)
 		}
