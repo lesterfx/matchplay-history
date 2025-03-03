@@ -1259,7 +1259,7 @@ function rank(game, uid) {
 				occurrences ++;
 			}
 		}
-		return initial_rank + (occurrences-1)/2
+		return - (initial_rank + (occurrences-1)/2)
 	}
 
 	return null
