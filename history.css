@@ -3,24 +3,24 @@ body {
     --page-background: #fff;
     --group-background: #ddd;
     --background: #bbb;
-    --border: #999;
-    --won-background: #bfb;
-    --won-border: #050;
-    --lost-background: #fbb;
-    --lost-border: #500;
+    --border: #888;
+    --won-border: #797;
+    --lost-border: #a66;
+    --won-light: #aca;
+    --lost-light: #caa;
+    --won-dark: #252;
+    --lost-dark: #522;
     --active-color: #08f;
+    --won-background: var(--won-light);
+    --lost-background: var(--lost-light);
 }
 body.flash {
     --text: #fff;
     --page-background: #000;
     --group-background: #222;
     --background: #444;
-    --border: #666;
-    --won-background: #040;
-    --won-border: #afa;
-    --lost-background: #400;
-    --lost-border: #faa;
-    --active-color: #08f;
+    --won-background: var(--won-dark);
+    --lost-background: var(--lost-dark);
 }
 @media (prefers-color-scheme: dark) {
     body {
@@ -28,25 +28,17 @@ body.flash {
         --page-background: #000;
         --group-background: #222;
         --background: #444;
-        --border: #666;
-        --won-background: #040;
-        --won-border: #afa;
-        --lost-background: #400;
-        --lost-border: #faa;
-        --active-color: #08f;
+        --won-background: var(--won-dark);
+        --lost-background: var(--lost-dark);
     }
     body.flash {
         --text: #000;
         --page-background: #fff;
         --group-background: #ddd;
         --background: #bbb;
-        --border: #999;
-        --won-background: #bfb;
-        --won-border: #050;
-        --lost-background: #fbb;
-        --lost-border: #500;
-        --active-color: #08f;
-    }
+        --won-background: var(--won-light);
+        --lost-background: var(--lost-light);
+        }
 }
 .boxgroup {
     display: flex;
@@ -56,7 +48,7 @@ body.flash {
     justify-items: stretch;
 }
 .boxgroup:not(.singular) {
-    z-index: 0;
+    z-index: 1;
     position: relative;
     order: 1;
     flex-grow: 1;
@@ -64,7 +56,7 @@ body.flash {
     border: 1px solid var(--border);
     margin-top: -1px;
     margin-bottom: 30px;
-    padding: 10px;
+    padding: 5px;
     background: var(--group-background);
 }
 .box.invisible {
@@ -78,20 +70,22 @@ body.flash {
     border-top: none;
     border-bottom: none;
 }
-.box {
+.box.click {
     cursor: pointer;
+}
+.box {
     border: 1px solid var(--border);
     background: var(--background);
     border-radius: 10px;
-    padding: 10px;
+    padding: 5px;
     margin: 5px;
     min-width: 20em;
     flex-basis: 20em;
     display: inline-block;
     flex-grow: 1;
 }
-.box.cached {
-    border-color: transparent;
+.box.not-cached {
+    border-color: var(--lost-border);
 }
 .box.nostyle {
     background: none;
@@ -100,24 +94,14 @@ body.flash {
 .box.active {
     outline: 4px solid var(--active-color);
 }
-.box.winmix {
-    background: color-mix(in hsl shorter hue, var(--won-background), var(--lost-background) var(--winmix));
-    border-color: color-mix(in hsl shorter hue, var(--won-border), var(--lost-border) var(--winmix));
+.winmix {
+    background: linear-gradient(110deg, var(--won-background) var(--winmix), var(--lost-background) var(--winmix)) no-repeat;
+    border-color: var(--border);
 }
-.box.won {
-    background: var(--won-background);
-    border-color: var(--won-border);
-}
-.box.lost {
-    background: var(--lost-background);
-    border-color: var(--lost-border);
-}
-#cache-button {
+#cache-button,
+#stop-cache {
     text-decoration: underline;
     cursor: pointer;
-}
-#cache-button.stale {
-    color: var(--lost-border);
 }
 #log pre {
     background: var(--background);
@@ -145,8 +129,6 @@ body {
     padding-right: env(safe-area-inset-right, 0);
     padding-bottom: env(safe-area-inset-bottom, 0);
     padding-left: env(safe-area-inset-left, 0);
-    background: var(--page-background);
-    color: var(--text);
     font-family: sans-serif;
     min-height: 100vh;
     margin-top: 0;
@@ -171,6 +153,7 @@ body {
     display: none;
 }
 .tabs>input+label {
+    opacity: 0.5;
     cursor: pointer;
     order: 0;
     margin-top: 1em;
@@ -180,7 +163,7 @@ body {
     border-color: var(--border);
     border-radius: 10px 10px 0 0;
     padding: 10px;
-    font-size: 1.3em;
+    font-size: 1.1em;
     margin-left: 25px;
     position: relative;
     z-index: 0;
@@ -188,6 +171,7 @@ body {
 .tabs>input:checked+label {
     background-color: var(--group-background);
     z-index: 2;
+    opacity: 1;
 }
 .tabs>input:checked+label::after {
     content: "";
@@ -217,10 +201,9 @@ span.vs-bars {
     border: 1px solid var(--border);
     --percent: 50%;
     display: inline-block;
-    background: var(--background);
 }
-span.vs-bars.ready {
-    background: linear-gradient(to right, var(--won-background) var(--percent), var(--lost-background) var(--percent)) no-repeat;
+span.vs-bars:not(.winmix) {
+    background: var(--background);
 }
 #player-histories {
     padding-top: 1em;
@@ -241,6 +224,7 @@ div.title {
 }
 ol {
     margin-bottom: 0;
+    margin-block: 0.3em;
 }
 #active-tournament-title.completed+.refresh {
     display: none;
@@ -385,6 +369,7 @@ h3.sticky-header {
 }
 #filter {
     min-width: 100%;
+    box-sizing: border-box;
 }
 #filters>div {
     display: flex;
