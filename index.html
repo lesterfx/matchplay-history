@@ -39,14 +39,24 @@
 					</span>
 				</h3>
 				<div class="boxgroup">
-					<div class="filters-lefter box" id="filters">
+					<div class="box" id="filters">
 						<input id="filter" placeholder="filter">
 					</div>
-					<div class="filters-lefter box">
+					<div class="box">
 						<span id="cache-status">0</span> tournaments cached<br />
 						<span id="cache-button">cache now</span>
 						<span id="stop-cache" class="hide">stop</span>
 					</div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
+					<div class="fake invisible box"></div>
 				</div>
 				<div id="my-tournaments" class="tabs" data-tabgroup="my-tournaments">
 				</div>
@@ -171,7 +181,7 @@
 			</div>
 		<div class="block hide" id="active-tournament-block">
 				<h3 class="sticky-header">
-					<span id="active-tournament-title"></span>
+					<span id="active-tournament-title" class="completed"></span>
 					<span class="refresh" id="refresh-active-tournament">
 						<span class="circle">↻</span>
 						<span class="text">refresh</span>
@@ -184,7 +194,6 @@
 			<div id="selected-history">
 				<div class="sticky-header boxgroup singular" id="selected-game"></div>
 				<div id="player-histories-tabs" class="tabs" data-tabgroup="player-histories-tabs"></div>
-				<div id="player-histories" class="block"></div>
 			</div>
 			<div class="spacer"></div>
 			<div id="custom-section" class="hide">

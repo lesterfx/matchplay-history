@@ -198,7 +198,7 @@ async function get_all_my_tournaments() {
 	await refresh_off()
 	document.getElementById('active-tournament-block').classList.add('hide');
 	document.getElementById('selected-game').innerHTML = '';
-	document.getElementById('player-histories').innerHTML = '';
+	document.getElementById('player-histories-tabs').innerHTML = '';
 
 	document.getElementById('my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
@@ -217,7 +217,7 @@ async function get_all_my_tournaments() {
 		let element = in_progress[0][1]
 		
 		element.dispatchEvent(new Event('click'))
-		activate_tab(my_tournaments_tab(status))
+		activate_tab('my-tournaments', status)
 	}
 }
 
@@ -305,9 +305,8 @@ async function add_game_to_player_standing(game, uid, only_update_element) {
 		won: won_game,
 		order: -game.tournamentId
 	})
-	let t = tab('player-histories-tabs', null, uid)
-	t.append(box)
-	let label = t.previousSibling
+	let [tab, label] = tab_and_label('player-histories-tabs', null, uid)
+	tab.append(box)
 	label.classList.add('winmix')
 	label.style.cssText = `--winmix: ${percent}%`
 	label.childNodes[1].innerHTML = ` (${won}-${lost})`
@@ -340,7 +339,7 @@ async function get_games_from_tournament(tournament, add_players) {
 					await add_player_button(uid);
 				}
 			};
-			count_tab(active_tournament_tab('players'))
+			count_tab(...tab_and_label('active-tournament', 'players'))
 		}
 	// };
 	return {games: games, changes: changes};
@@ -386,7 +385,6 @@ async function get_tournament_details(tid, get_games) {
 		for (let entry of standings) {
 			if (entry.playerId == pid) {
 				tournament.standing = 1 - (entry.position - 1) / standings.length
-				console.log(tournament.standing)
 				break
 			}
 		}
@@ -1118,14 +1116,15 @@ async function tournament_history(id) {
 	active_games.reverse();
 
 	document.getElementById('selected-game').innerHTML = '';
-	document.getElementById('player-histories').innerHTML = ''
+	document.getElementById('player-histories-tabs').innerHTML = ''
 	document.getElementById('active-tournament-block').classList.remove('hide')
 	let title_h2 = document.getElementById('active-tournament-title');
 	title_h2.classList.remove(...title_h2.classList);
 	title_h2.classList.add(tournament.status);
 	title_h2.innerHTML = '';
 	title_h2.append(await title('tournament', tournament.tournamentId, 'span'));
-
+	title_h2.append(matchplay_link(`tournaments/${tournament.tournamentId}`))
+	
 	let in_progress = []
 	for (game of active_games) {
 		let element = await add_active_game(game);
@@ -1136,9 +1135,17 @@ async function tournament_history(id) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
 		element.dispatchEvent(new Event('click'))
-		activate_tab(active_tournament_tab(status))
+		activate_tab('active-tournament', status)
 	}
 	return in_progress.length;
+}
+function matchplay_link(url_tail) {
+	let url = 'https://app.matchplay.events/' + url_tail
+	let a = document.createElement('a')
+	a.classList.add('matchplay-link')
+	a.href = url
+	a.target = '_blank'
+	return a
 }
 function arc(queue_pos, queue_size) {
 	let factor
@@ -1208,7 +1215,6 @@ async function compare_player(id) {
 }
 async function load_active_players_history(uids, game) {
 	document.getElementById('player-histories-tabs').innerHTML = ''
-	document.getElementById('player-histories').innerHTML = ''
 	let selected = document.getElementById('selected-game');
 	fakefill(selected)
 	if (game) {
@@ -1533,7 +1539,7 @@ async function add_player_button(uid) {
 	let button = await title('user', uid);
 	button.classList.add('box', 'click');
 	button.addEventListener('click', tabhandler(compare_player, uid))
-	insertSorted(button, active_tournament_tab('players'), (el) => {
+	insertSorted(button, tab('active-tournament', 'players'), (el) => {
 		return el.textContent.toLowerCase()
 	});
 	load_games_to_player_standing(uid, button)
@@ -1638,9 +1644,9 @@ async function add_active_game(game) {
 	let box = await game_element(game, true, false, undefined, true);
 	box.classList.add('click')
 	box.addEventListener('click', tabhandler(compare_players_from_game, game.gameId));
-	let tab = active_tournament_tab(game.status)
+	let [tab, label] = tab_and_label('active-tournament', game.status)
 	tab.append(box);
-	count_tab(tab)
+	count_tab(tab, label)
 	return box;
 }
 async function game_element(game, inc_players, inc_tournament, won, skip_bars) {
@@ -1723,12 +1729,11 @@ async function add_tournament(tournament, manual) {
 	} else {
 		box.classList.add('not-cached')
 	}
-	// my_tournaments_tab(tournament.status).append(box);
-	let tab = my_tournaments_tab(tournament.status)
+	let [tab, label] = tab_and_label('my-tournaments', tournament.status)
 	insertSorted(box, tab, (el) => {
 		return -el.dataset.id;
 	});
-	count_tab(tab)
+	count_tab(tab, label)
 	
 	return box
 }
@@ -1766,62 +1771,96 @@ function load_more_tournaments_button(value) {
 	box.textContent = `load page ${value.next} of ${value.last}`
 	box.classList.add('fake', 'box', 'nostyle', 'click')
 	box.addEventListener('click', handler(load_more_tournaments, value.next, box))
-	my_tournaments_tab('completed').append(box)
+	tab('my-tournaments', 'completed').append(box)
 }
 function manual_tournament_button() {
 	let box = notitle('tournament', 0)
 	box.textContent = 'Add Tournament by ID...'
-	box.classList.add('fake', 'box', 'nostyle')
+	box.classList.add('fake', 'box', 'nostyle', 'click')
 	box.addEventListener('click', handler(add_manual_tournament))
-	my_tournaments_tab('completed').append(box)
+	tab('my-tournaments', 'completed').append(box)
 }
-function my_tournaments_tab(status) {
-	return tab('my-tournaments', status)
-}
-function active_tournament_tab(status) {
-	return tab('active-tournament', status)
-}
-function count_tab(t) {
+function count_tab(t, label) {
 	let c = 0
 	for (let child of t.childNodes) {
 		if (!child.classList.contains('fake')) c++
 	}
-	t.previousSibling.childNodes[1].textContent = ` (${c})`
+	label.childNodes[1].textContent = ` (${c})`
 }
-function activate_tab(boxgroup) {
-	document.querySelector(`#${boxgroup.dataset.inputid}`).checked = true
+function activate_tab(tabgroup, status) {
+	let [tab, label] = tab_and_label(tabgroup, status)
+	for (let node of label.parentNode.childNodes) {
+		node.removeClass('selected')
+	}
+	label.classList.add('selected')
+	for (let node of tab.parentNode.childNodes) {
+		node.removeClass('selected')
+	}
+	tab.classList.add('selected')
 }
 function tab(parent, text, identifier) {
+	return tab_and_label(parent, text, identifier)[0]
+}
+function tab_and_label(parent, text, identifier) {
 	parent = document.getElementById(parent)
+	let tabs
+	let contents
+	if (!parent.children.length) {
+		tabs = document.createElement('div')
+		tabs.classList.add('tabs-list')
+		parent.append(tabs)
+		contents = document.createElement('div')
+		contents.classList.add('tabs-contents')
+		parent.append(contents)
+	} else {
+		tabs = parent.children[0]
+		contents = parent.children[1]
+	}
 	if (identifier === undefined) identifier = text
-	let boxgroup = parent.querySelector('.boxgroup.' + `${parent.dataset.tabgroup}-${identifier}`)
+	let boxgroup = contents.querySelector(`.boxgroup.${parent.dataset.tabgroup}-${identifier}`)
+	let label = tabs.querySelector(`#${parent.dataset.tabgroup}-${identifier}`)
 	if (boxgroup) {
-		return boxgroup
+		return [boxgroup, label]
 	}
 	let id = `${parent.dataset.tabgroup}-${identifier}`
 
-	let input_ = document.createElement('input')
-	input_.type = 'radio'
-	input_.name = parent.dataset.tabgroup
-	input_.id = id
-	input_.checked = true
-	parent.append(input_)
-
-	let label = document.createElement('label')
-	label.setAttribute('for', id)
+	label = document.createElement('label')
+	label.setAttribute('id', id)
 	label.textContent = text
 	let count = document.createElement('span')
 	label.append(count)
-	parent.append(label)
+	label.addEventListener('click', handler(tabselect, id))
+	label.classList.add('selected')
+	for (sibling of tabs.childNodes) {
+		sibling.classList.remove('selected')
+	}
+	tabs.append(label)
 
-	let div = document.createElement('div')
-	div.classList.add('clickables', 'boxgroup', id)
-	div.dataset.inputid = id
-	parent.append(div)
+	boxgroup = document.createElement('div')
+	boxgroup.classList.add('clickables', 'boxgroup', id)
+	boxgroup.classList.add('selected')
+	boxgroup.dataset.inputid = id
+	for (sibling of contents.childNodes) {
+		sibling.classList.remove('selected')
+	}
+	contents.append(boxgroup)
 
-	fakefill(div)
+	fakefill(boxgroup)
 
-	return div
+	return [boxgroup, label]
+}
+function tabselect(id) {
+	let me = document.getElementById(id)
+	for (sibling of me.parentNode.childNodes) {
+		sibling.classList.remove('selected')
+	}
+	me.classList.add('selected')
+	
+	let mydiv = me.parentNode.nextSibling.querySelector('.' + id)
+	for (sibling of mydiv.parentNode.childNodes) {
+		sibling.classList.remove('selected')
+	}
+	mydiv.classList.add('selected')
 }
 function fakefill(element) {
 	element.innerHTML = '';
