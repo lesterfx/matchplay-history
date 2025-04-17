@@ -1,4 +1,4 @@
-mphistory = (function(){
+(function(){
 
 let myUserId = 0;
 let all_my_tournaments = {};
@@ -13,7 +13,7 @@ let all_data = {
 	player: {}
 }
 winloss = {}
-let allow_refresh_completed = false  // also change css
+let allow_refresh_completed = false
 let limit_period = 1100;
 let limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
 let limit_phase = 0;
@@ -34,6 +34,7 @@ async function rate_limit() {
     return wait
 }
 let invalid_token = 'API token invalid'
+base_url = 'https://app.matchplay.events/api/'
 async function get(options) {
     const headers = new Headers();
 	
@@ -45,7 +46,6 @@ async function get(options) {
 		headers: headers,
 	};
 
-	base_url = 'https://app.matchplay.events/api/'
 	let request_url = base_url + options.endpoint
 
 	if (options.query) {
@@ -133,9 +133,6 @@ function add_game_to_db(game) {
 }
 
 async function get_games_from_db_by_userId(userId) {
-	if (typeof userId !== "number") {
-		console.log(`not a numeric userId, ${userId}. error expected!`)
-	}
 	const transaction = db.transaction("game");
 	const gameObjectStore = transaction.objectStore("game");
 	
@@ -197,7 +194,7 @@ async function get_me() {
 async function get_all_my_tournaments() {
 	await refresh_off()
 	document.getElementById('active-tournament-block').classList.add('hide');
-	document.getElementById('selected-game').innerHTML = '';
+	// document.getElementById('selected-game').innerHTML = '';
 	document.getElementById('player-histories-tabs').innerHTML = '';
 
 	document.getElementById('my-tournaments').classList.add('ready');
@@ -228,14 +225,19 @@ async function load_more_tournaments(page, element) {
 	let in_progress = []
 	let tournament_generator = get_tournaments_paginated(myUserId, page, page)
 	let result;
+	let start = new Date()
     while (!(result = await tournament_generator.next()).done) {
 		let tournaments = result.value
+		// MARK: need to await all these simultaneously
 		for (let tournament of tournaments) {
 			let element = await add_tournament(tournament);
 			all_my_tournaments[tournament.tournamentId] = tournament
-			if (tournament.status != 'completed') in_progress.push([tournament.status, element])
+			if (tournament.status != 'completed') {
+				in_progress.push([tournament.status, element])
+			}
 		}
 	}
+	console.log(`load_more_tournaments loop took ${(new Date()) - start} ms`)
 	filter()
 	load_more_tournaments_button(result.value);
 	return in_progress
@@ -293,11 +295,11 @@ async function add_game_to_player_standing(game, uid, only_update_element) {
 		return
 	}
 	
-	let bar = document.querySelector(`#selected-game .vs-bars[data-uid="${uid}"]`);
-	if (bar) {
-		bar.style.cssText = `--winmix: ${percent}%`;
-		bar.classList.add('winmix');
-	}
+	// let bar = document.querySelector(`#selected-game .vs-bars[data-uid="${uid}"]`);
+	// if (bar) {
+	// 	bar.style.cssText = `--winmix: ${percent}%`;
+	// 	bar.classList.add('winmix');
+	// }
 
 	let box = await add_player_game({
 		uid: uid,
@@ -317,31 +319,31 @@ async function get_games_from_tournament(tournament, add_players) {
 	let pid;
 	let games;
 	let changes;
-	// if (my_pid_by_organizer[tid] && !add_players) {
-	// 	pid = my_pid_by_organizer[tid];
-	// } else {
-		let result = await get_tournament_details(tid, true);
-		games = result.games
-		changes = result.changes
 
-		pid = result.pid
-		my_pid_by_organizer[tid] = pid;
+	let result = await get_tournament_details(tid, true);
+	games = result.games
+	changes = result.changes
 
-		if (add_players) {
-			all_data.user = {};
-			for (player of result.players) {
-				let uid = player.claimedBy;
-				if (uid == myUserId) {
-					continue;
-				};
-				if (!all_data.user[uid]) {
-					all_data.user[uid] = player;
-					await add_player_button(uid);
-				}
+	pid = result.pid
+	my_pid_by_organizer[tid] = pid;
+
+	if (add_players) {
+		all_data.user = {};
+		// MARK: need to await all these simultaneously
+		let start = new Date()
+		for (player of result.players) {
+			let uid = player.claimedBy;
+			if (uid == myUserId) {
+				continue;
 			};
-			count_tab(...tab_and_label('active-tournament', 'players'))
-		}
-	// };
+			if (!all_data.user[uid]) {
+				all_data.user[uid] = player;
+				await add_player_button(uid);
+			}
+		};
+		console.log(`get_games_from_tournament loop took ${(new Date()) - start} ms`)
+		count_tab(...tab_and_label('active-tournament', 'players'))
+	}
 	return {games: games, changes: changes};
 }
 async function get_tournament_details(tid, get_games) {
@@ -374,7 +376,13 @@ async function get_tournament_details(tid, get_games) {
 			query: {player: pid}
 		})).data;
 		for (game of games) {
-			changes += save_data('game', game);
+			let changed = save_data('game', game);
+			if (changed) {
+				changes++
+				log(`NEW GAME: ${game.gameId}:${game.userIds}`)
+			} else {
+				log(`${game.gameId}:${game.userIds} already existed`)
+			}
 			if (tournament.status == 'completed') {
 				add_game_to_db(game);
 			}
@@ -496,10 +504,8 @@ async function refresh_off(will_refresh) {
 }
 async function refresh_tournament_click() {
 	if (refresh_timer) {
-		log('turn off refresh')
 		await refresh_off();
 	} else {
-		log('turn on refresh')
 		await refresh_tournament_timer();
 	}
 }
@@ -517,8 +523,8 @@ async function refresh_tournament_timer() {
 	}
 }
 async function do_refresh_tournament() {
+	let changes = await tournament_history(active_tournament_id, true);
 	let status = all_data.tournament[active_tournament_id].status;
-	let changes = await tournament_history();
 	if (changes) {
 		await flash_screen();
 		return false;
@@ -701,6 +707,8 @@ async function load_standings() {
 
 	standings_settings = get_standings_settings()
 
+	// MARK: need to await all these simultaneously
+	let start = new Date()
 	for (el of selected_tournaments()) {
 		let tid = el.dataset.id
 		let tournament = all_data.tournament[tid]
@@ -710,10 +718,10 @@ async function load_standings() {
 		})
 		let need_players = false
 		for (let entry of standings) {
-				let pid = entry.playerId
-				if (!all_data.player[pid]) {
-					need_players = true
-				}
+			let pid = entry.playerId
+			if (!all_data.player[pid]) {
+				need_players = true
+			}
 		}
 		if (need_players) {
 			for (let p of (await get({
@@ -744,6 +752,7 @@ async function load_standings() {
 			loaded_standings.games_played[id] += 1
 		}
 	}
+	console.log(`load_standings loop took ${(new Date()) - start} ms`)
 	
 	loaded_standings.standings_tournaments.sort((a,b) => {
 		if (a.startUtc < b.startUtc) {
@@ -1043,6 +1052,8 @@ async function load_arenas() {
 	document.getElementById('arenas-table').classList.add('hide')
 
 	let arena_occurrences = {}
+	// MARK: need to await all these simultaneously
+	let start = new Date()
 	for (el of selected_tournaments()) {
 		let tid = el.dataset.id;
 		let tournament = all_data.tournament[tid];
@@ -1069,6 +1080,7 @@ async function load_arenas() {
 		}
 		// log('\n--\n')
 	}
+	console.log(`load_arenas loop took ${(new Date()) - start} ms`)
 	const arenas_entries = sorted_dictionary(arena_occurrences, true);
 	document.getElementById('arenas-table').classList.remove('hide')
 	let tbody = document.getElementById('arenas-tbody')
@@ -1093,29 +1105,34 @@ function sorted_dictionary(dictionary, descending) {
 		sign * (valueA - valueB) || keyA.localeCompare(keyB)
 	);
 }
-async function tournament_history(id) {
-	let refresh_players
-	if (id) {
+async function tournament_history(id, refreshing) {
+	let get_players
+	active_tournament_id = id
+	if (refreshing) {
+		// refreshing
+		get_players = false
+	} else {
 		// loading fresh
-		active_tournament_id = id
-		refresh_players = true
+		get_players = true
+		document.getElementById('player-histories-tabs').innerHTML = '';
 		document.getElementById('active-tournament').innerHTML = '';
 		for (el of document.querySelectorAll('#frenzy-countdown span')) el.textContent = ''
-	} else {
-		// refreshing
-		refresh_players = false
 	}
 	let tournament = all_data.tournament[active_tournament_id];
 
 	await get_frenzy_position(tournament)
 
-	let result = (await get_games_from_tournament(tournament, refresh_players));
-	if (!refresh_players && !result.changes) return;
+	log('getting games from tournament')
+	let result = (await get_games_from_tournament(tournament, get_players));
+	if (refreshing) {
+		log(`in refresh, changes: ${result.changes}`)
+		if (!result.changes) return;
+	}
 
 	let active_games = result.games
 	active_games.reverse();
 
-	document.getElementById('selected-game').innerHTML = '';
+	// document.getElementById('selected-game').innerHTML = '';
 	document.getElementById('player-histories-tabs').innerHTML = ''
 	document.getElementById('active-tournament-block').classList.remove('hide')
 	let title_h2 = document.getElementById('active-tournament-title');
@@ -1126,10 +1143,13 @@ async function tournament_history(id) {
 	title_h2.append(matchplay_link(`tournaments/${tournament.tournamentId}`))
 	
 	let in_progress = []
+	// MARK: need to await all these simultaneously
+	let start = new Date()
 	for (game of active_games) {
 		let element = await add_active_game(game);
 		if (game.status != 'completed') in_progress.push([game.status, element]);
 	};
+	console.log(`tournament_history loop took ${(new Date()) - start} ms`)
 	document.getElementById('active-tournament-title').scrollIntoView();
 	if (in_progress.length == 1 && mode == 'history') {
 		let status = in_progress[0][0]
@@ -1197,7 +1217,7 @@ async function get_frenzy_position(tournament) {
 		} else if (queue_pos === null) {
 			msg = `you are not in the queue of ${queue_size}`
 		} else {
-			msg = "You're on deck!"
+			msg = `you're next in the queue of ${queue_size}`
 		}
 		div.querySelector('.text').prepend(msg);
 		div.querySelector('.pie').innerHTML = svg;
@@ -1215,46 +1235,48 @@ async function compare_player(id) {
 }
 async function load_active_players_history(uids, game) {
 	document.getElementById('player-histories-tabs').innerHTML = ''
-	let selected = document.getElementById('selected-game');
-	fakefill(selected)
-	if (game) {
-		selected.append(await game_element(game, true, false));
-	}
-	for (uid of uids) {
+	// MARK: need to await all these simultaneously
+	let start = new Date()
+	for (let uid of uids) {
 		if (Number(uid) && !isNaN(uid) && uid != myUserId) {
 			// await add_active_player(uid)
 			let namestr = await name('user', uid)
-			tab('player-histories-tabs', namestr, uid)
+			let [t, l] = tab_and_label('player-histories-tabs', namestr, uid)
+			l.append(matchplay_link(`users/${uid}`))
 			await load_games_to_player_standing(uid)
 		}
 	};
+	console.log(`load_active_players_history loop took ${(new Date()) - start} ms`)
 	document.getElementById('selected-history').scrollIntoView();
 }
 async function load_games_to_player_standing(uid, only_update_element) {
 	uid = Number(uid)
 	winloss[uid] = {won: 0, lost: 0}
 	let games = (await get_games_from_db_by_userId(uid))
+	// MARK: need to await all these simultaneously
+	let start = new Date()
 	for (let game of games) {
 		await add_game_to_player_standing(game, uid, only_update_element)
 	}
+	console.log(`load_games_to_player_standing loop took ${(new Date()) - start} ms`)
 }
 function rank(game, uid) {
 	let index = game.userIds.indexOf(uid)
 	let playerId = game.playerIds[index]
 
+	let place = null
+	let string = ''
+	let maxplace = game.userIds.length - 1
+
 	// real results are best, but not for fair strikes
 	let result = game.resultPositions
 	if (result && result.length && !result.includes(null)) {
-		return result.indexOf(playerId)
+		place = result.indexOf(playerId)
+		string = ['1<sup>st</sup>', '2<sup>nd</sup>', '3<sup>rd</sup>', '4<sup>th</sup>'][place]
 	}
 
-	// suggested results even works with fair strikes
-	if (game.suggestions && game.suggestions.length == 1) {
-		return game.suggestions[0].results.indexOf(playerId)
-	}
-	
 	// if there are no suggestions and it's fair strikes, can't differentiate ties
-	if (game.resultPoints) {
+	else if (game.resultPoints) {
 		let my_points = game.resultPoints[index]
 		let point_choices = [...game.resultPoints]
 		point_choices.sort()
@@ -1265,14 +1287,35 @@ function rank(game, uid) {
 				occurrences ++;
 			}
 		}
-		return (initial_rank + (occurrences-1)/2)
+		place = maxplace - (initial_rank + (occurrences-1)/2)
+		if (place == 0) {
+			string = ''
+		} else if (place == maxplace) {
+			string = '2&times;'
+		} else {
+			string = '&times;'
+		}
 	}
 
-	return null
+	// suggested results even works with fair strikes
+	else if (game.suggestions && game.suggestions.length == 1) {
+		place = game.suggestions[0].results.indexOf(playerId)
+		string = ['1st', '2nd', '3rd', '4th'][place]
+	}
+	
+	
+
+	let percent = (game.userIds.length - 1 - place)/(game.userIds.length - 1) * 100
+	return {
+		place: place,
+		percent: percent,
+		maxplace: maxplace,
+		string: string
+	}
 }
 function did_i_win(game, uid) {
-	let me = rank(game, myUserId)
-	let other = rank(game, uid)
+	let me = rank(game, myUserId).place
+	let other = rank(game, uid).place
 	if (me === null || other === null) return null
 	if (me == other) {
 		return 0
@@ -1280,12 +1323,6 @@ function did_i_win(game, uid) {
 		return 1
 	} else {
 		return -1
-	}
-}
-function rankiness(game) {
-	return {
-		place: rank(game, myUserId),
-		maxplace: game.userIds.length - 1
 	}
 }
 token_promises = []
@@ -1395,7 +1432,7 @@ ready(async () => {
 	document.getElementById('filter').addEventListener('input', handler(filter))
 	document.getElementById('filter').addEventListener('focus', handler(filter))
 	document.getElementById('filter').addEventListener('change', handler(filter, true))
-	document.getElementById('cache-button').addEventListener('click', handler(cache_next_tournament, true))
+	document.getElementById('cache-button').addEventListener('click', handler(cache_all_tournaments, true))
 	document.getElementById('stop-cache').addEventListener('click', handler(function () {
 		clearTimeout(caching)
 	}, true))
@@ -1445,7 +1482,21 @@ async function update_cache(updating) {
 		button.classList.remove('hide')
 	}
 }
+async function cache_all_tournaments() {
+	update_cache(true)
+	// MARK: await all the tournaments needing to be cached at once?
+	let boxes = [...document.querySelectorAll('.box[data-kind="tournament"][data-id]:not(.cached):not(.not-completed)')]
+	await Promise.all(boxes.map(async (box) => {
+		let tid = Number(box.dataset.id)
+		if (tid) {
+			await get_tournament_details(tid, true)
+			update_cache(true)
+		}
+	}))
+	update_cache(false)
+}
 async function cache_next_tournament(first, previous_tid) {
+	// MARK: await all the tournaments needing to be cached at once?
 	let tid
 	let box = document.querySelector('.box[data-kind="tournament"][data-id]:not(.cached):not(.not-completed)')
 	if (box) tid = Number(box.dataset.id)
@@ -1634,6 +1685,7 @@ function spacer() {
 	return el
 }
 async function add_player_game(options) {
+	//                           game          plyrs  trnmt won         skipbars
 	let box = await game_element(options.game, false, true, options.won);
 	box.style.order = options.order;
 	// let parent = document.querySelector(`#player-histories div.player-history[data-playerid="${options.uid}"] .boxgroup`);
@@ -1641,7 +1693,8 @@ async function add_player_game(options) {
 	return box
 }
 async function add_active_game(game) {
-	let box = await game_element(game, true, false, undefined, true);
+	//                           game  plyrs trnmt  won        skipbars
+	let box = await game_element(game, true, false);
 	box.classList.add('click')
 	box.addEventListener('click', tabhandler(compare_players_from_game, game.gameId));
 	let [tab, label] = tab_and_label('active-tournament', game.status)
@@ -1649,31 +1702,30 @@ async function add_active_game(game) {
 	count_tab(tab, label)
 	return box;
 }
-async function game_element(game, inc_players, inc_tournament, won, skip_bars) {
+async function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'div');
 	let wordrank;
 	if (won === undefined) {
-		let win_rank = rankiness(game);
-		if (typeof win_rank != 'undefined') {
-			let percent = 100 - win_rank.place / win_rank.maxplace * 100
-			box.style.cssText = `--winmix: ${percent}%`;
+		let win_rank = rank(game, myUserId);
+		if (win_rank.place !== null) {
+			box.style.cssText = `--winmix: ${win_rank.percent}%`;
 			box.classList.add('winmix');
-			wordrank = ['1st', '2nd', '3rd', '4th'][win_rank.place] || '&times;'
+			wordrank = win_rank.string
 		} else {
 			wordrank = stringify(win_rank)
 		}
 	} else if (won === null) {
-		wordrank = '(?)'
+		wordrank = '?'
 	} else if (won == 1) {
-		wordrank = '(won)'
+		wordrank = 'won'
 		box.classList.add('winmix');
 		box.style.cssText = `--winmix: 100%`;
 	} else if (won == -1) {
-		wordrank = '(lost)'
+		wordrank = 'lost'
 		box.classList.add('winmix');
 		box.style.cssText = `--winmix: 0%`;
 	} else {
-		wordrank = '(tie)'
+		wordrank = 'tie'
 		box.classList.add('winmix');
 		box.style.cssText = `--winmix: 50%`;
 	}
@@ -1685,20 +1737,21 @@ async function game_element(game, inc_players, inc_tournament, won, skip_bars) {
 
 	box.append(tit);
 	if (inc_players) {
-		let plist = document.createElement('ol');
+		let plist = document.createElement('div');
 		plist.classList.add('players');
 		box.append(plist);
+		// MARK: need to await all these simultaneously
+		let start = new Date()
 		for (uid of game.userIds) {
-			let li = document.createElement('li');
-			if (!skip_bars) {
-				let vsBar = document.createElement('span')
-				vsBar.dataset.uid = uid
-				vsBar.classList.add('vs-bars')
-				li.append(vsBar)
-			}
+			let li = document.createElement('div');
+			let rankdiv = document.createElement('span')
+			rankdiv.innerHTML = rank(game, uid).string
+			rankdiv.classList.add('rank')
+			li.append(rankdiv)
 			li.append(await title('user', uid, 'span'));
 			plist.append(li);
 		}
+		console.log(`game_element loop took ${(new Date()) - start} ms`)
 	}
 	if (inc_tournament) {
 		box.append(spacer());
@@ -1855,6 +1908,7 @@ function tabselect(id) {
 		sibling.classList.remove('selected')
 	}
 	me.classList.add('selected')
+	me.scrollIntoView()
 	
 	let mydiv = me.parentNode.nextSibling.querySelector('.' + id)
 	for (sibling of mydiv.parentNode.childNodes) {

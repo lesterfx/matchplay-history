@@ -181,7 +181,7 @@
 			</div>
 		<div class="block hide" id="active-tournament-block">
 				<h3 class="sticky-header">
-					<span id="active-tournament-title" class="completed"></span>
+					<span id="active-tournament-title"></span>
 					<span class="refresh" id="refresh-active-tournament">
 						<span class="circle">↻</span>
 						<span class="text">refresh</span>
@@ -192,7 +192,6 @@
 				</div>
 			</div>
 			<div id="selected-history">
-				<div class="sticky-header boxgroup singular" id="selected-game"></div>
 				<div id="player-histories-tabs" class="tabs" data-tabgroup="player-histories-tabs"></div>
 			</div>
 			<div class="spacer"></div>
@@ -202,6 +201,8 @@
 			</div>
 
 		</div>
+		<label id="log-toggler" for="log-toggle"></label>
+		<input type="checkbox" id="log-toggle">
 		<div id="log"></div>
 		<script>
 			window.onerror = function(message, source, lineno, colno, error) {
