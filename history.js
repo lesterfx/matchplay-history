@@ -2,7 +2,6 @@
 
 let myUserId = 0;
 let all_my_tournaments = {};
-let my_pid_by_organizer = {};
 let active_tournament_id;
 let refresh_timer;
 let all_data = {
@@ -311,35 +310,6 @@ function winmix(element, percent) {
 	element.style.cssText = `--winmix: ${percent}%`
 }
 
-async function get_games_from_tournament(tournament, add_players) {
-	let tid = tournament.tournamentId;
-	let pid;
-	let games;
-	let active;
-
-	let result = await get_tournament_details(tid, true);
-	games = result.games
-	active = result.active
-
-	pid = result.pid
-	my_pid_by_organizer[tid] = pid;
-
-	if (add_players) {
-		all_data.user = {};
-		await Promise.all(result.players.map(async (player) => {
-			let uid = player.claimedBy;
-			// if (!uid) return
-			// if (uid == myUserId) {
-			// 	return;
-			// };
-			all_data.user[uid] = player;
-			pid = player.playerId
-			await add_player_button(uid, pid);
-		}))
-		count_tab(...tab_and_label('active-tournament', 'players'))
-	}
-	return {games: games, active: active};
-}
 async function get_tournament_details(tid, get_games) {
 
 	let tournament_from_db_promise = get_from_db('tournament', tid)
@@ -1150,7 +1120,7 @@ async function tournament_history(id, refreshing) {
 	let frenzy_position_promise = get_frenzy_position(tournament)
 
 	log('getting games from tournament')
-	let result = (await get_games_from_tournament(tournament, get_players));
+	let result = (await get_tournament_details(tournament.tournamentId, true));
 	if (refreshing) {
 		log(`in refresh, changes: ${result.active}`)
 		if (!result.active) return;
@@ -1166,11 +1136,28 @@ async function tournament_history(id, refreshing) {
 	title_h2.append(await title('tournament', tournament.tournamentId, 'span'));
 	title_h2.append(matchplay_link(`tournaments/${tournament.tournamentId}`))
 	
+	if (get_players) {
+		all_data.user = {};
+		for (let player of result.players) {
+			let uid = player.claimedBy;
+			let pid = player.playerId
+			all_data.user[uid] = player;
+			all_data.player[pid] = player;
+		}
+}
 	let in_progress = []
 	await Promise.all(active_games.map(async (game) => {
 		let element = await add_active_game(game);
 		if (game.status != 'completed') in_progress.push([game.status, element]);
 	}))
+	if (get_players) {
+		await Promise.all(result.players.map(async (player) => {
+			let uid = player.claimedBy;
+			let pid = player.playerId
+			await add_player_button(uid, pid);
+		}))
+		count_tab(...tab_and_label('active-tournament', 'players'))
+	}
 	document.getElementById('active-tournament-title').scrollIntoView();
 	if (in_progress.length == 1 && mode == 'history') {
 		let status = in_progress[0][0]
@@ -1228,7 +1215,7 @@ async function get_frenzy_position(tournament) {
 	let frenzy = await get({
 		endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
 	})
-	let my_pid = my_pid_by_organizer[tournament.tournamentId];
+	let my_pid = tournament.my_pid;
 	let queue_pos = null;
 	let queue_size = frenzy.queue.length;
 	for (const [i, queue] of frenzy.queue.entries()) {
@@ -1259,8 +1246,8 @@ async function compare_players_from_game(id) {
 	let pids = game.playerIds;
 	await load_active_players_history(uids, pids);
 }
-async function compare_player(id) {
-	await load_active_players_history([id])
+async function compare_player(uid, pid) {
+	await load_active_players_history([uid], [pid])
 }
 async function load_active_players_history(uids, pids) {
 	let histories = document.getElementById('player-histories-tabs')
@@ -1270,8 +1257,10 @@ async function load_active_players_history(uids, pids) {
 		let pid = pids && pids[index]
 		if (uid != myUserId) {
 			let namestr = await name('user', uid, 'player', pid)
-			let [tab_, label_] = tab_and_label('player-histories-tabs', namestr, uid)
-			label_.append(matchplay_link(`users/${uid}`))
+			let [tab_, label_] = tab_and_label('player-histories-tabs', namestr, uid || pid)
+			if (uid) {
+				label_.append(matchplay_link(`users/${uid}`))
+			}
 			await load_games_to_player_standing(uid, pid, label_, tab_)
 		}
 	}))
@@ -1585,7 +1574,7 @@ function insertSorted(element, parent, sortvalue_function) {
 async function add_player_button(uid, pid) {
 	let button = await title('user', uid, 'div', 'player', pid);
 	button.classList.add('box', 'click');
-	button.addEventListener('click', tabhandler(compare_player, uid))
+	button.addEventListener('click', tabhandler(compare_player, uid, pid))
 	insertSorted(button, tab('active-tournament', 'players'), (el) => {
 		return el.textContent.toLowerCase()
 	});
@@ -1731,9 +1720,10 @@ async function game_element(game, inc_players, inc_tournament, won) {
 		plist.classList.add('players');
 		box.append(plist);
 		game.userIds.forEach(async (uid, index) => {
+			let pid = game.playerIds[index]
 			let li = document.createElement('div');
 			li.append(rankspan(rank(game, uid).string))
-			li.append(await title('user', uid, 'span', 'player', game.playerIds[index]));  // not actually async
+			li.append(await title('user', uid, 'span', 'player', pid));  // not actually async
 			plist.append(li);
 		})
 	}
@@ -1874,10 +1864,11 @@ function tab_and_label(parent, text, identifier) {
 	boxgroup = document.createElement('div')
 	boxgroup.classList.add('clickables', 'boxgroup', id)
 	boxgroup.dataset.inputid = id
+	fakefill(boxgroup)
 	contents.append(boxgroup)
 	
-	activate_tab(tabgroup, identifier)
-	fakefill(boxgroup)
+	if (tabs.childNodes.length == 1)
+		activate_tab(tabgroup, identifier)
 	
 	return [boxgroup, label]
 }
