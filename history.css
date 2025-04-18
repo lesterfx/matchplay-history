@@ -103,6 +103,9 @@ body.flash {
     background: linear-gradient(110deg, var(--won-background) var(--winmix), var(--lost-background) var(--winmix)) no-repeat;
     border-color: var(--border);
 }
+#spacer {
+    height: 100vh;
+}
 #log-toggler {
     display: inline-block;
     height: 1em;
@@ -232,6 +235,9 @@ div.players {
     display: none;
 }
 .refresh {
+    flex-shrink: 0;
+    box-sizing: border-box;
+    background: var(--group-background);
     display: inline-block;
     margin-left: .2em;
     margin-right: .2em;
@@ -239,8 +245,12 @@ div.players {
     cursor: pointer;
     font-weight: normal;
     white-space: nowrap;
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
 }
 .refresh .text {
+    display: inline-block;
     margin-left: .2em;
 }
 .refresh .circle {
@@ -261,6 +271,7 @@ h1,h2,h3 {
 h3.sticky-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 .sticky-header {
     position: sticky;

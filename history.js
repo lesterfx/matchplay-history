@@ -440,7 +440,18 @@ function show_mode() {
 	filter()
 }
 async function refresh_tournaments_click() {
+	let button = document.getElementById('refresh-my-tournaments')
+	if (button.classList.contains('wait')) return
+	let text = button.querySelector('.text')
+	let minwidth = text.clientWidth
+	text.style.minWidth = `${minwidth}px`;
+	text.textContent = 'wait';
+	minwidth = Math.max(minwidth, text.clientWidth)
+	text.style.minWidth = `${minwidth}px`;
+	button.classList.add('wait')
 	await get_all_my_tournaments();
+	button.querySelector('.text').textContent = 'refresh';
+	button.classList.remove('wait')
 }
 
 let wakeLock = null;
@@ -1111,7 +1122,6 @@ async function tournament_history(id, refreshing) {
 	} else {
 		get_players = true
 		document.getElementById('player-histories-tabs').innerHTML = '';
-		active_tournament_box.style.minHeight = active_tournament_box.offsetHeight + 'px'
 		active_tournament_box.innerHTML = '';
 		for (el of document.querySelectorAll('#frenzy-countdown span')) el.textContent = ''
 	}
@@ -1156,7 +1166,8 @@ async function tournament_history(id, refreshing) {
 			let pid = player.playerId
 			await add_player_button(uid, pid);
 		}))
-		count_tab(...tab_and_label('active-tournament', 'players'))
+		let group = tab('active-tournament', 'players')
+		count_tab(group)
 	}
 	document.getElementById('active-tournament-title').scrollIntoView();
 	if (in_progress.length == 1 && mode == 'history') {
@@ -1167,10 +1178,6 @@ async function tournament_history(id, refreshing) {
 	}
 
 	await frenzy_position_promise
-
-	if (!refreshing) {
-		active_tournament_box.style.minHeight = ''
-	}
 
 	return in_progress.length;
 }
@@ -1240,32 +1247,40 @@ async function get_frenzy_position(tournament) {
 	// 	for (el of div.querySelectorAll('span')) el.textContent = ''
 	// }
 }
-async function compare_players_from_game(id) {
-	let game = all_data.game[id]
+async function compare_players_from_game(gameId) {
+	let game = all_data.game[gameId]
 	let uids = game.userIds;
 	let pids = game.playerIds;
+	let header = document.getElementById('selected-history-title')
+	header.innerHTML = ''
+	header.append(await title('arena', game.arenaId, 'span'))
+	header.append(matchplay_link(`tournaments/${game.tournamentId}/arenas/${game.arenaId}`
+	))
 	await load_active_players_history(uids, pids);
 }
 async function compare_player(uid, pid) {
+	let header = document.getElementById('selected-history-title')
+	header.innerHTML = ''
+	header.append(await title('user', uid, 'span', 'player', pid))
+	if (uid) {
+		header.append(matchplay_link(`users/${uid}`))
+	}
 	await load_active_players_history([uid], [pid])
 }
 async function load_active_players_history(uids, pids) {
 	let histories = document.getElementById('player-histories-tabs')
-	histories.style.minHeight = histories.offsetHeight + 'px'
 	histories.innerHTML = ''
 	await Promise.all(uids.map(async (uid, index) => {
 		let pid = pids && pids[index]
 		if (uid != myUserId) {
 			let namestr = await name('user', uid, 'player', pid)
-			let [tab_, label_] = tab_and_label('player-histories-tabs', namestr, uid || pid)
-			if (uid) {
-				label_.append(matchplay_link(`users/${uid}`))
-			}
-			await load_games_to_player_standing(uid, pid, label_, tab_)
+			let group = tab('player-histories-tabs', namestr, uid || pid)
+			await load_games_to_player_standing(uid, pid, group.label, group.box)
 		}
 	}))
-	document.getElementById('selected-history').scrollIntoView();
-	histories.style.minHeight = ''
+	document.querySelector('#selected-history .tabs-list').scrollIntoView({
+		block: 'center'
+	});
 }
 async function load_games_to_player_standing(uid, pid, label_, tab_) {
 	uid = Number(uid)
@@ -1575,7 +1590,7 @@ async function add_player_button(uid, pid) {
 	let button = await title('user', uid, 'div', 'player', pid);
 	button.classList.add('box', 'click');
 	button.addEventListener('click', tabhandler(compare_player, uid, pid))
-	insertSorted(button, tab('active-tournament', 'players'), (el) => {
+	insertSorted(button, tab('active-tournament', 'players').box, (el) => {
 		return el.textContent.toLowerCase()
 	});
 	load_games_to_player_standing(uid, pid, button)
@@ -1680,11 +1695,11 @@ async function add_active_game(game) {
 	let box = await game_element(game, true, false);
 	box.classList.add('click')
 	box.addEventListener('click', tabhandler(compare_players_from_game, game.gameId));
-	let [tab, label] = tab_and_label('active-tournament', game.status)
-	insertSorted(box, tab, (el) => {
+	let group = tab('active-tournament', game.status)
+	insertSorted(box, group.box, (el) => {
 		return -el.dataset.id
 	})
-	count_tab(tab, label)
+	count_tab(group)
 	return box;
 }
 async function game_element(game, inc_players, inc_tournament, won) {
@@ -1756,12 +1771,11 @@ async function add_tournament(tournament, manual) {
 		box.classList.add('not-cached')
 		document.getElementById('cache-box').classList.remove('hide')
 	}
-	let [tab, label] = tab_and_label('my-tournaments', tournament.status)
-	insertSorted(box, tab, (el) => {
+	let group = tab('my-tournaments', tournament.status)
+	insertSorted(box, group.box, (el) => {
 		return -el.dataset.id;
 	});
-	count_tab(tab, label)
-	
+	count_tab(group)
 	return box
 }
 function remove_manual_tournament(event, tid) {
@@ -1807,70 +1821,73 @@ function load_more_tournaments_button(value) {
 		return
 	}
 }
-function count_tab(t, label) {
+function count_tab(group) {
 	let c = 0
-	for (let child of t.childNodes) {
+	for (let child of group.box.childNodes) {
 		if (!child.classList.contains('fake')) c++
 	}
-	label.childNodes[1].textContent = ` (${c})`
+	group.label.childNodes[1].textContent = ` (${c})`
 }
 function activate_tab(tabgroup, status) {
-	let [tab, label] = tab_and_label(tabgroup, status)
-	for (let node of label.parentNode.childNodes) {
+	let group = tab(tabgroup, status)
+	for (let node of group.label.parentNode.childNodes) {
 		node.classList.remove('selected')
 	}
-	label.classList.add('selected')
-	for (let node of tab.parentNode.childNodes) {
+	group.label.classList.add('selected')
+	for (let node of group.box.parentNode.childNodes) {
 		node.classList.remove('selected')
 	}
-	tab.classList.add('selected')
-	label.scrollIntoView({inline: 'center'})
+	group.box.classList.add('selected')
+	group.label.scrollIntoView({block: 'center', inline: 'center'})
 }
 function tab(parent, text, identifier) {
-	return tab_and_label(parent, text, identifier)[0]
-}
-function tab_and_label(parent, text, identifier) {
 	parent = document.getElementById(parent)
-	let tabs
-	let contents
+	let labels
+	let boxes
 	if (!parent.children.length) {
-		tabs = document.createElement('div')
-		tabs.classList.add('tabs-list')
-		parent.append(tabs)
-		contents = document.createElement('div')
-		contents.classList.add('tabs-content')
-		parent.append(contents)
+		labels = document.createElement('div')
+		labels.classList.add('tabs-list')
+		parent.append(labels)
+		boxes = document.createElement('div')
+		boxes.classList.add('tabs-content')
+		parent.append(boxes)
 	} else {
-		tabs = parent.children[0]
-		contents = parent.children[1]
+		labels = parent.children[0]
+		boxes = parent.children[1]
 	}
 	if (identifier === undefined) identifier = text
 	let tabgroup = parent.dataset.tabgroup
-	let boxgroup = contents.querySelector(`.boxgroup.${tabgroup}-${identifier}`)
-	let label = tabs.querySelector(`#${tabgroup}-${identifier}`)
-	if (boxgroup) {
-		return [boxgroup, label]
+	let boxgroup = boxes.querySelector(`.boxgroup.${tabgroup}-${identifier}`)
+	let label = labels.querySelector(`#${tabgroup}-${identifier}`)
+
+	if (!boxgroup) {
+		let id = `${tabgroup}-${identifier}`
+
+		label = document.createElement('label')
+		label.setAttribute('id', id)
+		label.textContent = text
+		let count = document.createElement('span')
+		label.append(count)
+		label.addEventListener('click', handler(activate_tab, tabgroup, identifier))
+		labels.append(label)
+
+		boxgroup = document.createElement('div')
+		boxgroup.classList.add('clickables', 'boxgroup', id)
+		boxgroup.dataset.inputid = id
+		fakefill(boxgroup)
+		boxes.append(boxgroup)
+		
+		if (labels.childNodes.length == 1)
+			activate_tab(tabgroup, identifier)
 	}
-	let id = `${tabgroup}-${identifier}`
 
-	label = document.createElement('label')
-	label.setAttribute('id', id)
-	label.textContent = text
-	let count = document.createElement('span')
-	label.append(count)
-	label.addEventListener('click', handler(activate_tab, tabgroup, identifier))
-	tabs.append(label)
-
-	boxgroup = document.createElement('div')
-	boxgroup.classList.add('clickables', 'boxgroup', id)
-	boxgroup.dataset.inputid = id
-	fakefill(boxgroup)
-	contents.append(boxgroup)
-	
-	if (tabs.childNodes.length == 1)
-		activate_tab(tabgroup, identifier)
-	
-	return [boxgroup, label]
+	return {
+		box: boxgroup,
+		label: label,
+		parent: parent,
+		boxes: boxes,
+		labels: labels
+	}
 }
 function fakefill(element) {
 	for (i=0;i<10;i++) {
