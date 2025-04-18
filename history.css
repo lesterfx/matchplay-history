@@ -40,17 +40,25 @@ body.flash {
         --lost-background: var(--lost-light);
         }
 }
+#tournament-options {
+    align-items: flex-start;
+}
+.tabs-content>.boxgroup {
+    border-top: 1px solid var(--border);
+}
+.tabs-content:has(~.boxgroup) > .boxgroup {
+    border-bottom: none;
+    padding-bottom: 1.5em;
+}
 .boxgroup {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    min-height: 50px;
     justify-items: stretch;
     z-index: 1;
     position: relative;
     order: 1;
     flex-grow: 1;
-    border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     margin-top: -1px;
     padding: 5px;
@@ -94,11 +102,6 @@ body.flash {
 .winmix {
     background: linear-gradient(110deg, var(--won-background) var(--winmix), var(--lost-background) var(--winmix)) no-repeat;
     border-color: var(--border);
-}
-#cache-button,
-#stop-cache {
-    text-decoration: underline;
-    cursor: pointer;
 }
 #log-toggler {
     display: inline-block;
@@ -170,7 +173,7 @@ body {
     cursor: pointer;
     order: 0;
     margin-top: 1em;
-    background-color: var(--page-background);
+    background-color: var(--group-background);
     border-style: solid;
     border-width: 1px 1px 0 1px;
     border-color: var(--border);
@@ -182,23 +185,26 @@ body {
     z-index: 0;
 }
 .tabs label.selected {
-    background-color: var(--group-background);
     z-index: 2;
     opacity: 1;
 }
 .tabs label~label {
     margin-left: -1px;
 }
-.tabs .tabs-contents>div {
+.tabs .tabs-content>div {
     z-index: 1;
 }
-.tabs .tabs-contents>div:not(.selected) {
+.tabs .tabs-content>div:not(.selected) {
     display: none;
+}
+.title span.rank {
+    text-align: right;
 }
 span.rank {
     display: inline-block;
     min-width: 2em;
-    font-size: small;
+    font-size: smaller;
+    font-style: normal;
 }
 #player-histories {
     padding-top: 1em;
@@ -358,29 +364,39 @@ h3.sticky-header {
     writing-mode: vertical-rl;
     white-space: nowrap;
 }
-#standings-table td:empty::before {
-    content: "—";
-}
 #standings-table td.division {
     text-decoration: underline;
     cursor: pointer;
 }
 #filter {
+    border-radius: 4px;
     min-width: 100%;
     box-sizing: border-box;
+    border: none;
+    padding: 5px;
+    margin-bottom: 0.5em;
 }
-#filters>div {
+.box-button>div {
     display: flex;
     justify-content: space-between;
 }
-#filters span {
+.box-button span {
     cursor: pointer;
     display: inline-block;
     margin-left: 10px;
 }
-.filters-lefter {
-    cursor: initial;
-    flex-grow: 0;
+.box-button:not(.selected) {
+    cursor: pointer;
+    text-align: center;
+}
+.box-button.selected span.label {
+    display: none;
+}
+.box-button:not(.selected) :not(span.label) {
+    display: none;
+}
+#cache-box {
+    text-align: center;
 }
 #standings-settings {
     cursor: pointer;

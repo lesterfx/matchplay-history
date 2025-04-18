@@ -41,13 +41,19 @@
 				<div id="my-tournaments" class="tabs" data-tabgroup="my-tournaments">
 					<div class="tabs-list"></div>
 					<div class="tabs-content"></div>
-					<div class="boxgroup">
-						<div class="box" id="filters">
+					<div id="tournament-options" class="boxgroup">
+						<div class="box box-button" id="filters">
+							<span class="label">Filter...</span>
 							<input id="filter" placeholder="filter">
 						</div>
-						<div id="cache-box" class="box hide">
-							<span id="cache-button">cache all tournaments</span>
-							<span id="caching" class="hide">caching...</span>
+						<div id="cache-box" class="box hide box-button">
+							<span class="label">Cache All Tournaments</span>
+							<span id="caching">caching...</span>
+						</div>
+						<div id="manual-tournament" class="box click">
+							Add Tournament by ID...
+						</div>
+						<div id="load-next-page" class="box click hide">
 						</div>
 						<div class="fake invisible box"></div>
 						<div class="fake invisible box"></div>
