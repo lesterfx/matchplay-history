@@ -38,27 +38,28 @@
 						<span class="text">refresh</span>
 					</span>
 				</h3>
-				<div class="boxgroup">
-					<div class="box" id="filters">
-						<input id="filter" placeholder="filter">
-					</div>
-					<div class="box">
-						<span id="cache-status">0</span> tournaments cached<br />
-						<span id="cache-button">cache now</span>
-						<span id="stop-cache" class="hide">stop</span>
-					</div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-					<div class="fake invisible box"></div>
-				</div>
 				<div id="my-tournaments" class="tabs" data-tabgroup="my-tournaments">
+					<div class="tabs-list"></div>
+					<div class="tabs-content"></div>
+					<div class="boxgroup">
+						<div class="box" id="filters">
+							<input id="filter" placeholder="filter">
+						</div>
+						<div id="cache-box" class="box hide">
+							<span id="cache-button">cache all tournaments</span>
+							<span id="caching" class="hide">caching...</span>
+						</div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+					</div>
 				</div>
 			</div>
 			<div class="block hide" id="arenas-block">
@@ -194,12 +195,6 @@
 			<div id="selected-history">
 				<div id="player-histories-tabs" class="tabs" data-tabgroup="player-histories-tabs"></div>
 			</div>
-			<div class="spacer"></div>
-			<div id="custom-section" class="hide">
-				<input id="custom-endpoint" placeholder="users/profile">
-				<input type="button" id="run-custom" value="Run">
-			</div>
-
 		</div>
 		<label id="log-toggler" for="log-toggle"></label>
 		<input type="checkbox" id="log-toggle">

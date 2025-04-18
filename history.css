@@ -46,8 +46,6 @@ body.flash {
     flex-wrap: wrap;
     min-height: 50px;
     justify-items: stretch;
-}
-.boxgroup:not(.singular) {
     z-index: 1;
     position: relative;
     order: 1;
@@ -55,7 +53,6 @@ body.flash {
     border-top: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
     margin-top: -1px;
-    margin-bottom: 30px;
     padding: 5px;
     background: var(--group-background);
 }
@@ -104,8 +101,12 @@ body.flash {
     cursor: pointer;
 }
 #log-toggler {
+    display: inline-block;
     height: 1em;
     background: var(--group-background);
+    width: 1em;
+    border-radius: .2em;
+    margin: .5em;
 }
 #log-toggle {
     display: none;
@@ -246,6 +247,9 @@ div.players {
     transition-duration: 5s;
     transform: rotate(360deg);
 }
+h1,h2,h3 {
+    padding-left: 5px;
+}
 h3.sticky-header {
     display: flex;
     justify-content: space-between;
@@ -260,6 +264,7 @@ h3.sticky-header {
 }
 #options {
     z-index: 10;
+    margin-left: 5px;
 }
 #options>.items {
     float: left;
