@@ -915,8 +915,8 @@ function show_standings_table(settings_already_loaded) {
 		tr.append(td)
 		
 		td = document.createElement('td')
-		let name = all_data.player[id]
-		td.textContent = name
+		let playername = all_data.player[id]
+		td.textContent = playername
 		// td.classList.add('text')
 		td.classList.add('has-text-align-left')
 		td.dataset.align = 'left'
@@ -942,7 +942,7 @@ function show_standings_table(settings_already_loaded) {
 			let restricted = is_restricted(id)
 			if (restricted) added_restriction = true
 			if (tie_rank <= standings_settings.a_size && loaded_standings.games_played[id] >= standings_settings.a_attendance) {
-				a_divisions.push(name)
+				a_divisions.push(playername)
 				if (restricted) {
 					td.innerHTML = 'A*'
 				} else {
@@ -951,12 +951,12 @@ function show_standings_table(settings_already_loaded) {
 			} else if (restricted) {
 				td.innerHTML = '*'
 			} else if (loaded_standings.games_played[id] >= standings_settings.b_attendance) {
-				b_divisions.push(name)
+				b_divisions.push(playername)
 				td.innerHTML = 'B'
 			} else {
 				td.innerHTML = '&mdash;'
 			}
-			td.addEventListener('click', handler(toggle_restricted, id, name))
+			td.addEventListener('click', handler(toggle_restricted, id, playername))
 			tr.append(td)
 
 			td = document.createElement('td')
@@ -972,7 +972,7 @@ function show_standings_table(settings_already_loaded) {
 			} else {
 				td.innerHTML = '&mdash;'
 			}
-			td.addEventListener('click', handler(toggle_bonus, id, name))
+			td.addEventListener('click', handler(toggle_bonus, id, playername))
 			tr.append(td)
 		}
 
@@ -1275,7 +1275,7 @@ async function load_active_players_history(uids, pids) {
 	await Promise.all(uids.map(async (uid, index) => {
 		let pid = pids && pids[index]
 		if (uid != myUserId) {
-			let namestr = await name('user', uid, 'player', pid)
+			let namestr = await get_name('user', uid, 'player', pid)
 			let group = tab('player-histories-tabs', namestr, uid || pid)
 			await load_games_to_player_standing(uid, pid, group.label, group.box)
 		}
@@ -1626,11 +1626,11 @@ async function find_missing() {
 		// setTimeout(find_missing, 0)
 	}
 }
-async function name(kind, id, fallback_kind, fallback_id) {
+async function get_name(kind, id, fallback_kind, fallback_id) {
 	let str;
 	if (!id) {
 		if (fallback_kind) {
-			str = name(fallback_kind, fallback_id)
+			str = get_name(fallback_kind, fallback_id)
 		} else if (kind == 'user') {
 			str = '[unclaimed player]'
 		} else {
@@ -1659,7 +1659,7 @@ async function title(kind, id, element_type, fallback_kind, fallback_id) {
 	let element = notitle(kind, id, element_type);
 	element.classList.add(kind+'-name');
 	element.classList.add('title');
-	let str = await name(kind, id, fallback_kind, fallback_id)
+	let str = await get_name(kind, id, fallback_kind, fallback_id)
 	element.textContent = str;  // `${name} (${kind} ${id})`);
 	return element;
 }
