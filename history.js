@@ -606,6 +606,7 @@ function filter(save, value) {
 			filters.push(value)
 			return filters
 		})
+		document.getElementById('filter').scrollIntoView({block: 'center'})
 	}
 	tournament_toggled()
 }
@@ -1073,7 +1074,10 @@ function toggle_bonus(id, name) {
 }
 async function load_arenas() {
 	document.getElementById('load-arenas').classList.add('hide')
-	document.getElementById('arenas-table').classList.add('hide')
+	let table = document.getElementById('arenas-table')
+	table.classList.remove('hide')
+	table.innerHTML = ''
+	let group = tab('arenas-table', 'Arenas')
 
 	let arena_occurrences = {}
 	let arena_names = {}
@@ -1117,29 +1121,11 @@ async function load_arenas() {
 	}))
 
 	const arenas_entries = sorted_dictionary(arena_occurrences, true, 0);
-	document.getElementById('arenas-table').classList.remove('hide')
-	let tbody = document.getElementById('arenas-tbody')
-	tbody.textContent = ''
-	// for (let [arena, tournament] of no_opdbId) {
-	// 	let tr = document.createElement('tr')
-	// 	let td = document.createElement('td')
-	// 	td.textContent = arena.name
-	// 	td.append(matchplay_link(`tournaments/${tournament.tournamentId}/arenas/${arena.arenaId}`))
-	// 	tr.append(td)
-	// 	td = document.createElement('td')
-	// 	td.textContent = 'no opdb id'
-	// 	tr.append(td)
-	// 	tbody.appendChild(tr)
-	// }
 	for (let [opdb, [occurrences, an_arena, tournament]] of arenas_entries) {
-		let tr = document.createElement('tr')
-		let td
-		td = document.createElement('td')
-		td.textContent = arena_names[opdb]
-		td.title = opdb
-		td.append(matchplay_link(`tournaments/${tournament.tournamentId}/arenas/${an_arena.arenaId}`))
-		tr.appendChild(td)
-		
+		let box = document.createElement('div')
+		box.classList.add('box', 'arenas')
+		group.box.append(box)
+
 		let wins = 0
 		let losses = 0
 		let num_games = 0
@@ -1151,29 +1137,40 @@ async function load_arenas() {
 					if (tournaments.includes(game.tournamentId)) {
 						num_games ++
 						let winloss = rank(game)
-						wins += winloss.maxplace - winloss.place
-						losses += winloss.place
+						wins += Math.floor(winloss.maxplace - winloss.place)
+						losses += Math.floor(winloss.place)
 					}
 				}
-				// only_update
 			}
 		}
 
-		td = document.createElement('td')
-		td.textContent = occurrences
-		tr.appendChild(td)
+		let titlediv = document.createElement('div')
+		titlediv.textContent = arena_names[opdb]
+		titlediv.title = opdb
+		titlediv.append(matchplay_link(`tournaments/${tournament.tournamentId}/arenas/${an_arena.arenaId}`))
 
-		td = document.createElement('td')
-		td.classList.add('box')
+		let played = document.createElement('div')
 		if (num_games) {
-			td.textContent = `${wins} — ${losses} in ${num_games} games`
+			played.textContent = `played ${num_games} game${num_games > 1 ? "s" : ""}: ${wins} — ${losses}`
 		} else {
-			td.innerHTML = '&nbsp;'
+			played.innerHTML = 'not played'
 		}
-		winmix(td, wins / (wins+losses) * 100)
-		tr.appendChild(td)
 
-		tbody.appendChild(tr)
+		let leftdiv = document.createElement('div')
+		leftdiv.append(titlediv)
+		leftdiv.append(spacer())
+		leftdiv.append(played)
+		box.append(leftdiv)
+
+		box.append(spacer());
+
+		let occ = document.createElement('div')
+		occ.classList.add('occurrences')
+		occ.textContent = occurrences
+		box.append(occ)
+
+		winmix(box, wins / (wins+losses) * 100)
+
 	}
 }
 function sorted_dictionary(dictionary, descending, index) {
@@ -1382,12 +1379,14 @@ function rankspan(string) {
 	rankdiv.innerHTML = string
 	return rankdiv
 }
-function rank(game, uid) {
+function rank(game, uid, pid) {
 	if (uid === undefined) {
 		uid = myUserId
 	}
-	let index = game.userIds.indexOf(uid)
-	let playerId = game.playerIds[index]
+	if (uid !== null) {
+		pid = game.playerIds[game.userIds.indexOf(uid)]
+	}
+	let index = game.playerIds.indexOf(pid)
 
 	let place = null
 	let string = ''
@@ -1396,13 +1395,13 @@ function rank(game, uid) {
 	let result = game.resultPositions
 	// real results are best, but not for fair strikes
 	if (result && result.length && !result.includes(null)) {
-		place = result.indexOf(playerId)
+		place = result.indexOf(pid)
 		string = ['1<sup>st</sup>', '2<sup>nd</sup>', '3<sup>rd</sup>', '4<sup>th</sup>'][place]
 	}
 
 	// suggested results even works with fair strikes
 	else if (game.suggestions && game.suggestions.length == 1) {
-		place = game.suggestions[0].results.indexOf(playerId)
+		place = game.suggestions[0].results.indexOf(pid)
 		string = ['1st', '2nd', '3rd', '4th'][place]
 	}
 
@@ -1736,6 +1735,9 @@ async function title(kind, id, element_type, fallback_kind, fallback_id) {
 	element.classList.add(kind+'-name');
 	element.classList.add('title');
 	let str = await get_name(kind, id, fallback_kind, fallback_id)
+	if (id == myUserId) {
+		element.classList.add('me')
+	}
 	element.textContent = str;  // `${name} (${kind} ${id})`);
 	return element;
 }
@@ -1782,6 +1784,32 @@ async function add_active_game(game) {
 }
 async function game_element(game, inc_players, inc_tournament, won) {
 	let box = notitle('game', game.gameId, 'span');
+	box.classList.add('box');
+
+	let leftdiv = document.createElement('div')
+	leftdiv.classList.add('left-side')
+	box.append(leftdiv)
+	let tit = await title('arena', game.arenaId);
+	leftdiv.append(tit)
+
+	if (inc_players) {
+		leftdiv.append(spacer())
+		let plist = document.createElement('div');
+		plist.classList.add('players');
+		leftdiv.append(plist);
+		game.userIds.forEach(async (uid, index) => {
+			let pid = game.playerIds[index]
+			let li = document.createElement('div');
+			li.append(rankspan(rank(game, uid, pid).string))
+			li.append(await title('user', uid, 'span', 'player', pid));  // not actually async
+			plist.append(li);
+		})
+	}
+	if (inc_tournament) {
+		leftdiv.append(spacer());
+		leftdiv.append(await title('tournament', game.tournamentId));
+	}
+
 	let wordrank;
 	if (won === undefined) {
 		let win_rank = rank(game, myUserId);
@@ -1796,34 +1824,19 @@ async function game_element(game, inc_players, inc_tournament, won) {
 	} else if (won == 1) {
 		wordrank = 'won'
 		winmix(box, 100)
+		box.classList.add('vs')
 	} else if (won == -1) {
 		wordrank = 'lost'
 		winmix(box, 0)
+		box.classList.add('vs')
 	} else {
 		wordrank = 'tie'
 		winmix(box, 50)
+		box.classList.add('vs')
 	}
-	box.classList.add('box');
-	let tit = await title('arena', game.arenaId);
-	tit.append(rankspan(wordrank))
+	box.append(spacer())
+	box.append(rankspan(wordrank))
 
-	box.append(tit);
-	if (inc_players) {
-		let plist = document.createElement('div');
-		plist.classList.add('players');
-		box.append(plist);
-		game.userIds.forEach(async (uid, index) => {
-			let pid = game.playerIds[index]
-			let li = document.createElement('div');
-			li.append(rankspan(rank(game, uid).string))
-			li.append(await title('user', uid, 'span', 'player', pid));  // not actually async
-			plist.append(li);
-		})
-	}
-	if (inc_tournament) {
-		box.append(spacer());
-		box.append(await title('tournament', game.tournamentId));
-	}
 	return box;
 }
 async function add_tournament(tournament, manual) {
