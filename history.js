@@ -79,7 +79,7 @@ let db;
 
 const dbName = "history";
 
-const request = indexedDB.open(dbName, 4);
+const request = indexedDB.open(dbName, 6);
 
 request.onerror = (event) => {
     console.log(event)
@@ -106,6 +106,12 @@ request.onupgradeneeded = (event) => {
 	}
 	if (event.oldVersion < 4) {
 		event.target.transaction.objectStore("tournament").createIndex("status", "status", { unique: false });
+	}
+	if (event.oldVersion < 5) {
+		event.target.transaction.objectStore("game").createIndex("arenaId", "arenaId", { unique: false });
+	}
+	if (event.oldVersion < 6) {
+		event.target.transaction.objectStore("arena").createIndex("opdbId", "opdbId", { unique: false });
 	}
 
 	console.log('db upgrade finished')
@@ -135,15 +141,14 @@ function put_game(game) {
 }
 
 async function get_games_from_db_by_userId(userId) {
-	const transaction = db.transaction("game");
-	const gameObjectStore = transaction.objectStore("game");
+	const objectStore = db.transaction("game").objectStore("game");
 	
 	let result = [];
 	const indexNames = ['user1', 'user2', 'user3', 'user4'];
 	
 	for (const key of indexNames) {
 	  // Get the index for the current user key
-	  const index = gameObjectStore.index(key);
+	  const index = objectStore.index(key);
 	  
 	  // Wrap the getAll request in a Promise to await its result
 	  const entries = await new Promise((resolve, reject) => {
@@ -158,9 +163,18 @@ async function get_games_from_db_by_userId(userId) {
 	return result;
 }
 
+async function get_from_db_by_index(table, key, id) {
+	const objectStore = db.transaction(table).objectStore(table);
+	const index = objectStore.index(key)
+	return await new Promise((resolve, reject) => {
+		const request = index.getAll(id);
+		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
+	});
+}
+
 async function get_from_db(table, id) {
-	const transaction = db.transaction(table);
-	const objectStore = transaction.objectStore(table);
+	const objectStore = db.transaction(table).objectStore(table);
 	return await new Promise((resolve, reject) => {
 		const request = objectStore.get(id);
 		request.onsuccess = () => resolve(request.result);
@@ -273,7 +287,7 @@ async function* get_tournaments_paginated(uid, from_page, to_page) {  // paginat
 	} while (need_more)
 	return next_page
 }
-async function add_game_to_player_standing(game, uid, pid, label_, tab_) {
+async function add_game_to_player_standing(game, uid, pid, label, box) {
 	let won_game = did_i_win(game, uid)
 	if (won_game !== null) {
 		if (won_game == 1) {
@@ -286,20 +300,20 @@ async function add_game_to_player_standing(game, uid, pid, label_, tab_) {
 	let lost = winloss[uid].lost;
 	let percent = won / (won+lost) * 100;
 	
-	winmix(label_, percent)
-	if (!tab_) {
+	winmix(label, percent)
+	if (!box) {
 		return
 	}
 
-	label_.childNodes[1].innerHTML = ` (${won}-${lost})`
+	label.childNodes[1].innerHTML = ` (${won}-${lost})`
 
-	let box = await add_player_game({
+	let element = await add_player_game({
 		uid: uid,
 		game: game,
 		won: won_game,
 		order: -game.tournamentId
 	})
-	insertSorted(box, tab_, (el) => {
+	insertSorted(element, box, (el) => {
 		return -el.dataset.id;
 	});
 }
@@ -1062,12 +1076,14 @@ async function load_arenas() {
 	document.getElementById('arenas-table').classList.add('hide')
 
 	let arena_occurrences = {}
+	let arena_names = {}
+	let no_opdbId = []
+	let opdbIds = {}
 
-	await Promise.all(selected_tournaments().map(async (el) => {
-		let tid = el.dataset.id;
-		let tournament = all_data.tournament[tid];
-		// log(tournament.name)
-		let arena_names = []
+	let tournaments = selected_tournaments().map((el) => Number(el.dataset.id))
+	await Promise.all(tournaments.map(async (tid) => {
+		let tournament = await get_from_db('tournament', tid)
+		let tournament_arena_names = {}
 		let arenas
 		if (tournament.arenas) {
 			arenas = tournament.arenas
@@ -1077,41 +1093,98 @@ async function load_arenas() {
 				query: {'includeArenas': 1}
 			})).data.arenas
 		}
-		for (arena of arenas) {
-			arena_names.push(arena.name.split(' (')[0])
+		for (let arena of arenas) {
+		// 	if (arena.tournamentArena.status == 'active') {
+				if (arena.opdbId) {
+					let opdb = arena.opdbId.split('-')[0]
+					if (!opdbIds[opdb]) opdbIds[opdb] = {}
+					opdbIds[opdb][arena.opdbId] = 1
+					tournament_arena_names[opdb] = arena
+				} else {
+					no_opdbId.push([arena, tournament])
+				}
+			// } else {
+			// }
+			// log(arena)
 		}
-		arena_names = [...new Set(arena_names)]  // sometimes an arena was in the same tournament twice
-		arena_names.sort((a, b) => a.localeCompare(b));
-		for (name of arena_names) {
-			// if (arena.status == 'inactive') continue
-			if (!arena_occurrences[name]) arena_occurrences[name] = 0
-			arena_occurrences[name] ++;
+		for (let [opdb, arena] of Object.entries(tournament_arena_names)) {
+			if (!arena_occurrences[opdb]) arena_occurrences[opdb] = [0, null]
+			arena_occurrences[opdb][0] ++;
+			arena_occurrences[opdb][1] = arena
+			arena_occurrences[opdb][2] = tournament
+			arena_names[opdb] = arena.name
 		}
 	}))
 
-	const arenas_entries = sorted_dictionary(arena_occurrences, true);
+	const arenas_entries = sorted_dictionary(arena_occurrences, true, 0);
 	document.getElementById('arenas-table').classList.remove('hide')
 	let tbody = document.getElementById('arenas-tbody')
 	tbody.textContent = ''
-	for ([arena, occurrences] of arenas_entries) {
+	// for (let [arena, tournament] of no_opdbId) {
+	// 	let tr = document.createElement('tr')
+	// 	let td = document.createElement('td')
+	// 	td.textContent = arena.name
+	// 	td.append(matchplay_link(`tournaments/${tournament.tournamentId}/arenas/${arena.arenaId}`))
+	// 	tr.append(td)
+	// 	td = document.createElement('td')
+	// 	td.textContent = 'no opdb id'
+	// 	tr.append(td)
+	// 	tbody.appendChild(tr)
+	// }
+	for (let [opdb, [occurrences, an_arena, tournament]] of arenas_entries) {
 		let tr = document.createElement('tr')
 		let td
 		td = document.createElement('td')
-		td.textContent = arena
+		td.textContent = arena_names[opdb]
+		td.title = opdb
+		td.append(matchplay_link(`tournaments/${tournament.tournamentId}/arenas/${an_arena.arenaId}`))
 		tr.appendChild(td)
 		
+		let wins = 0
+		let losses = 0
+		let num_games = 0
+
+		for (let opdbId of Object.keys(opdbIds[opdb])) {
+			for (let arena of await get_from_db_by_index('arena', 'opdbId', opdbId)) {
+				let games = await get_from_db_by_index('game', 'arenaId', arena.arenaId)
+				for (let game of games) {
+					if (tournaments.includes(game.tournamentId)) {
+						num_games ++
+						let winloss = rank(game)
+						wins += winloss.maxplace - winloss.place
+						losses += winloss.place
+					}
+				}
+				// only_update
+			}
+		}
+
 		td = document.createElement('td')
 		td.textContent = occurrences
+		tr.appendChild(td)
+
+		td = document.createElement('td')
+		td.classList.add('box')
+		if (num_games) {
+			td.textContent = `${wins} — ${losses} in ${num_games} games`
+		} else {
+			td.innerHTML = '&nbsp;'
+		}
+		winmix(td, wins / (wins+losses) * 100)
 		tr.appendChild(td)
 
 		tbody.appendChild(tr)
 	}
 }
-function sorted_dictionary(dictionary, descending) {
+function sorted_dictionary(dictionary, descending, index) {
 	let sign = descending ? -1 : 1
-	return Object.entries(dictionary).sort(([keyA, valueA], [keyB, valueB]) => 
-		sign * (valueA - valueB) || keyA.localeCompare(keyB)
-	);
+	return Object.entries(dictionary).sort(([keyA, valueA], [keyB, valueB]) => {
+		if (index !== undefined) {
+			valueA = valueA[index]
+			valueB = valueB[index]
+		}
+		return sign * (valueA - valueB) || keyA.localeCompare(keyB)
+	});
 }
 async function tournament_history(id, refreshing) {
 	let get_players
@@ -1284,23 +1357,23 @@ async function load_active_players_history(uids, pids) {
 		block: 'center'
 	});
 }
-async function load_games_to_player_standing(uid, pid, label_, tab_) {
+async function load_games_to_player_standing(uid, pid, label, box) {
 	uid = Number(uid)
 	winloss[uid] = {won: 0, lost: 0}
 	let games = (await get_games_from_db_by_userId(uid))
 	await Promise.all(games.map(async (game) => {
-		await add_game_to_player_standing(game, uid, pid, label_, tab_)
+		await add_game_to_player_standing(game, uid, pid, label, box)
 	}))
-	if (!uid && tab_) {
+	if (!uid && box) {
 		let note = document.createElement('div')
 		note.textContent = 'Player unclaimed; history unavailable'
 		note.classList.add('box')
-		tab_.append(note)
-	} else if (!games.length && tab_) {
+		box.append(note)
+	} else if (!games.length && box) {
 		let note = document.createElement('div')
 		note.classList.add('box')
 		note.textContent = 'No games played together'
-		tab_.append(note)
+		box.append(note)
 	}
 }
 function rankspan(string) {
@@ -1310,6 +1383,9 @@ function rankspan(string) {
 	return rankdiv
 }
 function rank(game, uid) {
+	if (uid === undefined) {
+		uid = myUserId
+	}
 	let index = game.userIds.indexOf(uid)
 	let playerId = game.playerIds[index]
 
