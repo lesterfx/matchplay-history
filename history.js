@@ -1253,9 +1253,11 @@ async function compare_players_from_game(gameId) {
 	let pids = game.playerIds;
 	let header = document.getElementById('selected-history-title')
 	header.innerHTML = ''
+	let arena = await get_from_db('arena', game.arenaId)
 	header.append(await title('arena', game.arenaId, 'span'))
-	header.append(matchplay_link(`tournaments/${game.tournamentId}/arenas/${game.arenaId}`
-	))
+	if (arena.opdbId) {
+		header.append(matchplay_link(`tournaments/${game.tournamentId}/arenas/${game.arenaId}`))
+	}
 	await load_active_players_history(uids, pids);
 }
 async function compare_player(uid, pid) {
