@@ -79,7 +79,7 @@ let db;
 
 const dbName = "history";
 
-const request = indexedDB.open(dbName, 6);
+const request = indexedDB.open(dbName, 8);
 
 request.onerror = (event) => {
     console.log(event)
@@ -113,6 +113,12 @@ request.onupgradeneeded = (event) => {
 	if (event.oldVersion < 6) {
 		event.target.transaction.objectStore("arena").createIndex("opdbId", "opdbId", { unique: false });
 	}
+	if (event.oldVersion < 7) {
+		event.target.transaction.objectStore("game").createIndex("opdb", "opdb", { unique: false });
+	}
+	if (event.oldVersion < 8) {
+		db.createObjectStore("player", {keyPath: "playerId"});
+	}
 
 	console.log('db upgrade finished')
 };
@@ -135,8 +141,10 @@ function when_db_ready(callback, ...args) {
 function put(table, obj) {
 	db.transaction(table, "readwrite").objectStore(table).put(obj);
 }
-function put_game(game) {
+async function put_game(game) {
 	[game.user1, game.user2, game.user3, game.user4] = game.userIds
+	let arena = await get_from_db('arena', game.arenaId)
+	game.opdb = arena.opdb
 	put('game', game)
 }
 
@@ -161,6 +169,15 @@ async function get_games_from_db_by_userId(userId) {
 	  result = result.concat(entries);
 	}
 	return result;
+}
+
+async function get_all_from_db(table) {
+	const objectStore = db.transaction(table).objectStore(table);
+	return await new Promise((resolve, reject) => {
+		const request = objectStore.getAll();
+		request.onsuccess = () => resolve(request.result);
+		request.onerror = () => reject(request.error);
+	});
 }
 
 async function get_from_db_by_index(table, key, id) {
@@ -208,7 +225,7 @@ async function get_me() {
 async function get_all_my_tournaments() {
 	await refresh_off()
 	document.getElementById('active-tournament-block').classList.add('hide');
-	document.getElementById('player-histories-tabs').innerHTML = '';
+	reset_history_tabs()
 
 	document.getElementById('my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
@@ -298,7 +315,7 @@ async function add_game_to_player_standing(game, uid, pid, label, box) {
 	}
 	let won = winloss[uid].won;
 	let lost = winloss[uid].lost;
-	let percent = won / (won+lost) * 100;
+	let percent = won / (won+lost);
 	
 	winmix(label, percent)
 	if (!box) {
@@ -318,10 +335,10 @@ async function add_game_to_player_standing(game, uid, pid, label, box) {
 	});
 }
 
-function winmix(element, percent) {
-	if (isNaN(percent)) return
+function winmix(element, fraction) {
+	if (isNaN(fraction)) return
 	element.classList.add('winmix')
-	element.style.cssText = `--winmix: ${percent}%`
+	element.style.cssText = `--winmix: ${fraction * 100}%`
 }
 
 async function get_tournament_details(tid, get_games) {
@@ -360,10 +377,14 @@ async function get_tournament_details(tid, get_games) {
 		if (player.claimedBy == myUserId) {
 			tournament.my_pid = player.playerId
 		};
+		put('player', player)
 	}
 	save_data('tournament', tournament)
 	for (arena of tournament.arenas) {
 		save_data('arena', arena);
+		if (arena.opdbId) {
+			arena.opdb = arena.opdbId.split('-')[0]
+		}
 		put('arena', arena)
 	};
 	let active = 0;
@@ -386,7 +407,7 @@ async function get_tournament_details(tid, get_games) {
 				active++
 			}
 			if (tournament.status == 'completed') {
-				put_game(game);
+				await put_game(game);
 			}
 		};
 		log(statuses)
@@ -405,7 +426,7 @@ async function get_tournament_details(tid, get_games) {
 				box.classList.add('cached')
 				box.classList.remove('not-cached')
 				if (tournament.standing) {
-					winmix(box, tournament.standing*100)
+					winmix(box, tournament.standing)
 				}
 			}
 		} else {
@@ -419,7 +440,8 @@ async function get_tournament_details(tid, get_games) {
 		pid: tournament.my_pid, // relies on response_promise, sometimes
 		players: players,  		// relies on response_promise
 		games: games,  			// relies on games_promise
-		active: active  		// relies on games_promise
+		active: active,  		// relies on games_promise
+		arenas: tournament.arenas
 	};
 }
 
@@ -444,7 +466,7 @@ function show_mode() {
 	document.getElementById('standings-block').classList.toggle('hide', mode != 'standings')
 
 	document.getElementById('active-tournament-block').classList.toggle('hide', mode != 'history')
-	document.getElementById('selected-history').classList.toggle('hide', mode != 'history')
+	reset_history_tabs()
 	
 	document.getElementById('arenas-block').classList.toggle('hide', mode != 'arena')
 	
@@ -1081,7 +1103,6 @@ async function load_arenas() {
 
 	let arena_occurrences = {}
 	let arena_names = {}
-	let no_opdbId = []
 	let opdbIds = {}
 
 	let tournaments = selected_tournaments().map((el) => Number(el.dataset.id))
@@ -1098,18 +1119,12 @@ async function load_arenas() {
 			})).data.arenas
 		}
 		for (let arena of arenas) {
-		// 	if (arena.tournamentArena.status == 'active') {
-				if (arena.opdbId) {
-					let opdb = arena.opdbId.split('-')[0]
-					if (!opdbIds[opdb]) opdbIds[opdb] = {}
-					opdbIds[opdb][arena.opdbId] = 1
-					tournament_arena_names[opdb] = arena
-				} else {
-					no_opdbId.push([arena, tournament])
-				}
-			// } else {
-			// }
-			// log(arena)
+			if (arena.opdbId) {
+				let opdb = arena.opdbId.split('-')[0]
+				if (!opdbIds[opdb]) opdbIds[opdb] = {}
+				opdbIds[opdb][arena.opdbId] = 1
+				tournament_arena_names[opdb] = arena
+			}
 		}
 		for (let [opdb, arena] of Object.entries(tournament_arena_names)) {
 			if (!arena_occurrences[opdb]) arena_occurrences[opdb] = [0, null]
@@ -1120,6 +1135,7 @@ async function load_arenas() {
 		}
 	}))
 
+	let full_history = document.getElementById('full-arena-history').checked
 	const arenas_entries = sorted_dictionary(arena_occurrences, true, 0);
 	for (let [opdb, [occurrences, an_arena, tournament]] of arenas_entries) {
 		let box = document.createElement('div')
@@ -1130,20 +1146,14 @@ async function load_arenas() {
 		let losses = 0
 		let num_games = 0
 
-		for (let opdbId of Object.keys(opdbIds[opdb])) {
-			for (let arena of await get_from_db_by_index('arena', 'opdbId', opdbId)) {
-				let games = await get_from_db_by_index('game', 'arenaId', arena.arenaId)
-				for (let game of games) {
-					if (tournaments.includes(game.tournamentId)) {
-						num_games ++
-						let winloss = rank(game)
-						wins += Math.floor(winloss.maxplace - winloss.place)
-						losses += Math.floor(winloss.place)
-					}
-				}
+		for (let game of await get_from_db_by_index('game', 'opdb', opdb)) {
+			if (full_history || tournaments.includes(game.tournamentId)) {
+				num_games ++
+				let winloss = rank(game)
+				wins += Math.floor(winloss.maxplace - winloss.place)
+				losses += Math.floor(winloss.place)
 			}
 		}
-
 		let titlediv = document.createElement('div')
 		titlediv.textContent = arena_names[opdb]
 		titlediv.title = opdb
@@ -1169,9 +1179,9 @@ async function load_arenas() {
 		occ.textContent = occurrences
 		box.append(occ)
 
-		winmix(box, wins / (wins+losses) * 100)
-
+		winmix(box, wins / (wins+losses))
 	}
+	
 }
 function sorted_dictionary(dictionary, descending, index) {
 	let sign = descending ? -1 : 1
@@ -1191,7 +1201,7 @@ async function tournament_history(id, refreshing) {
 		get_players = false
 	} else {
 		get_players = true
-		document.getElementById('player-histories-tabs').innerHTML = '';
+		reset_history_tabs()
 		active_tournament_box.innerHTML = '';
 		for (el of document.querySelectorAll('#frenzy-countdown span')) el.textContent = ''
 	}
@@ -1227,7 +1237,7 @@ async function tournament_history(id, refreshing) {
 }
 	let in_progress = []
 	await Promise.all(active_games.map(async (game) => {
-		let element = await add_active_game(game);
+		let element = await add_tournament_game(game);
 		if (game.status != 'completed') in_progress.push([game.status, element]);
 	}))
 	if (get_players) {
@@ -1236,10 +1246,13 @@ async function tournament_history(id, refreshing) {
 			let pid = player.playerId
 			await add_player_button(uid, pid);
 		}))
-		let group = tab('active-tournament', 'players')
-		count_tab(group)
+		count_tab(tab('active-tournament', 'players'))
+		await Promise.all(result.arenas.map(async (arena) => {
+			await add_arena_button(arena)
+		}))
+		count_tab(tab('active-tournament', 'arenas'))
 	}
-	document.getElementById('active-tournament-title').scrollIntoView();
+	// document.getElementById('active-tournament-title').scrollIntoView();
 	if (in_progress.length == 1 && mode == 'history') {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
@@ -1317,31 +1330,62 @@ async function get_frenzy_position(tournament) {
 	// 	for (el of div.querySelectorAll('span')) el.textContent = ''
 	// }
 }
-async function compare_players_from_game(gameId) {
+function reset_history_tabs() {
+	let history = document.getElementById('selected-history')
+	history.innerHTML = '<div id="player-histories-tabs" class="tabs" data-tabgroup="player-histories-tabs"></div>'
+}
+async function compare_game(gameId) {
 	let game = all_data.game[gameId]
 	let uids = game.userIds;
 	let pids = game.playerIds;
-	let header = document.getElementById('selected-history-title')
-	header.innerHTML = ''
+	reset_history_tabs()
+	let header = await game_element(game, true, false)
+	document.getElementById('player-histories-tabs').before(header)
 	let arena = await get_from_db('arena', game.arenaId)
-	header.append(await title('arena', game.arenaId, 'span'))
-	if (arena.opdbId) {
-		header.append(matchplay_link(`tournaments/${game.tournamentId}/arenas/${game.arenaId}`))
-	}
+	let namestr = await get_name('arena', arena.arenaId)
+	let group = tab('player-histories-tabs', namestr, arena.opdb)
+	await load_arena_history(arena, group.label, group.box)
+	count_tab(group)
 	await load_active_players_history(uids, pids);
+	// header.scrollIntoView()
+}
+async function compare_arena(arena) {
+	reset_history_tabs()
+	let header = document.createElement('h3')
+	header.append(await title('arena', arena.arenaId, 'span'))
+	header.append(matchplay_link(`tournaments/${active_tournament_id}/arenas/${arena.arenaId}`))
+	document.getElementById('player-histories-tabs').before(header)
+	let namestr = await get_name('arena', arena.arenaId)
+	let group = tab('player-histories-tabs', namestr, arena.opdb)
+	await load_arena_history(arena, group.label, group.box)
+	count_tab(group)
+	// header.scrollIntoView()
+}
+async function load_arena_history(arena, label, box) {
+	let games = await get_from_db_by_index('game', 'opdb', arena.opdb)
+	let wins = 0
+	let losses = 0
+	await Promise.all(games.map(async (game) => {
+		if (box) {
+			insertSorted(await game_element(game, true, true), box, (el) => -el.dataset.id)
+		}
+		let winloss = rank(game)
+		wins += Math.floor(winloss.maxplace - winloss.place)
+		losses += Math.floor(winloss.place)
+	}))
+	winmix(label, wins / (wins+losses))
 }
 async function compare_player(uid, pid) {
-	let header = document.getElementById('selected-history-title')
-	header.innerHTML = ''
+	reset_history_tabs()
+	let header = document.createElement('h3')
 	header.append(await title('user', uid, 'span', 'player', pid))
 	if (uid) {
 		header.append(matchplay_link(`users/${uid}`))
 	}
+	document.getElementById('player-histories-tabs').before(header)
 	await load_active_players_history([uid], [pid])
 }
 async function load_active_players_history(uids, pids) {
-	let histories = document.getElementById('player-histories-tabs')
-	histories.innerHTML = ''
 	await Promise.all(uids.map(async (uid, index) => {
 		let pid = pids && pids[index]
 		if (uid != myUserId) {
@@ -1350,9 +1394,7 @@ async function load_active_players_history(uids, pids) {
 			await load_games_to_player_standing(uid, pid, group.label, group.box)
 		}
 	}))
-	document.querySelector('#selected-history .tabs-list').scrollIntoView({
-		block: 'center'
-	});
+	// document.querySelector('#selected-history .tabs-list').scrollIntoView({block: 'center'});
 }
 async function load_games_to_player_standing(uid, pid, label, box) {
 	uid = Number(uid)
@@ -1428,10 +1470,10 @@ function rank(game, uid, pid) {
 	}
 	
 
-	let percent = (game.userIds.length - 1 - place)/(game.userIds.length - 1) * 100
+	let fraction = (game.userIds.length - 1 - place)/(game.userIds.length - 1)
 	return {
 		place: place,
-		percent: percent,
+		fraction: fraction,
 		maxplace: maxplace,
 		string: string
 	}
@@ -1471,7 +1513,6 @@ async function log_in(message) {
 		token = localStorage.getItem('token');
 		if (token) {
 			myUserId = Number(localStorage.getItem('myUserId'));
-			log(myUserId)
 			if (myUserId) {
 				return false
 			} else {
@@ -1498,6 +1539,11 @@ async function log_out(message) {
 	clear_db()
 	await main(message)
 }
+async function clear_cache() {
+	db.close()
+	indexedDB.deleteDatabase(dbName)
+	window.location.reload()
+}
 
 ////////////////////////////////////////////////////////////////
 
@@ -1523,6 +1569,7 @@ ready(async () => {
 	});
 	
 	document.getElementById('log-out').addEventListener('click', handler(log_out, 'logged out'))
+	document.getElementById('clear-cache').addEventListener('click', handler(clear_cache))
 	document.getElementById('token-form').addEventListener('submit', async function (event) {
 		try {
 			event.preventDefault();
@@ -1550,6 +1597,7 @@ ready(async () => {
 	document.getElementById('cache-box').addEventListener('click', handler(cache_all_tournaments, true))
 	document.getElementById('manual-tournament').addEventListener('click', handler(add_manual_tournament, true))
 	document.getElementById('load-next-page').addEventListener('click', handler(load_more_tournaments_click, true))
+	document.getElementById('full-arena-history').addEventListener('change', handler(tournament_toggled))
 	document.getElementById('standings-settings').addEventListener('click', handler(function () {
 		document.getElementById('standings-settings-table').classList.toggle('hide')
 	}))
@@ -1652,6 +1700,11 @@ function handler(callback, ...args) {
 }
 function insertSorted(element, parent, sortvalue_function) {
 	let added = false;
+	if (!sortvalue_function) {
+		sortvalue_function = (el) => {
+			return el.textContent.toLowerCase()
+		}
+	}
 	let etext = sortvalue_function(element);
 	for (el of parent.children) {
 		if (sortvalue_function(el) > etext) {
@@ -1663,13 +1716,18 @@ function insertSorted(element, parent, sortvalue_function) {
 	if(!added) parent.append(element);
 }
 
+async function add_arena_button(arena) {
+	let box = await title('arena', arena.arenaId);
+	box.classList.add('box', 'click');
+	box.addEventListener('click', tabhandler(compare_arena, arena))
+	insertSorted(box, tab('active-tournament', 'arenas').box);
+	await load_arena_history(arena, box)
+}
 async function add_player_button(uid, pid) {
 	let button = await title('user', uid, 'div', 'player', pid);
 	button.classList.add('box', 'click');
 	button.addEventListener('click', tabhandler(compare_player, uid, pid))
-	insertSorted(button, tab('active-tournament', 'players').box, (el) => {
-		return el.textContent.toLowerCase()
-	});
+	insertSorted(button, tab('active-tournament', 'players').box);
 	load_games_to_player_standing(uid, pid, button)
 }
 
@@ -1715,7 +1773,7 @@ async function get_name(kind, id, fallback_kind, fallback_id) {
 	// 	str = 'Me';
 	} else if (all_data[kind][id]) {
 		str = all_data[kind][id].name;
-	} else if (kind == 'tournament' || kind == 'arena') {
+	} else if (kind == 'tournament' || kind == 'arena' || kind == 'player') {
 		let obj = await get_from_db(kind, id)
 		if (obj) {
 			str = obj.name
@@ -1726,7 +1784,12 @@ async function get_name(kind, id, fallback_kind, fallback_id) {
 			console.log('missing', str)
 		}
 	} else {
-		str = kind + id;
+		if (fallback_kind) {
+			str = get_name(fallback_kind, fallback_id)
+		} else {
+			str = kind + id;
+			console.log(`missing ${str}, fallback was ${fallback_kind}${fallback_id}`)
+		}
 	}
 	return str
 }
@@ -1771,10 +1834,10 @@ async function add_player_game(options) {
 	box.style.order = options.order;
 	return box
 }
-async function add_active_game(game) {
+async function add_tournament_game(game) {
 	let box = await game_element(game, true, false);
 	box.classList.add('click')
-	box.addEventListener('click', tabhandler(compare_players_from_game, game.gameId));
+	box.addEventListener('click', tabhandler(compare_game, game.gameId));
 	let group = tab('active-tournament', game.status)
 	insertSorted(box, group.box, (el) => {
 		return -el.dataset.id
@@ -1787,7 +1850,7 @@ async function game_element(game, inc_players, inc_tournament, won) {
 	box.classList.add('box');
 
 	let leftdiv = document.createElement('div')
-	leftdiv.classList.add('left-side')
+	leftdiv.classList.add('side')
 	box.append(leftdiv)
 	let tit = await title('arena', game.arenaId);
 	leftdiv.append(tit)
@@ -1814,7 +1877,7 @@ async function game_element(game, inc_players, inc_tournament, won) {
 	if (won === undefined) {
 		let win_rank = rank(game, myUserId);
 		if (win_rank.place !== null) {
-			winmix(box, win_rank.percent)
+			winmix(box, win_rank.fraction)
 			wordrank = win_rank.string
 		} else {
 			wordrank = stringify(win_rank)
@@ -1823,7 +1886,7 @@ async function game_element(game, inc_players, inc_tournament, won) {
 		wordrank = '?'
 	} else if (won == 1) {
 		wordrank = 'won'
-		winmix(box, 100)
+		winmix(box, 1)
 		box.classList.add('vs')
 	} else if (won == -1) {
 		wordrank = 'lost'
@@ -1831,11 +1894,16 @@ async function game_element(game, inc_players, inc_tournament, won) {
 		box.classList.add('vs')
 	} else {
 		wordrank = 'tie'
-		winmix(box, 50)
+		winmix(box, 0.5)
 		box.classList.add('vs')
 	}
 	box.append(spacer())
-	box.append(rankspan(wordrank))
+	let rightdiv = document.createElement('div')
+	rightdiv.classList.add('side')
+	rightdiv.append(matchplay_link(`tournaments/${game.tournamentId}/matches/${game.gameId}`))
+	rightdiv.append(spacer())
+	rightdiv.append(rankspan(wordrank))
+	box.append(rightdiv)
 
 	return box;
 }
@@ -1856,7 +1924,7 @@ async function add_tournament(tournament, manual) {
 	if (cached_tourney) {
 		box.classList.add('cached')
 		if (cached_tourney.standing) {
-			winmix(box, cached_tourney.standing*100)
+			winmix(box, cached_tourney.standing)
 		}
 	} else {
 		box.classList.add('not-cached')

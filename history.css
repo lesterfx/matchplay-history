@@ -78,14 +78,16 @@ body.flash {
 .box.click {
     cursor: pointer;
 }
-.box .left-side {
+.box .side {
     display: flex;
     flex-direction: column;
 }
-.box:not(.vs)>.rank {
+.box .side ~ .side {
+    align-items: flex-end;
+}
+.box:not(.vs) .side>.rank {
     font-size: 1.5em;
     flex-shrink: 0;
-    text-align: right;
     min-width: 0;
 }
 .box {
@@ -96,11 +98,8 @@ body.flash {
     margin: 4px;
     min-width: 20em;
     flex-basis: 20em;
-    display: inline-block;
+    display: inline-flex;
     flex-grow: 1;
-}
-.box {
-    display: flex;
 }
 .box.not-cached {
     border-color: var(--lost-border);
@@ -111,6 +110,9 @@ body.flash {
 }
 .box.active {
     outline: 4px solid var(--active-color);
+}
+.block {
+    margin-bottom: 1em;
 }
 .winmix {
     background: linear-gradient(110deg, var(--won-background) var(--winmix), var(--lost-background) var(--winmix)) no-repeat;
@@ -245,7 +247,7 @@ div.title {
     font-weight: bold;
 }
 div.players {
-    margin: 0.5em 0 0 0.5em;
+    margin-left: 0.5em;
 }
 #active-tournament-title:empty+.refresh {
     display: none;
@@ -311,23 +313,32 @@ h3.sticky-header {
     padding: 1px;
     border-radius: 0 11px 11px 11px;
 }
+#options>.items div.item:not(.active) {
+    cursor: pointer;
+}
 #options>.items div.item {
     border-radius: 10px;
     background: var(--group-background);
-    cursor: pointer;
     padding: .5em;
 }
 #options>.items div.item+div.item {
     margin-top: 1px;
 }
 #options>.items div.modes::before {
-    content: ' ';
+    content: '•';
+    opacity: 0;
     width: 1em;
     display: inline-block;
+    position: relative;
+    left: -0.5em;
+    transition-property: left, opacity;
+    transition-duration: 0.3s;
+
 }
 #options>.items div.modes:hover::before,
 #options>.items div.modes.active::before {
-    content: '•';
+    opacity: 1;
+    left: 0;
 }
 
 #options:not(.shown)>.items {
