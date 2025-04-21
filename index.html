@@ -222,6 +222,7 @@
 				}
 			};
 			function log (obj) {
+				console.log(obj)
 				let message = stringify(obj)
 				if (message.slice(0, 1) == '"') message = obj
 				let el = document.createElement('pre')

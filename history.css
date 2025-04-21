@@ -257,6 +257,7 @@ div.players {
     display: none;
 }
 .refresh {
+    text-align: center;
     flex-shrink: 0;
     box-sizing: border-box;
     background: var(--group-background);

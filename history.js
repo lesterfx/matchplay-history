@@ -184,6 +184,10 @@ async function get_from_db_by_index(table, key, id) {
 }
 
 async function get_from_db(table, id) {
+	if (!id) {
+		alert(`attempted to get ${table} ${id}`)
+		throw(`attempted to get ${table} ${id}`)
+	}
 	const objectStore = db.transaction(table).objectStore(table);
 	return await new Promise((resolve, reject) => {
 		const request = objectStore.get(id);
@@ -219,19 +223,19 @@ async function get_all_my_tournaments() {
 	await refresh_off()
 	document.getElementById('active-tournament-block').classList.add('hide');
 	reset_history_tabs()
-
+	
 	document.getElementById('my-tournaments').classList.add('ready');
 	all_my_tournaments = {};
 	document.getElementById('my-tournaments').querySelector('div.tabs-list').innerHTML = ''
 	document.getElementById('my-tournaments').querySelector('div.tabs-content').innerHTML = ''
 	
 	let in_progress = await load_more_tournaments(1)
-
+	
 	let manual_tournaments = get_storage_array('manual_tournaments')
 	await Promise.all(manual_tournaments.map(async (t) => {
 		await add_tournament_from_manual(t)
 	}));
-
+	
 	if (in_progress.length == 1) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
@@ -460,15 +464,17 @@ function show_mode() {
 	}
 	filter()
 }
+function minwidth(el) {
+	let minwidth = el.clientWidth
+	el.style.minWidth = `${minwidth}px`;
+}
 async function refresh_tournaments_click() {
 	let button = document.getElementById('refresh-my-tournaments')
 	if (button.classList.contains('wait')) return
 	let text = button.querySelector('.text')
-	let minwidth = text.clientWidth
-	text.style.minWidth = `${minwidth}px`;
+	minwidth(text)
 	text.textContent = 'wait';
-	minwidth = Math.max(minwidth, text.clientWidth)
-	text.style.minWidth = `${minwidth}px`;
+	minwidth(text)
 	button.classList.add('wait')
 	await get_all_my_tournaments();
 	button.querySelector('.text').textContent = 'refresh';
@@ -506,23 +512,27 @@ async function refresh_on() {
 	refresh_timer && clearTimeout(refresh_timer)
 	refresh_timer = setTimeout(refresh_tournament_timer, 5000);
 	let refresh_button = document.getElementById('refresh-active-tournament');
-	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`;
 	refresh_button.classList.add('timed');
-	refresh_button.querySelector('.text').textContent = 'live';
+	let text = refresh_button.querySelector('.text')
+	minwidth(text)
+	text.textContent = 'live';
+	minwidth(text)
 	await wakelock_on();
 }
 async function refresh_off(will_refresh) {
 	refresh_timer && clearTimeout(refresh_timer);
 	refresh_timer = null;
 	let refresh_button = document.getElementById('refresh-active-tournament');
-	refresh_button.style.minWidth = `${refresh_button.offsetWidth}px`;
 	refresh_button.classList.remove('timed');
+	let text = refresh_button.querySelector('.text')
+	minwidth(text)
 	if (will_refresh) {
-		refresh_button.querySelector('.text').textContent = 'wait';
+		text.textContent = 'wait';
 	} else {
-		refresh_button.querySelector('.text').textContent = 'refresh';
+		text.textContent = 'refresh';
 		await wakelock_off();
 	}
+	minwidth(text)
 }
 async function refresh_tournament_click() {
 	if (refresh_timer) {
@@ -1892,8 +1902,8 @@ async function add_tournament_from_manual(tid) {
 	tournament by id, from entering the tournanent id manually
 	*/
 	if (all_my_tournaments[tid]) return
-	let tournament = await get_tournament_details(tid, false)
-	await add_tournament(tournament, true)
+	let details = await get_tournament_details(tid, false)
+	await add_tournament(details.tournament, true)
 }
 function load_more_tournaments_click() {
 	let next_page = document.getElementById('load-next-page').dataset.next
