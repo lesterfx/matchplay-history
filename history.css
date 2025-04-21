@@ -64,6 +64,10 @@ body.flash {
     padding: 5px;
     background: var(--group-background);
 }
+.boxgroup.shadow {
+    background: none;
+    border: none;
+}
 .box.invisible {
     height: 0;
     visibility: hidden;

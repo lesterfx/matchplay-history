@@ -231,7 +231,9 @@
 				// logobj.scrollIntoView()
 			}
 			function catcher(err, supress) {
+				console.log(`${err.message}\n${err.stack}`)
 				log(`${err.message}\n${err.stack}`)
+				console.log(err)
 				log(err)
 				if (!supress) throw(err)
 			}
