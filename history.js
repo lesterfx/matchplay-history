@@ -1,10 +1,12 @@
+'use strict';
+
 (function(){
 
 let myUserId = 0;
 let all_my_tournaments = {};
 let active_tournament_id;
 let refresh_timer;
-winloss = {}
+let winloss = {}
 let allow_refresh_completed = false
 let limit_period = 1100;
 let limit_prev = 0  // initially wrong, but irrelevant when filled with the same values anyway
@@ -25,8 +27,9 @@ async function rate_limit() {
 	await new Promise(resolve => setTimeout(resolve, wait));
     return wait
 }
+let token = ''
 let invalid_token = 'API token invalid'
-base_url = 'https://app.matchplay.events/api/'
+let base_url = 'https://app.matchplay.events/api/'
 async function get(options) {
     const headers = new Headers();
 	
@@ -116,10 +119,10 @@ request.onupgradeneeded = (event) => {
 	console.log('db upgrade finished')
 };
 
-success_callbacks = []
+let success_callbacks = []
 request.onsuccess = (event) => {
     db = event.target.result;
-	for ([callback, args] of success_callbacks) {
+	for (let [callback, args] of success_callbacks) {
 		callback(...args)
 	}
 };
@@ -239,7 +242,7 @@ async function get_all_my_tournaments() {
 	if (in_progress.length == 1) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
-		
+
 		element.dispatchEvent(new Event('click'))
 		activate_tab('my-tournaments', status)
 	}
@@ -336,7 +339,6 @@ function winmix(element, fraction) {
 }
 
 async function get_tournament_details(tid, get_games) {
-
 	let tournament_from_db_promise = get_from_db('tournament', tid)
 
 	let response_promise = get({
@@ -366,13 +368,13 @@ async function get_tournament_details(tid, get_games) {
 
 	let tournament = (await response_promise).data;
 	let players = tournament.players;
-	for (player of players) {
+	for (let player of players) {
 		if (player.claimedBy == myUserId) {
 			tournament.my_pid = player.playerId
 		};
 		put('player', player)
 	}
-	for (arena of tournament.arenas) {
+	for (let arena of tournament.arenas) {
 		if (arena.opdbId) {
 			arena.opdb = arena.opdbId.split('-')[0]
 		}
@@ -380,6 +382,7 @@ async function get_tournament_details(tid, get_games) {
 	};
 	let active = 0;
 	let games = null;
+	let standings = {};
 	if (get_games) {
 		if (!games_promise) {
 			games_promise = get({
@@ -390,7 +393,7 @@ async function get_tournament_details(tid, get_games) {
 
 		games = (await games_promise).data;
 		let statuses = {}
-		for (game of games) {
+		for (let game of games) {
 			if (!statuses[game.status]) statuses[game.status] = 0
 			statuses[game.status] ++
 			if (game.status !== 'completed') {
@@ -402,11 +405,11 @@ async function get_tournament_details(tid, get_games) {
 		};
 		log(statuses)
 		
-		let standings = (await standings_promise)
-		for (let entry of standings) {
+		let raw_standings = await standings_promise
+		for (let entry of raw_standings) {
+			standings[entry.playerId] = entry.position
 			if (entry.playerId == tournament.my_pid) {
-				tournament.standing = 1 - (entry.position - 1) / standings.length
-				break
+				tournament.standing = 1 - (entry.position - 1) / raw_standings.length
 			}
 		}
 
@@ -430,12 +433,13 @@ async function get_tournament_details(tid, get_games) {
 		players: players,
 		games: games,
 		active: active,
-		tournament: tournament
+		tournament: tournament,
+		standings: standings
 	};
 }
 
-modes = ['history', 'standings', 'arena']
-mode = modes[(Number(localStorage.getItem('getting_standings') || '0'))]
+let modes = ['history', 'standings', 'arena']
+let mode = modes[(Number(localStorage.getItem('getting_standings') || '0'))]
 async function switch_mode(new_mode) {
 	mode = new_mode
 	localStorage.setItem('getting_standings', JSON.stringify(modes.indexOf(new_mode)))
@@ -577,7 +581,7 @@ async function flash_screen() {
 }
 async function click_tournament(id) {
 	if (mode == 'history') {
-		await tournament_history(id)
+		await tournament_history(id, false)
 	} else {
 		await tournament_toggled()
 	}
@@ -593,13 +597,13 @@ function filter(save, value) {
 	} else {
 		value = document.getElementById('filter').value
 	}
-	for (el of document.querySelectorAll('#my-tournaments.tabs div.tabs-content .box:not(.fake)')) {
+	for (let el of document.querySelectorAll('#my-tournaments.tabs div.tabs-content .box:not(.fake)')) {
 		el.classList.remove('hide')
 		el.classList.remove('active')
 	}
 	if (value) {
 		const regex = new RegExp(value, 'gmi')
-		for (el of document.querySelectorAll('#my-tournaments.tabs div.tabs-content .box:not(.fake)')) {
+		for (let el of document.querySelectorAll('#my-tournaments.tabs div.tabs-content .box:not(.fake)')) {
 			let name = el.textContent
 			regex.lastIndex = 0;
 			if (regex.test(name)) {
@@ -756,7 +760,7 @@ async function load_standings() {
 			let id = entry.playerId
 			if (standings_settings.combine_names) {
 				let player = await get_from_db('player', id)
-				alternate_id = loaded_standings.id_by_name[player.name.toLowerCase()]
+				let alternate_id = loaded_standings.id_by_name[player.name.toLowerCase()]
 				if (alternate_id) {
 					id = alternate_id
 				} else {
@@ -844,6 +848,7 @@ async function show_standings_table(settings_already_loaded) {
 	table.classList.remove('hide')
 
 	let td
+	let th
 
 	let headrow = table.querySelector('thead tr')
 	headrow.innerHTML = ''
@@ -898,7 +903,7 @@ async function show_standings_table(settings_already_loaded) {
 		headrow.append(th)
 	}
 	
-	for (tournament of loaded_standings.standings_tournaments) {
+	for (let tournament of loaded_standings.standings_tournaments) {
 		th = document.createElement('th')
 		let custom_column_header = get_custom_column_header(tournament.name)
 		// th.classList.add('wk')
@@ -920,8 +925,8 @@ async function show_standings_table(settings_already_loaded) {
 	let i = 1
 	let tie_rank = 1
 	let tie_score = null
-	added_restriction = false
-	added_bonus = false
+	let added_restriction = false
+	let added_bonus = false
 	console.log(loaded_standings)
 	for (let [id, score] of overall_standings_entries) {
 		id = Number(id)
@@ -1169,7 +1174,50 @@ async function load_arenas() {
 
 		winmix(box, wins / (wins+losses))
 	}
+}
 
+let sorting_checked = false
+function sort_players_button(parent) {
+	fakefill(parent, 'pre-sort')
+
+	let prebox = document.createElement('div')
+	prebox.classList.add('reset')
+	parent.append(prebox)
+
+	let box = document.createElement('label')
+	box.id = 'sort'
+	box.classList.add('box', 'box-button', 'toggle')
+
+	let checkbox = document.createElement('input')
+	checkbox.type = 'checkbox'
+	checkbox.checked = sorting_checked
+	checkbox.id = 'sort-input'
+	box.append(checkbox)
+
+	let label_a = document.createElement('span')
+	label_a.for = 'sort-input'
+	label_a.classList.add('label', 'if-checked')
+	label_a.textContent = 'Sort by standing'
+	box.append(label_a)
+	
+	let label_b = document.createElement('span')
+	label_b.for = 'sort-input'
+	label_b.classList.add('label', 'if-unchecked')
+	label_b.textContent = 'Sort by name'
+	box.append(label_b)
+
+	parent.append(box)
+
+	checkbox.addEventListener('change', handler(() => {
+		sorting_checked = checkbox.checked
+		let sorter = undefined
+		if (sorting_checked) {
+			sorter = sort_by_standing
+		}
+		for (let child of parent.childNodes) {
+			insertSorted(child, parent, sorter)
+		}
+	}))
 }
 function sorted_dictionary(dictionary, descending, index) {
 	let sign = descending ? -1 : 1
@@ -1180,6 +1228,9 @@ function sorted_dictionary(dictionary, descending, index) {
 		}
 		return sign * (valueA - valueB) || keyA.localeCompare(keyB)
 	});
+}
+function sort_by_standing(el) {
+	return [String(Number(el.dataset.standing)).padStart(5, '0'), el.textContnt]
 }
 async function tournament_history(tid, refreshing) {
 	let get_players
@@ -1192,7 +1243,9 @@ async function tournament_history(tid, refreshing) {
 		get_players = true
 		reset_history_tabs()
 		active_tournament_box.innerHTML = '';
-		for (el of document.querySelectorAll('#frenzy-countdown span')) el.textContent = ''
+		for (let el of document.querySelectorAll('#frenzy-countdown span')) el.textContent = ''
+		let players_tab = tab('active-tournament', 'players').box
+		sort_players_button(players_tab)
 	}
 
 	log('getting games from tournament')
@@ -1221,16 +1274,17 @@ async function tournament_history(tid, refreshing) {
 	title_h2.append(await title('tournament', tid, 'span'));
 	title_h2.append(matchplay_link(`tournaments/${tid}`))
 	
-	let in_progress = []
-	await Promise.all(active_games.map(async (game) => {
-		let element = await add_tournament_game(game);
-		if (game.status != 'completed') in_progress.push([game.status, element]);
-	}))
 	if (get_players) {
+		let sorter = undefined
+		if (document.getElementById('sort-input').checked) {
+			sorter = sort_by_standing
+		}
 		await Promise.all(result.players.map(async (player) => {
 			let uid = player.claimedBy;
 			let pid = player.playerId
-			await add_player_button(uid, pid);
+			let standing = result.standings[pid] || -1
+			log('adding player')
+			await add_player_button(uid, pid, sorter, standing);
 		}))
 		count_tab(tab('active-tournament', 'players'))
 		await Promise.all(tournament.arenas.map(async (arena) => {
@@ -1238,6 +1292,11 @@ async function tournament_history(tid, refreshing) {
 		}))
 		count_tab(tab('active-tournament', 'arenas'))
 	}
+	let in_progress = []
+	await Promise.all(active_games.map(async (game) => {
+		let element = await add_tournament_game(game);
+		if (game.status != 'completed') in_progress.push([game.status, element]);
+	}))
 	if (in_progress.length == 1 && mode == 'history') {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
@@ -1282,7 +1341,7 @@ function arc(queue_pos, queue_size) {
 }
 async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown');
-	for (el of div.querySelectorAll('span')) el.textContent = ''
+	for (let el of div.querySelectorAll('span')) el.textContent = ''
 	
 	if (tournament.type != 'frenzy') {
 		return;
@@ -1300,7 +1359,6 @@ async function get_frenzy_position(tournament) {
 		}
 	}
 	// if (queue_size && queue_pos !== null) {
-		queue_progress = (queue_size - queue_pos) / queue_size;
 		let svg = arc(queue_pos, queue_size);
 		let msg
 		if (queue_pos) {
@@ -1313,7 +1371,7 @@ async function get_frenzy_position(tournament) {
 		div.querySelector('.text').prepend(msg);
 		div.querySelector('.pie').innerHTML = svg;
 	// } else {
-	// 	for (el of div.querySelectorAll('span')) el.textContent = ''
+	// 	for (let el of div.querySelectorAll('span')) el.textContent = ''
 	// }
 }
 function reset_history_tabs() {
@@ -1443,7 +1501,7 @@ function rank(game, uid, pid) {
 		point_choices.sort()
 		let initial_rank = point_choices.indexOf(my_points)
 		let occurrences = 0;
-		for (pt of point_choices) {
+		for (let pt of point_choices) {
 			if (pt == my_points) {
 				occurrences ++;
 			}
@@ -1479,7 +1537,7 @@ function did_i_win(game, uid) {
 		return -1
 	}
 }
-token_promises = []
+let token_promises = []
 async function token_needed(message) {
 	document.getElementById('token-entry').classList.remove('hide');
 	if (message) document.getElementById('token-message').textContent = message;
@@ -1563,11 +1621,11 @@ ready(async () => {
 			tinput.value = '';
 			localStorage.setItem('token', token);
 			localStorage.removeItem('myUserId');
-			for (promise of token_promises) promise[0]()
+			for (let promise of token_promises) promise[0]()
 			token_promises = []
 		} catch (err) {
 			catcher(err)
-			for (promise of token_promises) promise[1]()
+			for (let promise of token_promises) promise[1]()
 			token_promises = []
 		}
 	});
@@ -1657,7 +1715,7 @@ function tabhandler(callback, ...args) {
 			refresh_off()
 			let tabs = this.closest('.tabs')
 			if (mode == 'history') {
-				for (child of tabs.querySelectorAll('.active')) child.classList.remove('active')
+				for (let child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
 			} else {
 				this.classList.toggle('active')
@@ -1694,7 +1752,7 @@ function insertSorted(element, parent, sortvalue_function) {
 		}
 	}
 	let etext = sortvalue_function(element);
-	for (el of parent.children) {
+	for (let el of parent.children) {
 		if (sortvalue_function(el) > etext) {
 			parent.insertBefore(element, el);
 			added = true;
@@ -1711,11 +1769,12 @@ async function add_arena_button(arena) {
 	insertSorted(box, tab('active-tournament', 'arenas').box);
 	await load_arena_history(arena, box)
 }
-async function add_player_button(uid, pid) {
+async function add_player_button(uid, pid, sorter, standing) {
 	let button = await title('user', uid, 'div', 'player', pid);
+	button.dataset.standing = standing
 	button.classList.add('box', 'click');
 	button.addEventListener('click', tabhandler(compare_player, uid, pid))
-	insertSorted(button, tab('active-tournament', 'players').box);
+	insertSorted(button, tab('active-tournament', 'players').box, sorter);
 	load_games_to_player_standing(uid, pid, button)
 }
 async function get_name(kind, id, fallback_kind, fallback_id) {
@@ -1988,10 +2047,10 @@ function tab(parent, text, identifier) {
 		labels: labels
 	}
 }
-function fakefill(element) {
-	for (i=0;i<10;i++) {
+function fakefill(element, extra_class) {
+	for (let i=0;i<10;i++) {
 		let new_el = document.createElement('div');
-		new_el.classList.add('fake', 'invisible', 'box');
+		new_el.classList.add('fake', 'invisible', 'box', extra_class);
 		element.append(new_el);
 	}
 	return element;

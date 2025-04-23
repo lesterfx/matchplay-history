@@ -68,6 +68,19 @@ body.flash {
     background: none;
     border: none;
 }
+.box-button.toggle input,
+.box-button.toggle input:not(:checked)~.if-unchecked,
+.box-button.toggle input:checked~.if-checked {
+    display: none;
+}
+div.reset {
+    width: 100%;
+    height: 1em;
+    order: 10000;
+}
+.box.invisible.pre-sort {
+    order: 1000;
+}
 .box.invisible {
     height: 0;
     visibility: hidden;
@@ -190,7 +203,7 @@ body {
 .tabs label:not(.selected) .matchplay-link {
     display: none;
 }
-.tabs label {
+.tabs .tabs-list label {
     opacity: 0.5;
     order: 0;
     margin-top: 1em;
@@ -205,14 +218,14 @@ body {
     position: relative;
     z-index: 0;
 }
-.tabs label:not(.selected) {
+.tabs .tabs-list label:not(.selected) {
     cursor: pointer;
 }
-.tabs label.selected {
+.tabs .tabs-list label.selected {
     z-index: 2;
     opacity: 1;
 }
-.tabs label~label {
+.tabs .tabs-list label~label {
     margin-left: -1px;
 }
 .tabs .tabs-content>div {
@@ -421,6 +434,16 @@ h3.sticky-header {
     padding: 5px;
     margin-bottom: 0.5em;
 }
+#sort {
+    order: 100000;
+}
+.boxgroup::before {
+    content: " ";
+    flex-grow: 1;
+    width: 100%;
+    display: block;
+    order: 10000000;
+}
 .box.box-button {
     display: block;
 }
@@ -437,10 +460,11 @@ h3.sticky-header {
     cursor: pointer;
     text-align: center;
 }
+.box-button:not(.toggle):has(input:not(:placeholder-shown)) span.label,
 .box-button.selected span.label {
     display: none;
 }
-.box-button:not(.selected) :not(span.label) {
+.box-button:not(.selected):not(:has(input:not(:placeholder-shown))) :not(span.label) {
     display: none;
 }
 #cache-box {
