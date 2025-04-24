@@ -1287,7 +1287,6 @@ async function tournament_history(tid, refreshing) {
 			let uid = player.claimedBy;
 			let pid = player.playerId
 			let standing = result.standings[pid] || -1
-			log('adding player')
 			await add_player_button(uid, pid, sorter, standing);
 		}))
 		count_tab(tab('active-tournament', 'players'))
