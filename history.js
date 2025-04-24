@@ -1244,7 +1244,6 @@ async function tournament_history(tid, refreshing) {
 		sort_players_button(players_tab)
 	}
 
-	log('getting games from tournament')
 	let result = (await get_tournament_details(tid, true));
 	let tournament = result.tournament
 
@@ -1268,6 +1267,8 @@ async function tournament_history(tid, refreshing) {
 	title_h2.innerHTML = '';
 	title_h2.append(await title('tournament', tid, 'span'));
 	title_h2.append(matchplay_link(`tournaments/${tid}`))
+	title_h2.append(document.createElement('br'))
+	title_h2.append(`\n${tournament.status}`)
 	
 	if (get_players) {
 		let sorter = undefined
@@ -1976,8 +1977,12 @@ async function add_tournament_from_manual(tid) {
 	tournament by id, from entering the tournanent id manually
 	*/
 	if (all_my_tournaments[tid]) return
-	let details = await get_tournament_details(tid, false)
-	await add_tournament(details.tournament, true)
+	let tournament = await get_from_db('tournament', tid)
+	if (!tournament) {
+		console.log('need to request the tournament', tid)
+		tournament = await get_tournament_details(tid, false).tournament
+	}
+	await add_tournament(tournament, true)
 }
 function load_more_tournaments_click() {
 	let next_page = document.getElementById('load-next-page').dataset.next
