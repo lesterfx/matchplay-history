@@ -437,13 +437,6 @@ h3.sticky-header {
 #sort {
     order: 100000;
 }
-.boxgroup::before {
-    content: " ";
-    flex-grow: 1;
-    width: 100%;
-    display: block;
-    order: 10000000;
-}
 .box.box-button {
     display: block;
 }

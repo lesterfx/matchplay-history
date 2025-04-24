@@ -1181,12 +1181,12 @@ function sort_players_button(parent) {
 	fakefill(parent, 'pre-sort')
 
 	let prebox = document.createElement('div')
-	prebox.classList.add('reset')
+	prebox.classList.add('reset', 'fake')
 	parent.append(prebox)
 
 	let box = document.createElement('label')
 	box.id = 'sort'
-	box.classList.add('box', 'box-button', 'toggle')
+	box.classList.add('box', 'box-button', 'toggle', 'fake')
 
 	let checkbox = document.createElement('input')
 	checkbox.type = 'checkbox'
@@ -1214,7 +1214,11 @@ function sort_players_button(parent) {
 		if (sorting_checked) {
 			sorter = sort_by_standing
 		}
-		for (let child of parent.childNodes) {
+		let children = []
+		for (let child of parent.querySelectorAll('.box:not(.fake)')) {
+			children.push(parent.removeChild(child))
+		}
+		for (let child of children) {
 			insertSorted(child, parent, sorter)
 		}
 	}))
