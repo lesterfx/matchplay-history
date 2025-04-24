@@ -376,7 +376,7 @@ async function get_tournament_details(tid, get_games) {
 	}
 	for (let arena of tournament.arenas) {
 		if (arena.opdbId) {
-			arena.opdb = arena.opdbId.split('-')[0]
+			arena.opdb = arena.opdbId.split('-')[0].toLowerCase()
 		}
 		put('arena', arena)
 	};
@@ -399,9 +399,7 @@ async function get_tournament_details(tid, get_games) {
 			if (game.status !== 'completed') {
 				active++
 			}
-			if (tournament.status == 'completed') {
-				await put_game(game);
-			}
+			await put_game(game);
 		};
 		log(statuses)
 		
@@ -414,19 +412,13 @@ async function get_tournament_details(tid, get_games) {
 		}
 
 		put('tournament', tournament)
-		if (tournament.status == 'completed') {
-			for (let box of document.querySelectorAll(`.box[data-kind="tournament"][data-id="${tid}"]`)) {
-				box.classList.add('cached')
-				box.classList.remove('not-cached')
-				if (tournament.standing) {
-					winmix(box, tournament.standing)
-				}
+		for (let box of document.querySelectorAll(`.box[data-kind="tournament"][data-id="${tid}"]`)) {
+			box.classList.add('cached')
+			box.classList.remove('not-cached')
+			box.classList.add(tournament.status)
+			if (tournament.standing) {
+				winmix(box, tournament.standing)
 			}
-		} else {
-			for (let box of document.querySelectorAll(`.box[data-kind="tournament"][data-id="${tid}"]`)) {
-				box.classList.add('not-completed')
-			}
-			console.log(`not caching tournament because status is ${tournament.status}`)
 		}
 	}
 	return {
@@ -1273,7 +1265,6 @@ async function tournament_history(tid, refreshing) {
 	document.getElementById('active-tournament-block').classList.remove('hide')
 	let title_h2 = document.getElementById('active-tournament-title');
 	title_h2.classList.remove(...title_h2.classList);
-	title_h2.classList.add(tournament.status);
 	title_h2.innerHTML = '';
 	title_h2.append(await title('tournament', tid, 'span'));
 	title_h2.append(matchplay_link(`tournaments/${tid}`))
@@ -1674,11 +1665,10 @@ ready(async () => {
 
 async function cache_all_tournaments(boxes) {
 	if (boxes === undefined) {
-		boxes = [...document.querySelectorAll('.box[data-kind="tournament"][data-id]:not(.cached)')]
+		boxes = [...document.querySelectorAll('.box[data-kind="tournament"][data-id]:not(.cached),.box[data-kind="tournament"][data-id]:not(.completed)')]
 	}
 	let tids = []
 	for (let box of boxes) {
-		if (box.classList.contains('cached')) continue;
 		let tid
 		if (tid = Number(box.dataset.id)) {
 			tids.push(tid)
@@ -1768,6 +1758,7 @@ function insertSorted(element, parent, sortvalue_function) {
 async function add_arena_button(arena) {
 	let box = await title('arena', arena.arenaId);
 	box.classList.add('box', 'click');
+	box.title = arena.opdb
 	box.addEventListener('click', tabhandler(compare_arena, arena))
 	insertSorted(box, tab('active-tournament', 'arenas').box);
 	await load_arena_history(arena, box)
@@ -1839,7 +1830,7 @@ async function add_tournament_game(game) {
 	let box = await game_element(game, true, false);
 	box.classList.add('click')
 	box.addEventListener('click', tabhandler(compare_game, game.gameId));
-	let group = tab('active-tournament', game.status)
+	let group = tab('active-tournament', `${game.status} games`, game.status)
 	insertSorted(box, group.box, (el) => {
 		return -el.dataset.id
 	})
@@ -1924,7 +1915,11 @@ async function add_tournament(tournament, manual) {
 	box.addEventListener('click', tabhandler(click_tournament, tid));
 	let cached_tourney = (await get_from_db('tournament', tid));
 	if (cached_tourney) {
-		box.classList.add('cached')
+		if (cached_tourney.status == 'completed') {
+			box.classList.add('cached')
+		} else {
+			document.getElementById('cache-box').classList.remove('hide')
+		}
 		if (cached_tourney.standing) {
 			winmix(box, cached_tourney.standing)
 		}
@@ -1947,9 +1942,26 @@ function remove_manual_tournament(event, tid) {
 	})
 }
 async function add_manual_tournament() {
-	let response = prompt('Tournament ID (found in URL)')
+	let response = prompt('Tournament ID or full URL')
 	if (!response) return
 	let tid = Number(response)
+	if (isNaN(tid)) {
+		const regex = /app\.matchplay\.events\/tournaments\/(?<asdf>\d*)(\/|$)/gm;
+		let m;
+		while ((m = regex.exec(response)) !== null) {
+			m.forEach((match, groupIndex) => {
+				console.log(`Found match, group ${groupIndex}: ${match}`);
+				let tid_maybe = Number(match)
+				if (!isNaN(tid_maybe) && tid_maybe) {
+					tid = tid_maybe
+				}
+			})
+		}
+	}
+	if (isNaN(tid)) {
+		alert('Could not find tournament ID from that URL. Maybe try using just the number?')
+		return
+	}
 	update_storage_array_async('manual_tournaments', async (manuals) => {
 		if (manuals.indexOf(tid) == -1) {
 			await add_tournament_from_manual(tid)
