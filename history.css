@@ -307,7 +307,8 @@ h1,h2,h3 {
 h3.sticky-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    margin-bottom: 0;
 }
 .sticky-header {
     position: sticky;
