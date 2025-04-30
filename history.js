@@ -236,13 +236,16 @@ async function get_all_my_tournaments() {
 	
 	let manual_tournaments = get_storage_array('manual_tournaments')
 	await Promise.all(manual_tournaments.map(async (t) => {
-		await add_tournament_from_manual(t)
+		let [status, element] = await add_tournament_from_manual(t)
+		if (status != 'completed') {
+			in_progress.push([status, element])
+		}
 	}));
 	
+	console.log('in progress:', in_progress)
 	if (in_progress.length == 1) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
-
 		element.dispatchEvent(new Event('click'))
 		activate_tab('my-tournaments', status)
 	}
@@ -340,6 +343,9 @@ function winmix(element, fraction) {
 
 async function get_tournament_details(tid, get_games) {
 	let tournament_from_db_promise = get_from_db('tournament', tid)
+	.catch((reason) => {
+		console.log(reason)
+	})
 
 	let response_promise = get({
 		endpoint: `tournaments/${tid}`,
@@ -1275,17 +1281,21 @@ async function tournament_history(tid, refreshing) {
 		if (document.getElementById('sort-input').checked) {
 			sorter = sort_by_standing
 		}
-		await Promise.all(result.players.map(async (player) => {
-			let uid = player.claimedBy;
-			let pid = player.playerId
-			let standing = result.standings[pid] || -1
-			await add_player_button(uid, pid, sorter, standing);
-		}))
-		count_tab(tab('active-tournament', 'players'))
-		await Promise.all(tournament.arenas.map(async (arena) => {
-			await add_arena_button(arena)
-		}))
-		count_tab(tab('active-tournament', 'arenas'))
+		if (result.players.length) {
+			await Promise.all(result.players.map(async (player) => {
+				let uid = player.claimedBy;
+				let pid = player.playerId
+				let standing = result.standings[pid] || -1
+				await add_player_button(uid, pid, sorter, standing);
+			}))
+			count_tab(tab('active-tournament', 'players'))
+		}
+		if (tournament.arenas.length) {
+			await Promise.all(tournament.arenas.map(async (arena) => {
+				await add_arena_button(arena)
+			}))
+			count_tab(tab('active-tournament', 'arenas'))
+		}
 	}
 	let in_progress = []
 	await Promise.all(active_games.map(async (game) => {
@@ -1297,6 +1307,8 @@ async function tournament_history(tid, refreshing) {
 		let element = in_progress[0][1]
 		activate_tab('active-tournament', status)
 		element.dispatchEvent(new Event('click'))
+	} else {
+		activate_tab('active-tournament', 'completed', true)
 	}
 
 	return {
@@ -1309,7 +1321,7 @@ function matchplay_link(url_tail) {
 	let a = document.createElement('a')
 	a.classList.add('matchplay-link')
 	a.href = url
-	a.target = '_blank'
+	a.target = 'mphistory_mp'
 	return a
 }
 function arc(queue_pos, queue_size) {
@@ -1336,15 +1348,19 @@ function arc(queue_pos, queue_size) {
 }
 async function get_frenzy_position(tournament) {
 	let div = document.getElementById('frenzy-countdown');
-	for (let el of div.querySelectorAll('span')) el.textContent = ''
-	
+
 	if (tournament.type != 'frenzy') {
+		for (let el of div.querySelectorAll('span')) el.textContent = ''
 		return;
 	}
 
 	let frenzy = await get({
 		endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
 	})
+
+	for (let el of div.querySelectorAll('span')) el.textContent = ''
+	
+
 	let my_pid = tournament.my_pid;
 	let queue_pos = null;
 	let queue_size = frenzy.queue.length;
@@ -1463,6 +1479,19 @@ function rankspan(string) {
 	rankdiv.innerHTML = string
 	return rankdiv
 }
+function ordinal(i) {
+	let j = i % 10,
+		k = i % 100;
+	if (j === 1 && k !== 11) {
+		return `${i}st`
+	} else if (j === 2 && k !== 12) {
+		return `${i}nd`
+	} else if (j === 3 && k !== 13) {
+		return `${i}rd`
+	} else {
+		return `${i}th`
+	}
+}
 function rank(game, uid, pid) {
 	if (uid === undefined) {
 		uid = myUserId
@@ -1486,7 +1515,7 @@ function rank(game, uid, pid) {
 	// suggested results even works with fair strikes
 	else if (game.suggestions && game.suggestions.length == 1) {
 		place = game.suggestions[0].results.indexOf(pid)
-		string = ['1st', '2nd', '3rd', '4th'][place]
+		string = ordinal(place+1)
 	}
 
 	// if there are no suggestions and it's fair strikes, can't differentiate ties
@@ -1766,7 +1795,12 @@ async function add_arena_button(arena) {
 }
 async function add_player_button(uid, pid, sorter, standing) {
 	let button = await title('user', uid, 'div', 'player', pid);
-	button.dataset.standing = standing
+	if (standing !== -1) {
+		button.dataset.standing = standing
+		let spanding = document.createElement('span')
+		spanding.textContent = ordinal(standing)
+		button.append(spanding)
+	}
 	button.classList.add('box', 'click');
 	button.addEventListener('click', tabhandler(compare_player, uid, pid))
 	insertSorted(button, tab('active-tournament', 'players').box, sorter);
@@ -1951,7 +1985,6 @@ async function add_manual_tournament() {
 		let m;
 		while ((m = regex.exec(response)) !== null) {
 			m.forEach((match, groupIndex) => {
-				console.log(`Found match, group ${groupIndex}: ${match}`);
 				let tid_maybe = Number(match)
 				if (!isNaN(tid_maybe) && tid_maybe) {
 					tid = tid_maybe
@@ -1980,9 +2013,15 @@ async function add_tournament_from_manual(tid) {
 	let tournament = await get_from_db('tournament', tid)
 	if (!tournament) {
 		console.log('need to request the tournament', tid)
-		tournament = await get_tournament_details(tid, false).tournament
+		let result = await get_tournament_details(tid, false)
+		console.log(result)
+		tournament = result.tournament
 	}
-	await add_tournament(tournament, true)
+	if (!tournament) {
+		alert(`tournament ${tid} could not be loaded`)
+		return
+	}
+	return [tournament.status, await add_tournament(tournament, true)]
 }
 function load_more_tournaments_click() {
 	let next_page = document.getElementById('load-next-page').dataset.next
@@ -2006,8 +2045,11 @@ function count_tab(group) {
 	}
 	group.label.childNodes[1].textContent = ` (${c})`
 }
-function activate_tab(tabgroup, status) {
-	let group = tab(tabgroup, status)
+function activate_tab(tabgroup, status, only_if_exists) {
+	let group = tab(tabgroup, status, undefined, only_if_exists)
+	if (!group.label) {
+		return
+	}
 	for (let node of group.label.parentNode.childNodes) {
 		node.classList.remove('selected')
 	}
@@ -2018,7 +2060,7 @@ function activate_tab(tabgroup, status) {
 	group.box.classList.add('selected')
 	group.label.scrollIntoView({block: 'center', inline: 'center'})
 }
-function tab(parent, text, identifier) {
+function tab(parent, text, identifier, only_if_exists) {
 	parent = document.getElementById(parent)
 	let labels
 	let boxes
@@ -2038,7 +2080,7 @@ function tab(parent, text, identifier) {
 	let boxgroup = boxes.querySelector(`.boxgroup.${tabgroup}-${identifier}`)
 	let label = labels.querySelector(`#${tabgroup}-${identifier}`)
 
-	if (!boxgroup) {
+	if (!boxgroup && !only_if_exists) {
 		let id = `${tabgroup}-${identifier}`
 
 		label = document.createElement('label')
