@@ -102,7 +102,7 @@ div.reset {
 .box .side ~ .side {
     align-items: flex-end;
 }
-.box:not(.vs) .side>.rank {
+.box .side>.rank:not(.vs) {
     font-size: 1.5em;
     flex-shrink: 0;
     min-width: 0;

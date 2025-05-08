@@ -1246,8 +1246,6 @@ async function tournament_history(tid, refreshing) {
 		reset_history_tabs()
 		active_tournament_box.innerHTML = '';
 		for (let el of document.querySelectorAll('#frenzy-countdown span')) el.textContent = ''
-		let players_tab = tab('active-tournament', 'players').box
-		sort_players_button(players_tab)
 	}
 
 	let result = (await get_tournament_details(tid, true));
@@ -1277,11 +1275,13 @@ async function tournament_history(tid, refreshing) {
 	title_h2.append(`\n${tournament.status}`)
 	
 	if (get_players) {
-		let sorter = undefined
-		if (document.getElementById('sort-input').checked) {
-			sorter = sort_by_standing
-		}
 		if (result.players.length) {
+			let players_tab = tab('active-tournament', 'players').box
+			sort_players_button(players_tab)
+			let sorter = undefined
+			if (document.getElementById('sort-input').checked) {
+				sorter = sort_by_standing
+			}
 			await Promise.all(result.players.map(async (player) => {
 				let uid = player.claimedBy;
 				let pid = player.playerId
@@ -1300,13 +1300,13 @@ async function tournament_history(tid, refreshing) {
 	let in_progress = []
 	await Promise.all(active_games.map(async (game) => {
 		let element = await add_tournament_game(game);
-		if (game.status != 'completed') in_progress.push([game.status, element]);
+		if (game.status != 'completed') in_progress.push({status: game.status, element: element});
 	}))
-	if (in_progress.length == 1 && mode == 'history') {
-		let status = in_progress[0][0]
-		let element = in_progress[0][1]
-		activate_tab('active-tournament', status)
-		element.dispatchEvent(new Event('click'))
+	if (in_progress.length && mode == 'history') {
+		activate_tab('active-tournament', in_progress[0].status)
+		if (in_progress.length == 1) {
+			in_progress[0].element.dispatchEvent(new Event('click'))
+		}
 	} else {
 		activate_tab('active-tournament', 'completed', true)
 	}
@@ -1357,6 +1357,7 @@ async function get_frenzy_position(tournament) {
 	let frenzy = await get({
 		endpoint: `tournaments/${tournament.tournamentId}/frenzy`,
 	})
+	log(frenzy)
 
 	for (let el of div.querySelectorAll('span')) el.textContent = ''
 	
@@ -1473,26 +1474,38 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 		box.append(note)
 	}
 }
-function rankspan(string) {
+function rankspan(string, vs) {
 	let rankdiv = document.createElement('span')
 	rankdiv.classList.add('rank')
+	if (vs) rankdiv.classList.add('vs')
 	rankdiv.innerHTML = string
 	return rankdiv
 }
 function ordinal(i) {
 	let j = i % 10,
 		k = i % 100;
+	let ord
 	if (j === 1 && k !== 11) {
-		return `${i}st`
+		ord = 'st'
 	} else if (j === 2 && k !== 12) {
-		return `${i}nd`
+		ord = 'nd'
 	} else if (j === 3 && k !== 13) {
-		return `${i}rd`
+		ord = 'rd'
 	} else {
-		return `${i}th`
+		ord = 'th'
 	}
+	return `${i}<sup>${ord}</sup>`
 }
 function rank(game, uid, pid) {
+	// if (game.status !== 'completed') {
+	// 	return {
+	// 		place: null,
+	// 		fraction: null,
+	// 		maxplace: null,
+	// 		string: game.status
+	// 	}
+	// }
+
 	if (uid === undefined) {
 		uid = myUserId
 	}
@@ -1505,23 +1518,26 @@ function rank(game, uid, pid) {
 	let string = ''
 	let maxplace = game.userIds.length - 1
 
-	let result = game.resultPositions
+	let positions = game.resultPositions
+	let suggestions = game.suggestions
+	let points = game.resultPoints
+
 	// real results are best, but not for fair strikes
-	if (result && result.length && !result.includes(null)) {
-		place = result.indexOf(pid)
-		string = ['1<sup>st</sup>', '2<sup>nd</sup>', '3<sup>rd</sup>', '4<sup>th</sup>'][place]
+	if (positions && positions.length && !positions.includes(null)) {
+		place = positions.indexOf(pid)
+		string = ordinal(place+1)
 	}
 
 	// suggested results even works with fair strikes
-	else if (game.suggestions && game.suggestions.length == 1) {
-		place = game.suggestions[0].results.indexOf(pid)
+	else if (suggestions && suggestions.length == 1) {
+		place = suggestions[0].results.indexOf(pid)
 		string = ordinal(place+1)
 	}
 
 	// if there are no suggestions and it's fair strikes, can't differentiate ties
-	else if (game.resultPoints) {
-		let my_points = game.resultPoints[index]
-		let point_choices = [...game.resultPoints]
+	else if (points && points.length) {
+		let my_points = points[index]
+		let point_choices = [...points]
 		point_choices.sort()
 		let initial_rank = point_choices.indexOf(my_points)
 		let occurrences = 0;
@@ -1798,7 +1814,7 @@ async function add_player_button(uid, pid, sorter, standing) {
 	if (standing !== -1) {
 		button.dataset.standing = standing
 		let spanding = document.createElement('span')
-		spanding.textContent = ordinal(standing)
+		spanding.innerHTML = ordinal(standing)
 		button.append(spanding)
 	}
 	button.classList.add('box', 'click');
@@ -1891,7 +1907,8 @@ async function game_element(game, inc_players, inc_tournament, won) {
 			let pid = game.playerIds[index]
 			let li = document.createElement('div');
 			li.append(rankspan(rank(game, uid, pid).string))
-			li.append(await title('user', uid, 'span', 'player', pid));  // not actually async
+			// MARK: parallelize this?
+			li.append(await title('user', uid, 'span', 'player', pid));
 			plist.append(li);
 		})
 	}
@@ -1900,36 +1917,39 @@ async function game_element(game, inc_players, inc_tournament, won) {
 		leftdiv.append(await title('tournament', game.tournamentId));
 	}
 
-	let wordrank;
+	let wordrank = null;
+	let small = true
+	log(won)
 	if (won === undefined) {
 		let win_rank = rank(game, myUserId);
 		if (win_rank.place !== null) {
 			winmix(box, win_rank.fraction)
 			wordrank = win_rank.string
+			small = false
 		} else {
-			wordrank = stringify(win_rank)
+			// wordrank = stringify(win_rank)
+			wordrank = game.status
 		}
 	} else if (won === null) {
 		wordrank = '?'
 	} else if (won == 1) {
 		wordrank = 'won'
 		winmix(box, 1)
-		box.classList.add('vs')
 	} else if (won == -1) {
 		wordrank = 'lost'
 		winmix(box, 0)
-		box.classList.add('vs')
 	} else {
-		wordrank = 'tie'
+		wordrank = String(won) + ' (tie?)'
 		winmix(box, 0.5)
-		box.classList.add('vs')
 	}
 	box.append(spacer())
 	let rightdiv = document.createElement('div')
 	rightdiv.classList.add('side')
 	rightdiv.append(matchplay_link(`tournaments/${game.tournamentId}/matches/${game.gameId}`))
-	rightdiv.append(spacer())
-	rightdiv.append(rankspan(wordrank))
+	if (wordrank) {
+		rightdiv.append(spacer())
+		rightdiv.append(rankspan(wordrank, small))
+	}
 	box.append(rightdiv)
 
 	return box;
