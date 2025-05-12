@@ -236,18 +236,21 @@ async function get_all_my_tournaments() {
 	
 	let manual_tournaments = get_storage_array('manual_tournaments')
 	await Promise.all(manual_tournaments.map(async (t) => {
-		let [status, element] = await add_tournament_from_manual(t)
+		let result = await add_tournament_from_manual(t)
+		if (!result) return
+		let [status, element] = result
 		if (status != 'completed') {
 			in_progress.push([status, element])
 		}
 	}));
-	
-	console.log('in progress:', in_progress)
-	if (in_progress.length == 1) {
+
+	if (in_progress.length) {
 		let status = in_progress[0][0]
 		let element = in_progress[0][1]
-		element.dispatchEvent(new Event('click'))
 		activate_tab('my-tournaments', status)
+		if (in_progress.length == 1) {
+			element.dispatchEvent(new Event('click'))
+		}
 	}
 }
 
@@ -407,7 +410,7 @@ async function get_tournament_details(tid, get_games) {
 			}
 			await put_game(game);
 		};
-		log(statuses)
+		log(`statuses: ${JSON.stringify(statuses)}`)
 		
 		let raw_standings = await standings_promise
 		for (let entry of raw_standings) {
@@ -1245,13 +1248,13 @@ async function tournament_history(tid, refreshing) {
 		get_players = true
 		reset_history_tabs()
 		active_tournament_box.innerHTML = '';
-		for (let el of document.querySelectorAll('#frenzy-countdown span')) el.textContent = ''
+		clear_frenzy()
 	}
 
 	let result = (await get_tournament_details(tid, true));
 	let tournament = result.tournament
 
-	await get_frenzy_position(tournament)
+	await get_frenzy_position(tournament, refreshing)
 
 	if (refreshing) {
 		log(`in refresh, changes: ${result.active}`)
@@ -1272,7 +1275,10 @@ async function tournament_history(tid, refreshing) {
 	title_h2.append(await title('tournament', tid, 'span'));
 	title_h2.append(matchplay_link(`tournaments/${tid}`))
 	title_h2.append(document.createElement('br'))
-	title_h2.append(`\n${tournament.status}`)
+	let span = document.createElement('span')
+	span.textContent = tournament.status
+	span.classList.add('status')
+	title_h2.append(span)
 	
 	if (get_players) {
 		if (result.players.length) {
@@ -1346,11 +1352,26 @@ function arc(queue_pos, queue_size) {
 	let svg = `<svg width="60" height="60" viewBox="0 0 60 60"><path d="M ${ax} ${ay} A ${radius} ${radius} 0 ${long} 1 ${bx} ${by} A ${radius} ${radius} 0 ${long} 1 ${cx} ${cy}"/></svg>`
 	return svg
 }
-async function get_frenzy_position(tournament) {
-	let div = document.getElementById('frenzy-countdown');
-
+let frenzy_countdown
+function clear_frenzy() {
+	document.getElementById('frenzy-countdown').innerHTML = ''
+	clearTimeout(frenzy_countdown)
+}
+function frenzy_countdown_f(due, msgspan, msg) {
+	let seconds = Math.floor((due - (new Date())) / 1000)
+	let duestr
+	if (seconds < 0) {
+		duestr = ''
+	} else {
+		let minutes = Math.floor(seconds / 60)
+		seconds = seconds % 60
+		duestr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} remaining. `
+	}
+	msgspan.textContent = duestr + msg
+}
+async function get_frenzy_position(tournament, refreshing) {
 	if (tournament.type != 'frenzy') {
-		for (let el of div.querySelectorAll('span')) el.textContent = ''
+		clear_frenzy()
 		return;
 	}
 
@@ -1359,32 +1380,45 @@ async function get_frenzy_position(tournament) {
 	})
 	log(frenzy)
 
-	for (let el of div.querySelectorAll('span')) el.textContent = ''
-	
-
 	let my_pid = tournament.my_pid;
 	let queue_pos = null;
 	let queue_size = frenzy.queue.length;
+	let my_created
 	for (const [i, queue] of frenzy.queue.entries()) {
 		if (queue.playerId == my_pid) {
 			queue_pos = i;
+			my_created = new Date(queue.createdAt)
+			break
 		}
 	}
-	// if (queue_size && queue_pos !== null) {
-		let svg = arc(queue_pos, queue_size);
-		let msg
-		if (queue_pos) {
-			msg = `${queue_pos} ahead of you in queue of ${queue_size}`
-		} else if (queue_pos === null) {
-			msg = `you are not in the queue of ${queue_size}`
+	clear_frenzy()
+	if (queue_size && queue_pos !== null) {
+		let div = document.getElementById('frenzy-countdown');
+
+		let msgspan = document.createElement('span')
+		msgspan.classList.add('text')
+		div.append(msgspan)
+
+		let piespan = document.createElement('span')
+		piespan.classList.add('pie')
+		div.append(piespan)
+
+		piespan.innerHTML = arc(queue_pos, queue_size);
+		if (queue_pos === null) {
+			msgspan.textContent = `You are not in the queue of ${queue_size}`
+		} else if (queue_pos) {
+			let due = Number(my_created) + frenzy.avgQueueDuration * 1000
+			let msg = `${queue_pos} ahead of you in queue of ${queue_size}`
+			if (refreshing) {
+				frenzy_countdown = setInterval(frenzy_countdown_f, 1000, due, msgspan, msg)
+				frenzy_countdown_f(due, msgspan, msg)
+			} else {
+				msgspan.textContent = msg + '. Click refresh for live updates.'
+			}
 		} else {
-			msg = `you're next in the queue of ${queue_size}`
+			msgspan.textContent = `You're next in the queue of ${queue_size}`
 		}
-		div.querySelector('.text').prepend(msg);
-		div.querySelector('.pie').innerHTML = svg;
-	// } else {
-	// 	for (let el of div.querySelectorAll('span')) el.textContent = ''
-	// }
+	}
 }
 function reset_history_tabs() {
 	let history = document.getElementById('selected-history')
@@ -1433,6 +1467,12 @@ async function load_arena_history(arena, label, box) {
 		losses += Math.floor(winloss.place)
 	}))
 	winmix(label, wins / (wins+losses))
+	if (!games.length && box) {
+		let note = document.createElement('div')
+		note.classList.add('box')
+		note.textContent = 'No games on this arena'
+		box.append(note)
+	}
 }
 async function compare_player(uid, pid) {
 	reset_history_tabs()
@@ -1470,14 +1510,14 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 	} else if (!games.length && box) {
 		let note = document.createElement('div')
 		note.classList.add('box')
-		note.textContent = 'No games played together'
+		note.textContent = 'No games with this player'
 		box.append(note)
 	}
 }
-function rankspan(string, vs) {
+function rankspan(string, small) {
 	let rankdiv = document.createElement('span')
 	rankdiv.classList.add('rank')
-	if (vs) rankdiv.classList.add('vs')
+	if (small) rankdiv.classList.add('small')
 	rankdiv.innerHTML = string
 	return rankdiv
 }
@@ -1919,7 +1959,7 @@ async function game_element(game, inc_players, inc_tournament, won) {
 
 	let wordrank = null;
 	let small = true
-	log(won)
+	log(`won: ${won}`)
 	if (won === undefined) {
 		let win_rank = rank(game, myUserId);
 		if (win_rank.place !== null) {
@@ -1939,7 +1979,7 @@ async function game_element(game, inc_players, inc_tournament, won) {
 		wordrank = 'lost'
 		winmix(box, 0)
 	} else {
-		wordrank = String(won) + ' (tie?)'
+		wordrank = 'tied'  // String(won) + ' (tie?)'
 		winmix(box, 0.5)
 	}
 	box.append(spacer())
@@ -1954,7 +1994,7 @@ async function game_element(game, inc_players, inc_tournament, won) {
 
 	return box;
 }
-async function add_tournament(tournament, manual) {
+async function add_tournament(tournament, manual, click) {
 	let tid = tournament.tournamentId
 	let box = await title('tournament', tid)
 	box.textContent = tournament.name
@@ -1987,10 +2027,14 @@ async function add_tournament(tournament, manual) {
 		return -el.dataset.id;
 	});
 	count_tab(group)
+	if (click) {
+		activate_tab('my-tournaments', tournament.status)
+		box.dispatchEvent(new Event('click'))
+	}
 	return box
 }
 function remove_manual_tournament(event, tid) {
-	event.stopPropagation()
+	event && event.stopPropagation()
 	document.querySelector(`.box[data-kind="tournament"][data-id="${tid}"]`).remove()
 	update_storage_array('manual_tournaments', (manuals) => {
 		return remove_from_array(manuals, tid) && manuals
@@ -2018,18 +2062,22 @@ async function add_manual_tournament() {
 	}
 	update_storage_array_async('manual_tournaments', async (manuals) => {
 		if (manuals.indexOf(tid) == -1) {
-			await add_tournament_from_manual(tid)
+			await add_tournament_from_manual(tid, true)
 			manuals.push(tid)
 			filter()
 			return manuals
 		}
 	})
 }
-async function add_tournament_from_manual(tid) {
+async function add_tournament_from_manual(tid, click) {
 	/*
 	tournament by id, from entering the tournanent id manually
 	*/
-	if (all_my_tournaments[tid]) return
+	if (all_my_tournaments[tid]) {
+		console.log(`${tid} is already in all_my_tournaments. removing from manual`)
+		remove_manual_tournament(null, t)
+		return
+	}
 	let tournament = await get_from_db('tournament', tid)
 	if (!tournament) {
 		console.log('need to request the tournament', tid)
@@ -2041,7 +2089,7 @@ async function add_tournament_from_manual(tid) {
 		alert(`tournament ${tid} could not be loaded`)
 		return
 	}
-	return [tournament.status, await add_tournament(tournament, true)]
+	return [tournament.status, await add_tournament(tournament, true, click)]
 }
 function load_more_tournaments_click() {
 	let next_page = document.getElementById('load-next-page').dataset.next

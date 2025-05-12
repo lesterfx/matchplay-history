@@ -102,7 +102,7 @@ div.reset {
 .box .side ~ .side {
     align-items: flex-end;
 }
-.box .side>.rank:not(.vs) {
+.box .side>.rank:not(.small) {
     font-size: 1.5em;
     flex-shrink: 0;
     min-width: 0;
@@ -237,7 +237,12 @@ body {
 .title span.rank {
     text-align: right;
 }
-span.rank {
+
+.box .side>.rank {
+    font-size: smaller;
+    font-style: normal;
+}
+.players span.rank {
     display: inline-block;
     min-width: 2em;
     font-size: smaller;
@@ -300,6 +305,10 @@ div.players {
     transition-timing-function: linear;
     transition-duration: 5s;
     transform: rotate(360deg);
+}
+span.status {
+    font-size: medium;
+    font-weight: normal;
 }
 h1,h2,h3 {
     padding-left: 5px;
