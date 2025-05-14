@@ -4,23 +4,30 @@ body {
     --group-background: #ddd;
     --background: #bbb;
     --border: #888;
-    --won-border: #797;
-    --lost-border: #a66;
+    --not-cached: #a66;
     --won-light: #aca;
     --lost-light: #caa;
     --won-dark: #252;
     --lost-dark: #522;
+    --won-bg-dark: #131;
+    --lost-bg-dark: #311;
+    --won-bg-light: #ebe;
+    --lost-bg-light: #bee;
     --active-color: #08f;
-    --won-background: var(--won-light);
-    --lost-background: var(--lost-light);
+    --won: var(--won-light);
+    --lost: var(--lost-light);
+    --won-bg: var(--won-bg-light);
+    --lost-bg: var(--lost-bg-light);
 }
 body.flash {
     --text: #fff;
     --page-background: #000;
     --group-background: #222;
     --background: #444;
-    --won-background: var(--won-dark);
-    --lost-background: var(--lost-dark);
+    --won: var(--won-dark);
+    --lost: var(--lost-dark);
+    --won-bg: var(--won-bg-dark);
+    --lost-bg: var(--lost-bg-dark);
 }
 @media (prefers-color-scheme: dark) {
     body {
@@ -28,16 +35,20 @@ body.flash {
         --page-background: #000;
         --group-background: #222;
         --background: #444;
-        --won-background: var(--won-dark);
-        --lost-background: var(--lost-dark);
+        --won: var(--won-dark);
+        --lost: var(--lost-dark);
+        --won-bg: var(--won-bg-dark);
+        --lost-bg: var(--lost-bg-dark);
     }
     body.flash {
         --text: #000;
         --page-background: #fff;
         --group-background: #ddd;
         --background: #bbb;
-        --won-background: var(--won-light);
-        --lost-background: var(--lost-light);
+        --won: var(--won-light);
+        --lost: var(--lost-light);
+        --won-bg: var(--won-bg-light);
+        --lost-bg: var(--lost--bg-light);
         }
 }
 #tournament-options {
@@ -119,7 +130,7 @@ div.reset {
     flex-grow: 1;
 }
 .box.not-cached {
-    border-color: var(--lost-border);
+    border-color: var(--not-cached);
 }
 .box.nostyle {
     background: none;
@@ -132,7 +143,7 @@ div.reset {
     margin-bottom: 1em;
 }
 .winmix {
-    background: linear-gradient(110deg, var(--won-background) var(--winmix), var(--lost-background) var(--winmix)) no-repeat;
+    background: linear-gradient(110deg, var(--won) var(--winmix), var(--lost) var(--winmix)) no-repeat;
     border-color: var(--border);
 }
 #spacer {
@@ -204,8 +215,6 @@ body {
     display: none;
 }
 .tabs .tabs-list label {
-    opacity: 0.5;
-    order: 0;
     margin-top: 1em;
     background-color: var(--group-background);
     border-style: solid;
@@ -219,6 +228,11 @@ body {
     z-index: 0;
 }
 .tabs .tabs-list label:not(.selected) {
+    /* opacity: 0.5; */
+    color: var(--border);
+    order: 0;
+    --won: var(--won-bg);
+    --lost: var(--lost-bg);
     cursor: pointer;
 }
 .tabs .tabs-list label.selected {
@@ -500,6 +514,13 @@ a.matchplay-link {
 }
 .occurrences {
     font-size: 2em;
+}
+img.avatar {
+    border-radius: 100%;
+    border: 1px solid var(--text);
+    height: 2.5em;
+    margin: -1em 0.4em -0.6em 0;
+    vertical-align: bottom;
 }
 @media (prefers-color-scheme: dark) {
     a.matchplay-link {

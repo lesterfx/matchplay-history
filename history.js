@@ -1114,7 +1114,7 @@ async function load_arenas() {
 		}
 		for (let arena of arenas) {
 			if (arena.opdbId) {
-				let opdb = arena.opdbId.split('-')[0]
+				let opdb = arena.opdbId.split('-')[0].toLowerCase()
 				if (!opdbIds[opdb]) opdbIds[opdb] = {}
 				opdbIds[opdb][arena.opdbId] = 1
 				tournament_arena_names[opdb] = arena
@@ -1140,7 +1140,8 @@ async function load_arenas() {
 		let losses = 0
 		let num_games = 0
 
-		for (let game of await get_from_db_by_index('game', 'opdb', opdb)) {
+		let games = await get_from_db_by_index('game', 'opdb', opdb)
+		for (let game of games) {
 			if (full_history || tournament_ids.includes(game.tournamentId)) {
 				num_games ++
 				let winloss = rank(game)
@@ -1155,7 +1156,7 @@ async function load_arenas() {
 
 		let played = document.createElement('div')
 		if (num_games) {
-			played.textContent = `played ${num_games} game${num_games > 1 ? "s" : ""}: ${wins} — ${losses}`
+			played.textContent = `${wins} — ${losses} in ${num_games} game${num_games > 1 ? "s" : ""}`
 		} else {
 			played.innerHTML = 'not played'
 		}
@@ -1470,7 +1471,7 @@ async function load_arena_history(arena, label, box) {
 	if (!games.length && box) {
 		let note = document.createElement('div')
 		note.classList.add('box')
-		note.textContent = 'No games on this arena'
+		note.textContent = 'No history on this arena'
 		box.append(note)
 	}
 }
@@ -1499,6 +1500,12 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 	uid = Number(uid)
 	winloss[uid] = {won: 0, lost: 0}
 	let games = (await get_games_from_db_by_userId(uid))
+	let userInfoGetter
+	if (uid && box && label) {
+		userInfoGetter = get({
+			endpoint: `users/${uid}`
+		})
+	}
 	await Promise.all(games.map(async (game) => {
 		await add_game_to_player_standing(game, uid, pid, label, box)
 	}))
@@ -1510,8 +1517,17 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 	} else if (!games.length && box) {
 		let note = document.createElement('div')
 		note.classList.add('box')
-		note.textContent = 'No games with this player'
+		note.textContent = 'No history with this player'
 		box.append(note)
+	}
+	if (uid && box && label) {
+		let userInfo = await userInfoGetter
+		if (userInfo.user.avatar) {
+			let img = document.createElement('img')
+			img.src = userInfo.user.avatar
+			img.classList.add('avatar')
+			label.prepend(img)
+		}
 	}
 }
 function rankspan(string, small) {
