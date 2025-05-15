@@ -139,8 +139,10 @@ function put(table, obj) {
 }
 async function put_game(game) {
 	[game.user1, game.user2, game.user3, game.user4] = game.userIds
-	let arena = await get_from_db('arena', game.arenaId)
-	game.opdb = arena.opdb
+	if (!game.bye) {
+		let arena = await get_from_db('arena', game.arenaId)
+		game.opdb = arena.opdb
+	}
 	put('game', game)
 }
 
@@ -1951,8 +1953,12 @@ async function game_element(game, inc_players, inc_tournament, won) {
 	let leftdiv = document.createElement('div')
 	leftdiv.classList.add('side')
 	box.append(leftdiv)
-	let tit = await title('arena', game.arenaId);
-	leftdiv.append(tit)
+	if (game.bye) {
+		let tit = await title('arena', game.arenaId);
+		leftdiv.append(tit)
+	} else {
+		leftdiv.append('bye game')
+	}
 
 	if (inc_players) {
 		leftdiv.append(spacer())
