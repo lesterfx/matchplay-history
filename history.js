@@ -1937,8 +1937,10 @@ async function add_player_game(options) {
 }
 async function add_tournament_game(game) {
 	let box = await game_element(game, true, false);
-	box.classList.add('click')
-	box.addEventListener('click', tabhandler(compare_game, game.gameId));
+	if (!game.bye) {
+		box.classList.add('click')
+		box.addEventListener('click', tabhandler(compare_game, game.gameId));
+	}
 	let group = tab('active-tournament', `${game.status} games`, game.status)
 	insertSorted(box, group.box, (el) => {
 		return -el.dataset.id
@@ -1954,10 +1956,10 @@ async function game_element(game, inc_players, inc_tournament, won) {
 	leftdiv.classList.add('side')
 	box.append(leftdiv)
 	if (game.bye) {
+		leftdiv.append('[bye game]')
+	} else {
 		let tit = await title('arena', game.arenaId);
 		leftdiv.append(tit)
-	} else {
-		leftdiv.append('bye game')
 	}
 
 	if (inc_players) {
