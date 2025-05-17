@@ -1180,7 +1180,7 @@ async function load_arenas() {
 	}
 }
 
-let sorting_checked = false
+let sorting_checked = true
 function sort_players_button(parent) {
 	fakefill(parent, 'pre-sort')
 
@@ -1841,7 +1841,7 @@ function handler(callback, ...args) {
 	}
 	return handle
 }
-function insertSorted(element, parent, sortvalue_function) {
+function insertSorted(element, parent, sortvalue_function, reverse) {
 	let added = false;
 	if (!sortvalue_function) {
 		sortvalue_function = (el) => {
@@ -1850,7 +1850,7 @@ function insertSorted(element, parent, sortvalue_function) {
 	}
 	let etext = sortvalue_function(element);
 	for (let el of parent.children) {
-		if (sortvalue_function(el) > etext) {
+		if ((!reverse && sortvalue_function(el) > etext) || (reverse && sortvalue_function(el) < etext)) {
 			parent.insertBefore(element, el);
 			added = true;
 			return false;
@@ -2023,6 +2023,7 @@ async function add_tournament(tournament, manual, click) {
 	let box = await title('tournament', tid)
 	box.textContent = tournament.name
 	box.classList.add('box', 'click');
+	box.dataset.start = tournament.startUtc
 	if (manual) {
 		let del = document.createElement('div')
 		del.textContent = '×'
@@ -2048,8 +2049,8 @@ async function add_tournament(tournament, manual, click) {
 	}
 	let group = tab('my-tournaments', tournament.status)
 	insertSorted(box, group.box, (el) => {
-		return -el.dataset.id;
-	});
+		return el.dataset.start;
+	}, true);
 	count_tab(group)
 	if (click) {
 		activate_tab('my-tournaments', tournament.status)
