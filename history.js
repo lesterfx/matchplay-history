@@ -1594,6 +1594,7 @@ function rank(game, uid, pid) {
 
 	// if there are no suggestions and it's fair strikes, can't differentiate ties
 	else if (points && points.length) {
+		log(points)
 		let my_points = points[index]
 		let point_choices = [...points]
 		point_choices.sort()
