@@ -462,6 +462,7 @@ function show_mode() {
 	document.getElementById('standings-block').classList.toggle('hide', mode != 'standings')
 
 	document.getElementById('active-tournament-block').classList.toggle('hide', mode != 'history')
+
 	reset_history_tabs()
 	
 	document.getElementById('arenas-block').classList.toggle('hide', mode != 'arena')
@@ -469,6 +470,7 @@ function show_mode() {
 	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
 		el.classList.remove('active')
 	}
+	document.getElementById('my-tournaments').classList.toggle('multi', mode!='history')
 	filter()
 }
 function minwidth(el) {
@@ -1180,14 +1182,90 @@ async function load_arenas() {
 	}
 }
 
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function golf_groups_button(parent, n) {
+	let box = document.createElement('label')
+	box.id = 'golf'
+	box.classList.add('box', 'box-button', 'fake')
+
+	let ngroups = Math.ceil(n / 4)
+	box.textContent = `Create ${ngroups} golf groups`
+
+	box.addEventListener('click', handler(async () => {
+		parent.closest('.boxgroup').classList.add('multi')
+		let teachers = get_storage_array('teachers')
+		log(teachers)
+		for (let player of tab('active-tournament', 'players').box.childNodes) {
+			if (!player.classList.contains('fake')) {
+				let teacher = teachers.indexOf(Number(player.dataset.pid)) != -1
+				console.log(player.dataset.pid, teacher)
+				player.classList.toggle('active', teacher)
+			}
+		}
+		let teachers_needed = await generate_golf_groups()
+		if (teachers_needed > 0) {
+			alert(`select ${teachers_needed} more 🎓teachers`)
+		} else if (teachers_needed < 0) {
+			alert(`recommend to deselect ${-teachers_needed} extra teachers`)
+		}
+	}))
+
+	parent.append(box)
+}
+async function generate_golf_groups() {
+	reset_history_tabs()
+	let parent = tab('active-tournament', 'players').box
+	let n = 0
+	let players = {true: [], false: []}
+	for (let player of parent.childNodes) {
+		if (!player.classList.contains('fake')) {
+			let pro = player.classList.contains('active')
+			players[pro].push(player)
+			n ++
+		}
+	}
+	let ngroups = Math.ceil(n / 4)
+	if (players[true].length > ngroups) {
+		shuffle(players[true])
+	}
+	shuffle(players[false])
+	let groups = []
+	for (let i=0;i<ngroups;i++) {
+		groups.push({
+			userIds: [],
+			playerIds: [],
+			pros: [],
+			arena: `Golf Group ${i+1}`,
+			tournamentId: active_tournament_id
+		})
+	}
+	let i = 0
+	for (let pro of [true, false]) {
+		for (let player of players[pro]) {
+			groups[i].userIds.push(Number(player.dataset.uid))
+			groups[i].playerIds.push(Number(player.dataset.pid))
+			groups[i].pros.push(pro)
+			i = (i + 1) % ngroups
+		}
+	}
+	let needed = ngroups - players[true].length
+	let tabgroup = tab('player-histories-tabs', 'Golf Groups', 'golf-groups', false, needed)
+	for (let group of groups) {
+		let one_teacher = group.pros[0] && !group.pros[1]
+		let element = await game_element(group, true, false, one_teacher*2-1, true)
+		tabgroup.box.append(element)
+	}
+	return needed
+}
+
 let sorting_checked = true
 function sort_players_button(parent) {
-	fakefill(parent, 'pre-sort')
-
-	let prebox = document.createElement('div')
-	prebox.classList.add('reset', 'fake')
-	parent.append(prebox)
-
 	let box = document.createElement('label')
 	box.id = 'sort'
 	box.classList.add('box', 'box-button', 'toggle', 'fake')
@@ -1286,10 +1364,17 @@ async function tournament_history(tid, refreshing) {
 	if (get_players) {
 		if (result.players.length) {
 			let players_tab = tab('active-tournament', 'players').box
-			sort_players_button(players_tab)
+			fakefill(players_tab, 'pre-sort')
+			let prebox = document.createElement('div')
+			prebox.classList.add('reset', 'fake')
+			players_tab.append(prebox)
+
 			let sorter = undefined
-			if (document.getElementById('sort-input').checked) {
-				sorter = sort_by_standing
+			if (result.standings) {
+				sort_players_button(players_tab)
+				if (document.getElementById('sort-input').checked) {
+					sorter = sort_by_standing
+				}
 			}
 			await Promise.all(result.players.map(async (player) => {
 				let uid = player.claimedBy;
@@ -1297,7 +1382,10 @@ async function tournament_history(tid, refreshing) {
 				let standing = result.standings[pid] || -1
 				await add_player_button(uid, pid, sorter, standing);
 			}))
-			count_tab(tab('active-tournament', 'players'))
+			let n = count_tab(tab('active-tournament', 'players'))
+			if (tournament.type == 'golf') {
+				golf_groups_button(players_tab, n, tournament)
+			}
 		}
 		if (tournament.arenas.length) {
 			await Promise.all(tournament.arenas.map(async (arena) => {
@@ -1475,6 +1563,22 @@ async function load_arena_history(arena, label, box) {
 		note.classList.add('box')
 		note.textContent = 'No history on this arena'
 		box.append(note)
+	}
+}
+async function player_click(uid, pid) {
+	if (this.closest('.boxgroup').classList.contains('multi')) {
+		let add = this.classList.contains('active')
+		await update_storage_array_async('teachers', function (teachers) {
+			if (add && teachers.indexOf(pid) == -1) {
+				teachers.push(pid)
+				return teachers
+			} else if (!add && teachers.indexOf(pid) != -1) {
+				return remove_from_array(teachers, pid) && teachers
+			}
+		})
+		generate_golf_groups()
+	} else {
+		compare_player(uid, pid)
 	}
 }
 async function compare_player(uid, pid) {
@@ -1812,13 +1916,15 @@ function tabhandler(callback, ...args) {
 		try {
 			refresh_off()
 			let tabs = this.closest('.tabs')
-			if (mode == 'history') {
+			let box = this.closest('.boxgroup')
+			// if (mode == 'history') {
+			if (tabs.classList.contains('multi') || box.classList.contains('multi')) {
+				this.classList.toggle('active')
+			} else {
 				for (let child of tabs.querySelectorAll('.active')) child.classList.remove('active')
 				this.classList.add('active')
-			} else {
-				this.classList.toggle('active')
 			}
-			await callback(...args)
+			await callback.call(this, ...args)
 		} catch (err) {
 			this.classList.remove('active')
 			await catcher(err)
@@ -1877,7 +1983,9 @@ async function add_player_button(uid, pid, sorter, standing) {
 		button.append(spanding)
 	}
 	button.classList.add('box', 'click');
-	button.addEventListener('click', tabhandler(compare_player, uid, pid))
+	button.dataset.pid = pid
+	button.dataset.uid = uid
+	button.addEventListener('click', tabhandler(player_click, uid, pid))
 	insertSorted(button, tab('active-tournament', 'players').box, sorter);
 	load_games_to_player_standing(uid, pid, button)
 }
@@ -1949,7 +2057,7 @@ async function add_tournament_game(game) {
 	count_tab(group)
 	return box;
 }
-async function game_element(game, inc_players, inc_tournament, won) {
+async function game_element(game, inc_players, inc_tournament, won, no_won_label) {
 	let box = notitle('game', game.gameId, 'span');
 	box.classList.add('box');
 
@@ -1958,9 +2066,10 @@ async function game_element(game, inc_players, inc_tournament, won) {
 	box.append(leftdiv)
 	if (game.bye) {
 		leftdiv.append('[bye game]')
-	} else {
-		let tit = await title('arena', game.arenaId);
-		leftdiv.append(tit)
+	} else if (game.arenaId) {
+		leftdiv.append(await title('arena', game.arenaId))
+	} else if (game.arena) {
+		leftdiv.append(game.arena)
 	}
 
 	if (inc_players) {
@@ -1972,6 +2081,9 @@ async function game_element(game, inc_players, inc_tournament, won) {
 			let pid = game.playerIds[index]
 			let li = document.createElement('div');
 			li.append(rankspan(rank(game, uid, pid).string))
+			if (game.pros && game.pros[index]) {
+				li.append('🎓')
+			}
 			// MARK: parallelize this?
 			li.append(await title('user', uid, 'span', 'player', pid));
 			plist.append(li);
@@ -2010,8 +2122,10 @@ async function game_element(game, inc_players, inc_tournament, won) {
 	box.append(spacer())
 	let rightdiv = document.createElement('div')
 	rightdiv.classList.add('side')
-	rightdiv.append(matchplay_link(`tournaments/${game.tournamentId}/matches/${game.gameId}`))
-	if (wordrank) {
+	if (game.gameId) {
+		rightdiv.append(matchplay_link(`tournaments/${game.tournamentId}/matches/${game.gameId}`))
+	}
+	if (wordrank && !no_won_label) {
 		rightdiv.append(spacer())
 		rightdiv.append(rankspan(wordrank, small))
 	}
@@ -2138,8 +2252,9 @@ function count_tab(group) {
 		if (!child.classList.contains('fake')) c++
 	}
 	group.label.childNodes[1].textContent = ` (${c})`
+	return c
 }
-function activate_tab(tabgroup, status, only_if_exists) {
+function activate_tab(tabgroup, status, only_if_exists, noscroll) {
 	let group = tab(tabgroup, status, undefined, only_if_exists)
 	if (!group.label) {
 		return
@@ -2152,9 +2267,11 @@ function activate_tab(tabgroup, status, only_if_exists) {
 		node.classList.remove('selected')
 	}
 	group.box.classList.add('selected')
-	group.label.scrollIntoView({block: 'center', inline: 'center'})
+	if (!noscroll) {
+		group.label.scrollIntoView({block: 'center', inline: 'center'})
+	}
 }
-function tab(parent, text, identifier, only_if_exists) {
+function tab(parent, text, identifier, only_if_exists, noscroll) {
 	parent = document.getElementById(parent)
 	let labels
 	let boxes
@@ -2192,7 +2309,7 @@ function tab(parent, text, identifier, only_if_exists) {
 		boxes.append(boxgroup)
 		
 		if (labels.childNodes.length == 1)
-			activate_tab(tabgroup, identifier)
+			activate_tab(tabgroup, identifier, only_if_exists, noscroll)
 	}
 
 	return {

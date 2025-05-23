@@ -458,7 +458,7 @@ h3.sticky-header {
     padding: 5px;
     margin-bottom: 0.5em;
 }
-#sort {
+#sort,#golf {
     order: 100000;
 }
 .box.box-button {
