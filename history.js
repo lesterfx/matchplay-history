@@ -240,15 +240,14 @@ async function get_all_my_tournaments() {
 	await Promise.all(manual_tournaments.map(async (t) => {
 		let result = await add_tournament_from_manual(t)
 		if (!result) return
-		let [status, element] = result
-		if (status != 'completed') {
-			in_progress.push([status, element])
+		if (result.status != 'completed') {
+			in_progress.push(result)
 		}
 	}));
 
 	if (in_progress.length) {
-		let status = in_progress[0][0]
-		let element = in_progress[0][1]
+		let status = in_progress[0].status
+		let element = in_progress[0].element
 		activate_tab('my-tournaments', status)
 		if (in_progress.length == 1) {
 			element.dispatchEvent(new Event('click'))
@@ -269,7 +268,10 @@ async function load_more_tournaments(page, element) {
 			let element = await add_tournament(tournament);
 			all_my_tournaments[tournament.tournamentId] = tournament
 			if (tournament.status != 'completed') {
-				in_progress.push([tournament.status, element])
+				in_progress.push({
+					status: tournament.status,
+					element: element
+				})
 			}
 		}))
 	}
@@ -441,7 +443,7 @@ async function get_tournament_details(tid, get_games) {
 	};
 }
 
-let modes = ['history', 'standings', 'arena']
+let modes = ['history', 'standings', 'arena', 'golf']
 let mode = modes[(Number(localStorage.getItem('getting_standings') || '0'))]
 async function switch_mode(new_mode) {
 	mode = new_mode
@@ -462,15 +464,18 @@ function show_mode() {
 	document.getElementById('standings-block').classList.toggle('hide', mode != 'standings')
 
 	document.getElementById('active-tournament-block').classList.toggle('hide', mode != 'history')
-
+	reset_tournament_tabs()
 	reset_history_tabs()
 	
 	document.getElementById('arenas-block').classList.toggle('hide', mode != 'arena')
 	
+	let my_tournaments = document.getElementById('my-tournaments')
+	my_tournaments.classList.toggle('golf-filter', mode=='golf')
+
 	for (let el of document.querySelectorAll('#my-tournaments.tabs .box.active')) {
 		el.classList.remove('active')
 	}
-	document.getElementById('my-tournaments').classList.toggle('multi', mode!='history')
+	document.getElementById('my-tournaments').classList.toggle('multi', ['history', 'golf'].indexOf(mode)==-1)
 	filter()
 }
 function minwidth(el) {
@@ -519,7 +524,7 @@ async function wakelock_off() {
 }
 async function refresh_on() {
 	refresh_timer && clearTimeout(refresh_timer)
-	refresh_timer = setTimeout(refresh_tournament_timer, 5000);
+	refresh_timer = setTimeout(refresh_tournament_timer, 5000, 2);
 	let refresh_button = document.getElementById('refresh-active-tournament');
 	refresh_button.classList.add('timed');
 	let text = refresh_button.querySelector('.text')
@@ -547,13 +552,13 @@ async function refresh_tournament_click() {
 	if (refresh_timer) {
 		await refresh_off();
 	} else {
-		await refresh_tournament_timer();
+		await refresh_tournament_timer(1);
 	}
 }
-async function refresh_tournament_timer() {
+async function refresh_tournament_timer(refreshing) {
 	try {
 		await refresh_off(true);
-		if (await do_refresh_tournament()) {
+		if (await do_refresh_tournament(refreshing)) {
 			await refresh_on();
 		} else {
 			await refresh_off();
@@ -563,8 +568,8 @@ async function refresh_tournament_timer() {
 		catcher(err)
 	}
 }
-async function do_refresh_tournament() {
-	let result = await tournament_history(active_tournament_id, true);
+async function do_refresh_tournament(refreshing) {
+	let result = await tournament_history(active_tournament_id, refreshing);
 	if (result.changes) {
 		await flash_screen();
 		return false;
@@ -585,8 +590,8 @@ async function flash_screen() {
 	}
 }
 async function click_tournament(id) {
-	if (mode == 'history') {
-		await tournament_history(id, false)
+	if (mode == 'history' || mode == 'golf') {
+		await tournament_history(id, 0)
 	} else {
 		await tournament_toggled()
 	}
@@ -1189,34 +1194,25 @@ function shuffle(array) {
     }
 }
 
-function golf_groups_button(parent, n) {
-	let box = document.createElement('label')
-	box.id = 'golf'
-	box.classList.add('box', 'box-button', 'fake')
-
-	let ngroups = Math.ceil(n / 4)
-	box.textContent = `Create ${ngroups} golf groups`
-
-	box.addEventListener('click', handler(async () => {
-		parent.closest('.boxgroup').classList.add('multi')
-		let teachers = get_storage_array('teachers')
-		log(teachers)
-		for (let player of tab('active-tournament', 'players').box.childNodes) {
-			if (!player.classList.contains('fake')) {
-				let teacher = teachers.indexOf(Number(player.dataset.pid)) != -1
-				console.log(player.dataset.pid, teacher)
-				player.classList.toggle('active', teacher)
-			}
+async function start_golf_groups(parent, n) {
+	parent.closest('.boxgroup').classList.add('multi')
+	let teachers = get_storage_array('teachers')
+	log(teachers)
+	for (let player of tab('active-tournament', 'players').box.childNodes) {
+		if (!player.classList.contains('fake')) {
+			let teacher = teachers.indexOf(Number(player.dataset.pid)) != -1
+			console.log(player.dataset.pid, teacher)
+			player.classList.toggle('active', teacher)
 		}
-		let teachers_needed = await generate_golf_groups()
+	}
+	let teachers_needed = await generate_golf_groups()
+	setTimeout(() => {
 		if (teachers_needed > 0) {
 			alert(`select ${teachers_needed} more 🎓teachers`)
 		} else if (teachers_needed < 0) {
 			alert(`recommend to deselect ${-teachers_needed} extra teachers`)
 		}
-	}))
-
-	parent.append(box)
+	}, 100)
 }
 async function generate_golf_groups() {
 	reset_history_tabs()
@@ -1240,7 +1236,7 @@ async function generate_golf_groups() {
 		groups.push({
 			userIds: [],
 			playerIds: [],
-			pros: [],
+			pros: 0,
 			arena: `Golf Group ${i+1}`,
 			tournamentId: active_tournament_id
 		})
@@ -1250,14 +1246,17 @@ async function generate_golf_groups() {
 		for (let player of players[pro]) {
 			groups[i].userIds.push(Number(player.dataset.uid))
 			groups[i].playerIds.push(Number(player.dataset.pid))
-			groups[i].pros.push(pro)
+			if (pro) groups[i].pros ++
 			i = (i + 1) % ngroups
 		}
 	}
 	let needed = ngroups - players[true].length
 	let tabgroup = tab('player-histories-tabs', 'Golf Groups', 'golf-groups', false, needed)
 	for (let group of groups) {
-		let one_teacher = group.pros[0] && !group.pros[1]
+		let one_teacher = group.pros == 1
+		if (!one_teacher) {
+			group.arena += ` (${group.pros} teachers)`
+		}
 		let element = await game_element(group, true, false, one_teacher*2-1, true)
 		tabgroup.box.append(element)
 	}
@@ -1319,11 +1318,12 @@ function sort_by_standing(el) {
 	return [String(Number(el.dataset.standing)).padStart(5, '0'), el.textContnt]
 }
 async function tournament_history(tid, refreshing) {
+	// refreshing: 0 for clicked tournament, 1 for clicked refresh, 2 for timer refresh
 	let get_players
 	tid = Number(tid)
 	active_tournament_id = tid
 	let active_tournament_box = document.getElementById('active-tournament')
-	if (refreshing) {
+	if (refreshing == 2) {
 		get_players = false
 	} else {
 		get_players = true
@@ -1337,7 +1337,7 @@ async function tournament_history(tid, refreshing) {
 
 	await get_frenzy_position(tournament, refreshing)
 
-	if (refreshing) {
+	if (refreshing == 2) {
 		log(`in refresh, changes: ${result.active}`)
 		if (!result.active) {
 			return {
@@ -1383,11 +1383,11 @@ async function tournament_history(tid, refreshing) {
 				await add_player_button(uid, pid, sorter, standing);
 			}))
 			let n = count_tab(tab('active-tournament', 'players'))
-			if (tournament.type == 'golf') {
-				golf_groups_button(players_tab, n, tournament)
+			if (mode == 'golf' && tournament.type == 'golf') {
+				start_golf_groups(players_tab, n, tournament)
 			}
 		}
-		if (tournament.arenas.length) {
+		if (tournament.arenas.length && mode == 'history') {
 			await Promise.all(tournament.arenas.map(async (arena) => {
 				await add_arena_button(arena)
 			}))
@@ -1511,6 +1511,9 @@ async function get_frenzy_position(tournament, refreshing) {
 		}
 	}
 }
+function reset_tournament_tabs() {
+	document.getElementById('active-tournament').innerHTML = ''
+}
 function reset_history_tabs() {
 	let history = document.getElementById('selected-history')
 	history.innerHTML = '<div id="player-histories-tabs" class="tabs" data-tabgroup="player-histories-tabs"></div>'
@@ -1566,7 +1569,7 @@ async function load_arena_history(arena, label, box) {
 	}
 }
 async function player_click(uid, pid) {
-	if (this.closest('.boxgroup').classList.contains('multi')) {
+	if (mode == 'golf') {
 		let add = this.classList.contains('active')
 		await update_storage_array_async('teachers', function (teachers) {
 			if (add && teachers.indexOf(pid) == -1) {
@@ -1835,6 +1838,7 @@ ready(async () => {
 	document.getElementById('standings-mode').addEventListener('click', handler(switch_mode, 'standings'))
 	document.getElementById('history-mode').addEventListener('click', handler(switch_mode, 'history'))
 	document.getElementById('arena-mode').addEventListener('click', handler(switch_mode, 'arena'))
+	document.getElementById('golf-mode').addEventListener('click', handler(switch_mode, 'golf'))
 	document.getElementById('load-standings').addEventListener('click', handler(load_standings))
 	document.getElementById('load-arenas').addEventListener('click', handler(load_arenas))
 	document.getElementById('filter').addEventListener('input', handler(filter))
@@ -2066,6 +2070,7 @@ async function game_element(game, inc_players, inc_tournament, won, no_won_label
 	box.append(leftdiv)
 	if (game.bye) {
 		leftdiv.append('[bye game]')
+		return box
 	} else if (game.arenaId) {
 		leftdiv.append(await title('arena', game.arenaId))
 	} else if (game.arena) {
@@ -2081,7 +2086,7 @@ async function game_element(game, inc_players, inc_tournament, won, no_won_label
 			let pid = game.playerIds[index]
 			let li = document.createElement('div');
 			li.append(rankspan(rank(game, uid, pid).string))
-			if (game.pros && game.pros[index]) {
+			if (index < game.pros) {
 				li.append('🎓')
 			}
 			// MARK: parallelize this?
@@ -2139,6 +2144,7 @@ async function add_tournament(tournament, manual, click) {
 	box.textContent = tournament.name
 	box.classList.add('box', 'click');
 	box.dataset.start = tournament.startUtc
+	box.classList.add(`tournament-${tournament.type}`)
 	if (manual) {
 		let del = document.createElement('div')
 		del.textContent = '×'
@@ -2229,7 +2235,10 @@ async function add_tournament_from_manual(tid, click) {
 		alert(`tournament ${tid} could not be loaded`)
 		return
 	}
-	return [tournament.status, await add_tournament(tournament, true, click)]
+	return {
+		status: tournament.status,
+		element: await add_tournament(tournament, true, click)
+	}
 }
 function load_more_tournaments_click() {
 	let next_page = document.getElementById('load-next-page').dataset.next

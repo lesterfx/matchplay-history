@@ -330,7 +330,7 @@ h1,h2,h3 {
 h3.sticky-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 0;
 }
 .sticky-header {
@@ -376,6 +376,11 @@ h3.sticky-header {
     transition-property: left, opacity;
     transition-duration: 0.3s;
 
+}
+#options>.items div.modes:hover ~ div.modes.active::before,
+#options>.items div.modes.active:has(~div.modes:hover)::before {
+    opacity: 0;
+    left: -0.5em;
 }
 #options>.items div.modes:hover::before,
 #options>.items div.modes.active::before {
@@ -460,6 +465,9 @@ h3.sticky-header {
 }
 #sort,#golf {
     order: 100000;
+}
+#my-tournaments.golf-filter .box.title:not(.tournament-golf) {
+    display: none;
 }
 .box.box-button {
     display: block;
