@@ -1019,7 +1019,7 @@ async function show_standings_table(settings_already_loaded) {
 		}
 		if (standings_settings.show_avg_pts) {
 			td = document.createElement('td')
-			td.textContent = (score / loaded_standings.games_played[id]).toFixed(0)
+			td.textContent = (score / loaded_standings.games_played[id]).toFixed(1)
 			tr.append(td)
 		}
 		if (standings_settings.show_avg_place) {
