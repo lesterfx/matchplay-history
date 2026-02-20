@@ -1632,10 +1632,10 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 	if (uid && box && label) {
 		let userInfo = await userInfoGetter
 		let count = label.querySelector('.count')
-		document.createElement('br').insertBefore(count)
+		label.insertBefore(document.createElement('br'), count)
 		let rating = document.createElement('span')
 		rating.innerText = letter_rating(userInfo.rating.rating)
-		rating.insertBefore(count)
+		label.insertBefore(rating, count)
 		if (userInfo.user.avatar) {
 			let img = document.createElement('img')
 			img.src = userInfo.user.avatar
