@@ -1632,13 +1632,15 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 	if (uid && box && label) {
 		let userInfo = await userInfoGetter
 		let count = label.querySelector('.count')
-		count.prepend(document.createElement('br'))
-		count.prepend(letter_rating(userInfo.rating.rating))
+		document.createElement('br').insertBefore(count)
+		let rating = document.createElement('span')
+		rating.innerText = letter_rating(userInfo.rating.rating))
+		rating.insertBefore(count)
 		if (userInfo.user.avatar) {
 			let img = document.createElement('img')
 			img.src = userInfo.user.avatar
 			img.classList.add('avatar')
-			label.append(img)
+			label.prepend(img)
 		}
 	}
 }
@@ -1646,14 +1648,14 @@ function letter_rating(value) {
   if (typeof value !== 'number' || !isFinite(value)) {
     return null;
   }
-  if (value >= 1900) return "Wizard";
-  if (value >= 1800) return "Master";
-  if (value >= 1700) return "Expert";
-  if (value >= 1600) return "A";
-  if (value >= 1500) return "B";
-  if (value >= 1400) return "C";
-  if (value >= 1300) return "D";
-  return "E";
+  if (value >= 1900) return "Wizard ";
+  if (value >= 1800) return "Master ";
+  if (value >= 1700) return "Expert ";
+  if (value >= 1600) return "A ";
+  if (value >= 1500) return "B ";
+  if (value >= 1400) return "C ";
+  if (value >= 1300) return "D ";
+  return "E ";
 }
 function rankspan(string, small) {
 	let rankdiv = document.createElement('span')
