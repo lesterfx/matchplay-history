@@ -1634,7 +1634,7 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 		let count = label.querySelector('.count')
 		document.createElement('br').insertBefore(count)
 		let rating = document.createElement('span')
-		rating.innerText = letter_rating(userInfo.rating.rating))
+		rating.innerText = letter_rating(userInfo.rating.rating)
 		rating.insertBefore(count)
 		if (userInfo.user.avatar) {
 			let img = document.createElement('img')
