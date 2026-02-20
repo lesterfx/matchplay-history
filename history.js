@@ -329,7 +329,7 @@ async function add_game_to_player_standing(game, uid, pid, label, box) {
 		return
 	}
 
-	label.childNodes[1].innerHTML = ` (${won}-${lost})`
+	label.querySelector('.count').innerHTML = ` (${won}-${lost})`
 
 	let element = await add_player_game({
 		uid: uid,
@@ -1631,13 +1631,29 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 	}
 	if (uid && box && label) {
 		let userInfo = await userInfoGetter
+		let count = label.querySelector('.count')
+		count.prepend(document.createElement('br'))
+		count.prepend(letter_rating(userInfo.rating.rating))
 		if (userInfo.user.avatar) {
 			let img = document.createElement('img')
 			img.src = userInfo.user.avatar
 			img.classList.add('avatar')
-			label.prepend(img)
+			label.append(img)
 		}
 	}
+}
+function letter_rating(value) {
+  if (typeof value !== 'number' || !isFinite(value)) {
+    return null;
+  }
+  if (value >= 1900) return "Wizard";
+  if (value >= 1800) return "Master";
+  if (value >= 1700) return "Expert";
+  if (value >= 1600) return "A";
+  if (value >= 1500) return "B";
+  if (value >= 1400) return "C";
+  if (value >= 1300) return "D";
+  return "E";
 }
 function rankspan(string, small) {
 	let rankdiv = document.createElement('span')
@@ -2307,6 +2323,7 @@ function tab(parent, text, identifier, only_if_exists, noscroll) {
 		label.setAttribute('id', id)
 		label.textContent = text
 		let count = document.createElement('span')
+		count.classList.add('count')
 		label.append(count)
 		label.addEventListener('click', handler(activate_tab, tabgroup, identifier))
 		labels.append(label)
