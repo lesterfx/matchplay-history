@@ -527,7 +527,7 @@ img.avatar {
     border-radius: 100%;
     border: 1px solid var(--text);
     height: 2.5em;
-    margin: -1em -0.6em 0.4em;
+    margin: -1em 0em -1em 0.4em;
     vertical-align: bottom;
 }
 @media (prefers-color-scheme: dark) {
