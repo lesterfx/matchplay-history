@@ -1630,17 +1630,18 @@ async function load_games_to_player_standing(uid, pid, label, box) {
 		box.append(note)
 	}
 	if (uid && box && label) {
-		let userInfo = await userInfoGetter
 		let count = label.querySelector('.count')
-		label.insertBefore(document.createElement('br'), count)
+		let br = document.createElement('br')
+		label.insertBefore(br, count)
 		let rating = document.createElement('span')
-		rating.innerText = letter_rating(userInfo.rating.rating)
 		label.insertBefore(rating, count)
+		let userInfo = await userInfoGetter
+		rating.innerText = letter_rating(userInfo.rating.rating)
 		if (userInfo.user.avatar) {
 			let img = document.createElement('img')
 			img.src = userInfo.user.avatar
 			img.classList.add('avatar')
-			label.prepend(img)
+			label.insertBefore(img, br)
 		}
 	}
 }
