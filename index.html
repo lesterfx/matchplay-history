@@ -2,6 +2,7 @@
 <html>
 	<head>
 	<meta charset="UTF-8">
+	<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 	<meta name="viewport" content="width=device-width" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -19,12 +20,14 @@
 		<div id="options" class="hide">
 			<div class="button">☰</div>
 			<div class="items">
-				<div id="log-out">Log out</div>
-				<!-- <div id="custom">Enable custom API query</div> -->
-				<div class="modes" id="standings-mode">Season Standings</div>
-				<div class="modes" id="history-mode">Player Histories</div>
-				<div class="modes" id="arena-mode">Arena Stats</div>
-				<!-- <div id="notify">Test notification</div> -->
+				<div class="items-group">
+					<div class="item" id="log-out">Log out</div>
+					<div class="item modes" id="history-mode">Player Histories</div>
+					<div class="item modes" id="golf-mode">Make Golf Groups</div>
+					<div class="item modes" id="standings-mode">Season Standings</div>
+					<div class="item modes" id="arena-mode">Arena Stats</div>
+					<div class="item" id="clear-cache">Clear cache</div>
+				</div>
 			</div>
 		</div>
 		<h1 id="header">&nbsp;</h1>
@@ -37,12 +40,34 @@
 						<span class="text">refresh</span>
 					</span>
 				</h3>
-				<div id="filters-lefter">
-					<div id="filters">
-						<input id="filter" placeholder="filter">
-					</div>
-				</div>
 				<div id="my-tournaments" class="tabs" data-tabgroup="my-tournaments">
+					<div class="tabs-list"></div>
+					<div class="tabs-content"></div>
+					<div id="tournament-options" class="boxgroup">
+						<div class="box box-button" id="filters">
+							<span class="label">Filter...</span>
+							<input id="filter" placeholder="filter">
+						</div>
+						<div id="cache-box" class="box hide box-button">
+							<span class="label">Cache All Tournaments</span>
+							<span id="caching">caching...</span>
+						</div>
+						<div id="manual-tournament" class="box click">
+							Add Tournament from URL
+						</div>
+						<div id="load-next-page" class="box click hide">
+						</div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+						<div class="fake invisible box"></div>
+					</div>
 				</div>
 			</div>
 			<div class="block hide" id="arenas-block">
@@ -53,10 +78,8 @@
 					</span>
 					<span class="spacer"></span>
 				</h3>
-				<table id="arenas-table" class="hide">
-					<thead><tr><th>Arena Name</th><th>Occurrences</th></tr></thead>
-					<tbody id="arenas-tbody"></tbody>
-				</table>
+				<input type="checkbox" id="full-arena-history"><label for="full-arena-history">Full history for an arena</label>
+				<div id="arenas-table" class="tabs" data-tabgroup="arenas-table"></div>
 			</div>
 			<div class="block hide" id="standings-block">
 				<h3 class="sticky-header">
@@ -171,21 +194,20 @@
 						<span class="text">refresh</span>
 					</span>
 				</h3>
-				<div id="frenzy-countdown"><span class="pie"></span><span class="text"></span></div>
+				<div id="frenzy-countdown"></div>
 				<div id="active-tournament" class="tabs" data-tabgroup="active-tournament">
 				</div>
 			</div>
 			<div id="selected-history">
-				<div class="sticky-header boxgroup singular" id="selected-game"></div>
-				<div id="player-histories" class="block"></div>
+				<h3 class="sticky-header">
+					<span id="selected-history-title"></span>
+				</h3>
+				<div id="player-histories-tabs" class="tabs" data-tabgroup="player-histories-tabs"></div>
 			</div>
-			<div class="spacer"></div>
-			<div id="custom-section" class="hide">
-				<input id="custom-endpoint" placeholder="users/profile">
-				<input type="button" id="run-custom" value="Run">
-			</div>
-
 		</div>
+		<div id="spacer"></div>
+		<label id="log-toggler" for="log-toggle"></label>
+		<input type="checkbox" id="log-toggle">
 		<div id="log"></div>
 		<script>
 			window.onerror = function(message, source, lineno, colno, error) {
@@ -201,6 +223,7 @@
 				}
 			};
 			function log (obj) {
+				console.log(obj)
 				let message = stringify(obj)
 				if (message.slice(0, 1) == '"') message = obj
 				let el = document.createElement('pre')
@@ -210,20 +233,23 @@
 				// logobj.scrollIntoView()
 			}
 			function catcher(err, supress) {
+				console.log(`${err.message}\n${err.stack}`)
 				log(`${err.message}\n${err.stack}`)
+				console.log(err)
 				log(err)
 				if (!supress) throw(err)
 			}
 			document.querySelector('#log').addEventListener('click', () => {document.querySelector('#log').prepend('tap')})
 			async function load(src, loader) {
-				try {
+				return await loader(src)
+				// try {
 					let t = Date.now()
 					let s = `${src}?t=${t}`
 					await loader(s)
 					return s
-				} catch (err) {
-					catcher(err)
-				}
+				// } catch (err) {
+				// 	catcher(err)
+				// }
 			}
 			async function loadjs(src) {
 				return await load(src, scriptloader)
@@ -255,12 +281,13 @@
 					document.head.append(script);
 				})
 			}
-			try {
+			// try {
 				loadcss('history.css')
 				loadjs('history.js')
-			} catch (err) {
-				catcher(err)
-			}
+			// } catch (err) {
+			// 	catcher(err)
+			// }
 		</script>
+		<!-- <script src="history.js"></script> -->
 	</body>
 </html>
